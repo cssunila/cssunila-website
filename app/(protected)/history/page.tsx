@@ -77,6 +77,8 @@ const HistoryPage = () => {
   const qc = useQueryClient();
   const [payingId, setPayingId] = useState<string | null>(null);
   const suparef = useRef(createClient());
+  const [rows, setRows] = useState<Row[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { role, loading, user } = useAuth();
   const router = useRouter();
 
@@ -96,12 +98,13 @@ const HistoryPage = () => {
     document.head.appendChild(s);
   }, []);
 
-  const { data: rows, isLoading } = useQuery({
-    queryKey: ["my-registrations"],
-    queryFn: async (): Promise<Row[]> => {
+  useEffect(() => {
+    (async () => {
+      if (!user) return;
+
       const supabase = suparef.current;
-      
-      if (!user) return [];
+      setIsLoading(true);
+
       const { data, error } = await supabase
         .from("registrations")
         .select(
@@ -110,11 +113,16 @@ const HistoryPage = () => {
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        setIsLoading(false);
+        setRows([]);
+        return;
+      }
 
-      return (data ?? []) as unknown as Row[];
-    },
-  });
+      setRows((data ?? []) as unknown as Row[])
+      setIsLoading(false);
+    })()
+  }, [user]);
 
   const pay = useMutation({
     mutationFn: async (registrationId: string) => {

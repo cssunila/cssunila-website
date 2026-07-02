@@ -121,7 +121,7 @@ const CompetitionEditor = ({
         </div>
 
         <label className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/2 p-3 text-sm">
-          <input type="checkbox" className="appearance-none size-3 rounded-2xl border-none bg-white/20 checked:bg-primary" checked={!!value.is_open} onChange={(e) => onChange({ ...value, is_open: e.target.checked })} />
+          <input type="checkbox" className="appearance-none shrink-0 size-3 rounded-2xl border-none bg-white/20 checked:bg-primary" checked={!!value.is_open} onChange={(e) => onChange({ ...value, is_open: e.target.checked })} />
           <span>
             <strong>Pendaftaran dibuka</strong>
             <span className="ml-2 text-xs text-muted-foreground">Jika dimatikan, peserta melihat pesan &quot;pendaftaran ditutup&quot;.</span>
