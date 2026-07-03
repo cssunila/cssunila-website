@@ -60,7 +60,7 @@ const Seminars = () => {
                         <Link
                             key={s.slug}
                             href={`/seminar/${s.slug}`}
-                            className="glass group relative overflow-hidden rounded-3xl p-6 transition hover:-translate-y-1 block"
+                            className="glass group relative overflow-hidden rounded-3xl p-6 transition hover:-translate-y-1 hover:border-white/20 block"
                         >
                             <div className="glass flex size-12 items-center justify-center rounded-2xl group-hover:bg-cyan-strong/10 transition-colors">
                                 <Mic size={20} className="text-cyan-strong" />

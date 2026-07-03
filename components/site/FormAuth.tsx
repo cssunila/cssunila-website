@@ -183,7 +183,7 @@ const FormAuth = () => {
                     <>
                         <Field icon={Lock} placeholder="Confirm Password" type="password" value={confirmPassword} onChange={setConfirmPassword} required />
                         <label htmlFor="agree" className="flex items-start gap-3 my-2">
-                            <input onChange={(e) => setAgree(e.target.checked)} checked={agree} type="checkbox" id="agree" className="appearance-none shrink-0 w-5 h-5 checked:bg-secondary rounded-md border" />
+                            <input onChange={(e) => setAgree(e.target.checked)} checked={agree} type="checkbox" id="agree" className="appearance-none mt-1 shrink-0 w-5 h-5 checked:bg-secondary rounded-md border" />
                             <span className="text-sm text-muted-foreground">Dengan mendaftar, saya menyetujui <Link href="terms" target="_blank" className="text-secondary font-semibold">Syarat & Ketentuan</Link> dan <Link href="privacy" target="_blank" className="text-secondary font-semibold">Kebijakan Privasi</Link></span>
                         </label>
                     </>

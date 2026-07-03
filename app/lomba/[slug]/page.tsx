@@ -117,7 +117,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                     <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {[
                             { icon: Wallet, label: "Biaya", value: `Rp ${c.fee_idr.toLocaleString("id-ID")}` },
-                            { icon: Users, label: "Kuota", value: `${c.quota} tim` },
+                            { icon: Users, label: "Kuota", value: `${c.quota > 0 ? c.quota+' tim' : 'Tidak ada batasan'}` },
                             { icon: Users, label: "Tim", value: c.team_size ?? "-" },
                             { icon: Trophy, label: "Hadiah", value: c.prize ?? "-" },
                         ].map((s) => (

@@ -51,9 +51,9 @@ const About = ({ title, description1, description2, highlights, logo }: AboutPro
             {aboutHighlights.map((f) => (
               <li
                 key={f}
-                className="glass flex items-center gap-2 rounded-xl px-3 py-2.5"
+                className="glass flex items-stretch gap-2 rounded-xl px-3 py-2.5"
               >
-                <span className="size-1.5 shrink-0 rounded-full bg-cyan-strong shadow-[0_0_10px_var(--cyan-strong)]" />
+                <span className="size-1.5 mt-1 border-2 shrink-0 rounded-full bg-cyan-strong shadow-[0_0_10px_var(--cyan-strong)]" />
                 {f}
               </li>
             ))}

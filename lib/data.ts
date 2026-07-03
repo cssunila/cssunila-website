@@ -121,9 +121,9 @@ export const competitions: Competition[] = [
 ];
 
 export const eventTimeline = [
-  { date: "25 Oktober 2026", label: "Pembukaan", status: "upcoming", description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam dolore suscipit sunt cum quas. Fuga tenetur repudiandae at beatae sit. Distinctio doloribus laborum voluptate ipsa repudiandae voluptates aut itaque optio." },
-  { date: "25 Oktober - 02 November 2026", label: "Pelaksanaan Lomba", status: "upcoming", description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam dolore suscipit sunt cum quas. Fuga tenetur repudiandae at beatae sit. Distinctio doloribus laborum voluptate ipsa repudiandae voluptates aut itaque optio." },
-  { date: "08 November 2026", label: "Penutupan", status: "upcoming", description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam dolore suscipit sunt cum quas. Fuga tenetur repudiandae at beatae sit. Distinctio doloribus laborum voluptate ipsa repudiandae voluptates aut itaque optio." },
+  { start_date: "2026-07-03 11:40:00+00", end_date: "2026-07-08 11:40:00+00", label: "Pembukaan", status: "upcoming", description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam dolore suscipit sunt cum quas. Fuga tenetur repudiandae at beatae sit. Distinctio doloribus laborum voluptate ipsa repudiandae voluptates aut itaque optio." },
+  { start_date: "2026-07-09 11:40:00+00", end_date: "2026-07-11 11:40:00+00", label: "Pelaksanaan Lomba", status: "upcoming", description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam dolore suscipit sunt cum quas. Fuga tenetur repudiandae at beatae sit. Distinctio doloribus laborum voluptate ipsa repudiandae voluptates aut itaque optio." },
+  { start_date: "2026-07-12 11:40:00+00", end_date: null, label: "Penutupan", status: "upcoming", description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam dolore suscipit sunt cum quas. Fuga tenetur repudiandae at beatae sit. Distinctio doloribus laborum voluptate ipsa repudiandae voluptates aut itaque optio." },
 ] as const;
 
 export const news = [

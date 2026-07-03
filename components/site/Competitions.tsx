@@ -74,8 +74,8 @@ const Competitions = () => {
                                 <div
                                     className={`pointer-events-none absolute -top-20 -right-20 size-56 rounded-full bg-linear-to-br blur-3xl transition group-hover:scale-110 ${accentGlow[accent] ?? accentGlow.cyan}`}
                                 />
-                                <div className="flex items-center justify-between">
-                                    <div className="glass flex size-12 items-center justify-center rounded-2xl">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="glass group-hover:bg-cyan-strong/10 transition-colors shrink-0 flex size-12 items-center justify-center rounded-2xl">
                                         <Icon size={22} className="text-cyan-strong" />
                                     </div>
                                     {c.is_open ? (
@@ -88,7 +88,7 @@ const Competitions = () => {
                                         </span>
                                     )}
                                 </div>
-                                <h3 className="mt-5 font-display text-xl font-semibold">{c.name}</h3>
+                                <h3 className="mt-5 group-hover:text-cyan-strong transition-colors font-display text-xl font-semibold">{c.name}</h3>
                                 <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
                                     {c.description}
                                 </p>
@@ -107,7 +107,7 @@ const Competitions = () => {
 
                                 <Link
                                     href={`/lomba/${c.slug}`}
-                                    className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-strong transition hover:gap-2.5"
+                                    className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground group-hover:text-cyan-strong transition hover:gap-2.5"
                                 >
                                     Lihat Detail <ArrowUpRight size={14} />
                                 </Link>

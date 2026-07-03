@@ -108,7 +108,10 @@ const CompetitionsTab = () => {
           <div key={c.id} className="glass flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4">
             <div>
               <p className="font-display font-semibold">{c.name}</p>
-              <p className="text-xs text-muted-foreground">/{c.slug} · Rp {c.fee_idr.toLocaleString("id-ID")} · kuota {c.quota} · <span className={c.is_open ? "text-emerald-300" : "text-amber-300"}>{c.is_open ? "buka" : "tutup"}</span></p>
+              <p className="text-xs text-muted-foreground"><span className="text-cyan-strong font-semibold">Slug:</span> /{c.slug}</p>
+              <p className="text-xs text-muted-foreground"><span className="text-cyan-strong font-semibold">Harga:</span> Rp. {c.fee_idr.toLocaleString("id-ID")}</p>
+              <p className="text-xs text-muted-foreground"><span className="text-cyan-strong font-semibold">Kuota:</span> {c.quota > 0 ? c.quota+' tim' : 'Tidak ada batasan'}</p>
+              <p className="text-xs text-muted-foreground"><span className="text-cyan-strong font-semibold">Status:</span> <span className={c.is_open ? "text-emerald-300" : "text-amber-300"}>{c.is_open ? "buka" : "tutup"}</span></p>
             </div>
             <div className="flex gap-2">
               <button onClick={() => setManagingFields({ id: c.id, name: c.name })} title="Atur input form pendaftaran" className="rounded-full cursor-pointer text-primary bg-primary/25 p-2 hover:bg-primary/50"><Settings2 size={14} /></button>

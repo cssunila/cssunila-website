@@ -274,21 +274,21 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
                                     </Field>
                                 ))}
 
+                                <label htmlFor="agree"
+                                    className="flex items-start gap-3 cursor-pointer"
+                                >
+                                    <input type="checkbox" id="agree" className="appearance-none mt-1 shrink-0 checked:bg-secondary size-3.5 bg-muted-foreground rounded-lg border-none" required onChange={(e)=> setAggre(e.target.checked)}/>
+                                    <span className="text-sm text-muted-foreground">
+                                        Saya menyetujui bahwa semua informasi yang saya berikan adalah benar dan akurat.
+                                    </span>
+                                </label>
+
                                 <div className="rounded-xl border border-white/10 bg-white/2 p-4 text-xs text-muted-foreground">
                                     <p className="flex items-start gap-2">
                                         <ShieldCheck size={14} className="mt-0.5 shrink-0 text-cyan-strong" />
                                         Setelah pengiriman, kamu akan diarahkan ke halaman riwayat untuk menyelesaikan pembayaran.
                                     </p>
                                 </div>
-
-                                <label htmlFor="agree"
-                                    className="flex items-center gap-4 cursor-pointer"
-                                >
-                                    <input type="checkbox" id="agree" className="appearance-none shrink-0 checked:bg-secondary size-4 bg-muted-foreground rounded-lg border-none" required onChange={(e)=> setAggre(e.target.checked)}/>
-                                    <span className="text-sm text-muted-foreground">
-                                        Saya menyetujui bahwa semua informasi yang saya berikan adalah benar dan akurat.
-                                    </span>
-                                </label>
 
                                 <button
                                     type="submit"

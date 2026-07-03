@@ -65,7 +65,7 @@ const News = () => {
                         <Link
                             key={n.slug}
                             href={`/berita/${n.slug}`}
-                            className="glass group relative flex h-full flex-col overflow-hidden rounded-3xl p-6 transition hover:-translate-y-1"
+                            className="glass group relative flex h-full flex-col overflow-hidden rounded-3xl p-6 transition hover:-translate-y-1 hover:border-white/20"
                         >
                             {n.image_url && (
                                 <Image src={n.image_url} alt={n.title} className="mb-4 h-40 w-full rounded-2xl object-cover" loading="lazy" />

@@ -26,7 +26,8 @@ type SiteSetting = {
 
 type TimelineItem = {
   id: string;
-  date: string;
+  start_date: string | null;
+  end_date: string | null;
   label: string;
   description: string;
   position: number;
@@ -112,7 +113,8 @@ const SiteSettingsTab = () => {
     mutationFn: async (v: Partial<TimelineItem>) => {
       const supabase = suparef.current;
       const payload = {
-        date: v.date!,
+        start_date: v.start_date || null,
+        end_date: v.end_date || null,
         label: v.label!,
         description: v.description ?? "",
         position: v.position ?? (timelineData?.length ?? 0) + 1,
@@ -237,11 +239,20 @@ const SiteSettingsTab = () => {
     saveSettings.mutate(final);
   };
 
+  const formatTanggal = (date: string) => {
+    return new Intl.DateTimeFormat("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "Asia/Jakarta",
+    }).format(new Date(date));
+  };
+
   return (
     <div className="space-y-8">
       <div className="glass rounded-3xl p-6 space-y-5">
         <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-cyan-strong/10">
+          <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-cyan-strong/10">
             <Globe size={16} className="text-cyan-strong" />
           </div>
           <div>
@@ -310,7 +321,7 @@ const SiteSettingsTab = () => {
 
       <div className="glass rounded-3xl p-6 space-y-5">
         <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-cyan-strong/10">
+          <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-cyan-strong/10">
             <LayoutTemplate size={16} className="text-cyan-strong" />
           </div>
           <div>
@@ -350,7 +361,7 @@ const SiteSettingsTab = () => {
 
       <div className="glass rounded-3xl p-6 space-y-5">
         <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-sapphire/10">
+          <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-sapphire/10">
             <LayoutTemplate size={16} className="text-sapphire" />
           </div>
           <div>
@@ -466,7 +477,7 @@ const SiteSettingsTab = () => {
       <div className="space-y-5">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-500/10">
+            <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-emerald-500/10">
               <Calendar size={16} className="text-emerald-400" />
             </div>
             <div>
@@ -475,7 +486,7 @@ const SiteSettingsTab = () => {
             </div>
           </div>
           <button
-            onClick={() => setEditingTimeline({ date: "", label: "", description: "", position: (timelineData?.length ?? 0) + 1 })}
+            onClick={() => setEditingTimeline({ start_date: "", end_date: "", label: "", description: "", position: (timelineData?.length ?? 0) + 1 })}
             className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/25 cursor-pointer transition"
           >
             <Plus size={14} /> Tambah Item
@@ -522,7 +533,7 @@ const SiteSettingsTab = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-cyan-strong glass px-2.5 py-1 rounded-lg shrink-0">
-                        {item.date}
+                        {`${item.start_date ? formatTanggal(item.start_date) : ""}${item.end_date ? ' - ' + formatTanggal(item.end_date) : ""}`}
                       </span>
                       <span className="font-display font-semibold text-sm text-foreground">
                         {item.label}
@@ -583,15 +594,29 @@ const SiteSettingsTab = () => {
               </button>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground after:content-['*'] after:ml-1 after:text-red-500">Tanggal / Periode</label>
-              <input
-                className="inputCls"
-                required
-                placeholder="Misal: 25 Oktober 2026 atau 25 Okt - 02 Nov 2026"
-                value={editingTimeline.date ?? ""}
-                onChange={(e) => setEditingTimeline((prev) => ({ ...prev, date: e.target.value }))}
-              />
+            <div className="space-y-2">
+              <label className="text-xs text-muted-foreground">Tanggal / Periode</label>
+              <div className="flex mt-1 p-2 px-3 glass rounded-2xl items-center gap-3 justify-between">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground after:content-['*'] after:ml-1 after:text-red-500">Start</label>
+                  <input
+                    className="inputCls"
+                    type="datetime-local"
+                    required
+                    value={editingTimeline.start_date ? editingTimeline.start_date.slice(0, 16) : ""}
+                    onChange={(e) => setEditingTimeline((prev) => ({ ...prev, start_date: e.target.value ? new Date(e.target.value).toISOString() : null }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">End (Opsional)</label>
+                  <input
+                    className="inputCls"
+                    type="datetime-local"
+                    value={editingTimeline.end_date ? editingTimeline.end_date.slice(0, 16) : ""}
+                    onChange={(e) => setEditingTimeline((prev) => ({ ...prev, end_date: e.target.value ? new Date(e.target.value).toISOString() : null }))}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="space-y-1">

@@ -21,7 +21,7 @@ export default async function Home() {
   let aboutDesc2: string | undefined;
   let aboutHighlights: string[] | undefined;
   let siteLogo: string | undefined;
-  let timelineItems: { date: string; label: string; description: string }[] | undefined;
+  let timelineItems: { start_date: string; end_date: string; label: string; description: string }[] | undefined;
 
   try {
     const supabase = await createClient();
@@ -69,7 +69,7 @@ export default async function Home() {
 
     const { data: tlItems } = await supabase
       .from("timeline_items")
-      .select("date, label, description")
+      .select("start_date, end_date, label, description")
       .order("position", { ascending: true });
 
     if (tlItems && tlItems.length > 0) {
