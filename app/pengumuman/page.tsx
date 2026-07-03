@@ -3,6 +3,16 @@ import { ArrowLeft, Trophy, Medal, Star, Gift, Users } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Pengumuman Juara | CSS 3.0",
+  description: "Pengumuman juara lomba CSS 3.0",
+  openGraph: {
+    title: "Pengumuman Juara | CSS 3.0",
+    description: "Pengumuman juara lomba CSS 3.0",
+  }
+}
 
 type WinnerItem = {
   id: string;
@@ -39,8 +49,7 @@ export default async function PengumumanPage() {
 
     if (error) throw error;
     winners = (data ?? []) as unknown as WinnerItem[];
-  } catch (err) {
-    console.error("Failed to load winners:", err);
+  } catch {
     errorMsg = "Gagal memuat data pengumuman juara.";
   }
 

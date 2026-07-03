@@ -2,9 +2,19 @@ import { createClient } from "@/supabase/server";
 import { ArrowLeft, Calendar, FolderOpen, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
+import NotFound from "@/components/site/NotFound";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Berita | CSS 3.0",
+  description: "Berita terbaru CSS 3.0",
+  openGraph: {
+    title: "Berita | CSS 3.0",
+    description: "Berita terbaru CSS 3.0",
+  }
+}
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -34,13 +44,9 @@ export default async function NewsDetailPage({ params }: Props) {
       .maybeSingle();
 
     news = data as NewsItem | null;
-  } catch (error) {
-    console.error("Failed to fetch news detail:", error);
-  }
+  } catch { }
 
-  if (!news) {
-    notFound();
-  }
+  if (!news) return <NotFound />;
 
   let galleryImages: string[] = [];
   if (news.gallery) {

@@ -7,6 +7,7 @@ import { Mail, Lock, User as UserIcon, Loader2, Eye, EyeClosed } from "lucide-re
 import { Metadata } from "next";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/supabase/client";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "Masuk / Daftar — CSS 3.0",
@@ -64,6 +65,7 @@ const FormAuth = () => {
     const [loading, setLoading] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState("");
     const [googleLoading, setGoogleLoading] = useState(false);
+    const [agree, setAgree] = useState<boolean>(false);
     const suparef = useRef(createClient());
 
     useEffect(() => {
@@ -90,6 +92,11 @@ const FormAuth = () => {
 
             const supabase = suparef.current;
             if (mode === "register") {
+                if(!agree) {
+                    toast.error("Anda harus menyetujui syarat dan ketentuan");
+                    return;
+                }
+
                 const isSame = password === confirmPassword;
                 if (!isSame) {
                     toast.error("Password tidak sama");
@@ -173,7 +180,13 @@ const FormAuth = () => {
                 <Field icon={Mail} placeholder="Email" type="email" value={email} onChange={setEmail} required />
                 <Field icon={Lock} placeholder="Password" type="password" value={password} onChange={setPassword} required />
                 {mode === "register" && (
-                    <Field icon={Lock} placeholder="Confirm Password" type="password" value={confirmPassword} onChange={setConfirmPassword} required />
+                    <>
+                        <Field icon={Lock} placeholder="Confirm Password" type="password" value={confirmPassword} onChange={setConfirmPassword} required />
+                        <label htmlFor="agree" className="flex items-start gap-3 my-2">
+                            <input onChange={(e) => setAgree(e.target.checked)} checked={agree} type="checkbox" id="agree" className="appearance-none shrink-0 w-5 h-5 checked:bg-secondary rounded-md border" />
+                            <span className="text-sm text-muted-foreground">Dengan mendaftar, saya menyetujui <Link href="terms" target="_blank" className="text-secondary font-semibold">Syarat & Ketentuan</Link> dan <Link href="privacy" target="_blank" className="text-secondary font-semibold">Kebijakan Privasi</Link></span>
+                        </label>
+                    </>
                 )}
 
                 <button

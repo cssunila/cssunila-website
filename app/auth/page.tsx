@@ -8,6 +8,10 @@ import { createClient } from "@/supabase/server";
 export const metadata: Metadata = {
     title: "Masuk / Daftar",
     description: "Masuk atau daftar akun untuk mendaftar lomba",
+    openGraph: {
+      title: "Masuk / Daftar",
+      description: "Masuk atau daftar akun untuk mendaftar lomba",
+    }
 };
 
 const AuthPage = async () => {
@@ -48,7 +52,7 @@ const AuthPage = async () => {
                         <Image src={logo} width={80} height={80} alt={`${titleMain} ${titleSub}`} className="h-8 w-auto" />
                         <div>
                             <p className="font-display text-lg font-bold">
-                                {titleMain}<span className="gradient-text">{titleSub}</span>
+                                {titleMain} <span className="gradient-text">{titleSub}</span>
                             </p>
                             <p className="text-xs text-muted-foreground">Computer Science Showdown</p>
                         </div>

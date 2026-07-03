@@ -5,6 +5,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Seminar | CSS 3.0",
+  description: "Seminar terbaru CSS 3.0",
+  openGraph: {
+    title: "Seminar | CSS 3.0",
+    description: "Seminar terbaru CSS 3.0",
+  }
+}
 
 type Props = {
   params: Promise<{ slug: string }>;

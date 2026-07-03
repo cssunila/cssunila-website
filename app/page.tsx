@@ -21,7 +21,6 @@ export default async function Home() {
   let aboutDesc2: string | undefined;
   let aboutHighlights: string[] | undefined;
   let siteLogo: string | undefined;
-
   let timelineItems: { date: string; label: string; description: string }[] | undefined;
 
   try {
@@ -64,7 +63,7 @@ export default async function Home() {
         try {
           const parsed = JSON.parse(map["about_highlights"]);
           if (Array.isArray(parsed)) aboutHighlights = parsed;
-        } catch { /* ignore */ }
+        } catch { }
       }
     }
 
@@ -76,9 +75,7 @@ export default async function Home() {
     if (tlItems && tlItems.length > 0) {
       timelineItems = tlItems;
     }
-  } catch (e) {
-    console.error("Failed to load dynamic data:", e);
-  }
+  } catch { }
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
