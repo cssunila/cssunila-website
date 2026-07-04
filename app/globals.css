@@ -67,7 +67,7 @@
   --popover: oklch(0.18 0.05 275);
   --popover-foreground: oklch(0.97 0.02 180);
 
-  --primary: oklch(0.72 0.14 200); 
+  --primary: oklch(0.72 0.14 200);
   --primary-foreground: oklch(0.12 0.05 270);
   --secondary: oklch(0.52 0.3 274); /* sapphire */
   --secondary-foreground: oklch(0.98 0.02 180);
@@ -152,12 +152,12 @@
   }
 }
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
   width: 2px;
   height: 2px;
 }
 
-::-webkit-scrollbar-thumb{
+::-webkit-scrollbar-thumb {
   background: var(--color-primary);
   border-radius: 2px;
 }
@@ -165,7 +165,7 @@
 @utility glass {
   background: oklch(0.97 0.02 180 / 0.04);
   backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid oklch(0.97 0.02 180 / 0.10);
+  border: 1px solid oklch(0.97 0.02 180 / 0.1);
   box-shadow: var(--shadow-card);
 }
 
@@ -186,14 +186,16 @@
   background: var(--gradient-cta);
   color: oklch(0.12 0.05 270);
   box-shadow: var(--shadow-glow);
-  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
 }
 
 @utility btn-hero-hover {
   transform: translateY(-1px);
   filter: brightness(1.08);
 }
-
 
 @utility inputCls {
   @apply w-full rounded-xl border border-white/10 bg-white/3 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-cyan-strong/60 focus:outline-none focus:ring-2 focus:ring-cyan-strong/20;
@@ -204,8 +206,218 @@
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translate3d(0,0,0); }
-  50% { transform: translate3d(0, -14px, 0); }
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0);
+  }
 }
 
-.animate-float { animation: float-slow 7s ease-in-out infinite; }
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: confirmFadeIn 0.18s ease;
+}
+
+@keyframes confirmFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.confirm-modal-box {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(
+    135deg,
+    rgba(20, 20, 35, 0.97) 0%,
+    rgba(12, 12, 25, 0.99) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  padding: 2rem 1.75rem 1.75rem;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 32px 64px rgba(0, 0, 0, 0.6),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+  animation: confirmSlideUp 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+}
+
+@keyframes confirmSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.confirm-modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+}
+
+.confirm-icon-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: rgb(239, 68, 68);
+  box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.06);
+}
+
+.confirm-icon-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: rgb(245, 158, 11);
+  box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.06);
+}
+
+.confirm-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.confirm-modal-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.confirm-modal-content {
+  width: 100%;
+  margin-bottom: 1.75rem;
+}
+
+.confirm-modal-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.confirm-modal-message {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.confirm-btn-cancel {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.confirm-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.confirm-btn-confirm {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.625rem 1rem;
+  border-radius: 0.875rem;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.confirm-btn-danger {
+  background: linear-gradient(135deg, rgb(220, 38, 38), rgb(185, 28, 28));
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+}
+
+.confirm-btn-danger:hover {
+  background: linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38));
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+  transform: translateY(-1px);
+}
+
+.confirm-btn-warning {
+  background: linear-gradient(135deg, rgb(217, 119, 6), rgb(180, 83, 9));
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+}
+
+.confirm-btn-warning:hover {
+  background: linear-gradient(135deg, rgb(245, 158, 11), rgb(217, 119, 6));
+  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.5);
+  transform: translateY(-1px);
+}
+
+.confirm-btn-confirm:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+  .confirm-modal-box {
+    padding: 1.5rem 1.25rem 1.25rem;
+    border-radius: 1.25rem;
+  }
+
+  .confirm-modal-actions {
+    flex-direction: column-reverse;
+  }
+}
+
+.animate-float {
+  animation: float-slow 7s ease-in-out infinite;
+}

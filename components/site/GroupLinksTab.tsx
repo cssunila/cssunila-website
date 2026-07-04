@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import QR from "qrcode";
+import { useAuth } from "@/hooks/use-auth";
 
 
 type GroupComp = {
@@ -18,20 +19,44 @@ type GroupComp = {
 
 const GroupLinksTab = () => {
   const qc = useQueryClient();
+  const { role, user } = useAuth();
   const suparef = useRef(createClient());
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin-groups"],
-    queryFn: async (): Promise<GroupComp[]> => {
+  const { data: allowedComps } = useQuery({
+    queryKey: ["user-allowed-comps", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
       const supabase = suparef.current;
       const { data, error } = await supabase
-        .from("competitions")
-        .select("id, name, slug, group_links(link_url, qr_url)")
-        .order("position");
+        .from("user_competitions")
+        .select("competition_id")
+        .eq("user_id", user.id);
       if (error) throw error;
-      console.log(data);
-      return (data ?? []) as unknown as GroupComp[];
+      return (data ?? []).map((c) => c.competition_id);
     },
+    enabled: !!user,
+  });
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-groups", role, allowedComps],
+    queryFn: async (): Promise<GroupComp[]> => {
+      const supabase = suparef.current;
+      let query = supabase
+        .from("competitions")
+        .select("id, name, slug, group_links(link_url, qr_url)");
+
+      if (role === "lomba") {
+        if (!allowedComps || allowedComps.length === 0) {
+          return [];
+        }
+        query = query.in("id", allowedComps);
+      }
+
+      const { data: list, error } = await query.order("position");
+      if (error) throw error;
+      return (list ?? []) as unknown as GroupComp[];
+    },
+    enabled: role !== null,
   });
 
   const save = useMutation({

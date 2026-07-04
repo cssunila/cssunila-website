@@ -5,8 +5,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Settings2, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
 import CompetitionEditor from "./CompetitionEditor";
 import FieldManager from "./FieldManager";
+import ConfirmModal from "./ConfirmModal";
 
 type CompRow = {
   id: string;
@@ -31,25 +33,51 @@ type CompFull = CompRow & {
 
 const CompetitionsTab = () => {
   const qc = useQueryClient();
+  const { role, user } = useAuth();
   const [editing, setEditing] = useState<Partial<CompFull> | null>(null);
   const [managingFields, setManagingFields] = useState<{ id: string; name: string } | null>(null);
   const suparef = useRef(createClient());
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin-comps"],
-    queryFn: async (): Promise<CompFull[]> => {
+  const { data: allowedComps } = useQuery({
+    queryKey: ["user-allowed-comps", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
       const supabase = suparef.current;
       const { data, error } = await supabase
-        .from("competitions")
-        .select("id,slug,name,tagline,fee_idr,quota,is_open,position,description,icon,accent,team_size,prize,rules,timeline")
-        .order("position");
+        .from("user_competitions")
+        .select("competition_id")
+        .eq("user_id", user.id);
       if (error) throw error;
-      return (data ?? []).map((c) => ({
+      return (data ?? []).map((c) => c.competition_id);
+    },
+    enabled: !!user,
+  });
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-comps", role, allowedComps],
+    queryFn: async (): Promise<CompFull[]> => {
+      const supabase = suparef.current;
+      let query = supabase
+        .from("competitions")
+        .select("id,slug,name,tagline,fee_idr,quota,is_open,position,description,icon,accent,team_size,prize,rules,timeline");
+
+      if (role === "lomba") {
+        if (!allowedComps || allowedComps.length === 0) {
+          return [];
+        }
+        query = query.in("id", allowedComps);
+      }
+
+      const { data: list, error } = await query.order("position");
+      if (error) throw error;
+      return (list ?? []).map((c) => ({
         ...c,
         rules: Array.isArray(c.rules) ? (c.rules as string[]) : [],
         timeline: Array.isArray(c.timeline) ? (c.timeline as { date: string; label: string }[]) : [],
       })) as CompFull[];
     },
+    enabled: role !== null,
   });
 
   const save = useMutation({
@@ -97,11 +125,13 @@ const CompetitionsTab = () => {
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
-        <button onClick={() => setEditing({ is_open: true, position: (data?.length ?? 0) + 1, accent: "cyan", icon: "Trophy", rules: [], timeline: [] })} className="btn-hero inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold">
-          <Plus size={14} /> Lomba baru
-        </button>
-      </div>
+      {role !== "lomba" && (
+        <div className="mb-4 flex justify-end">
+          <button onClick={() => setEditing({ is_open: true, position: (data?.length ?? 0) + 1, accent: "cyan", icon: "Trophy", rules: [], timeline: [] })} className="btn-hero cursor-pointer inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold">
+            <Plus size={14} /> Lomba baru
+          </button>
+        </div>
+      )}
       {isLoading && <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground">Memuat…</div>}
       <div className="space-y-2">
         {data?.map((c) => (
@@ -116,7 +146,9 @@ const CompetitionsTab = () => {
             <div className="flex gap-2">
               <button onClick={() => setManagingFields({ id: c.id, name: c.name })} title="Atur input form pendaftaran" className="rounded-full cursor-pointer text-primary bg-primary/25 p-2 hover:bg-primary/50"><Settings2 size={14} /></button>
               <button onClick={() => setEditing(c)} className="rounded-full cursor-pointer text-amber-500 bg-amber-500/15 p-2 hover:bg-amber-500/30"><Pencil size={14} /></button>
-              <button onClick={() => confirm(`Hapus ${c.name}?`) && del.mutate(c.id)} className="rounded-full cursor-pointer bg-destructive/15 p-2 text-destructive hover:bg-destructive/25"><Trash2 size={14} /></button>
+              {role !== "lomba" && (
+                <button onClick={() => setConfirmDelete({ id: c.id, name: c.name })} className="rounded-full cursor-pointer bg-destructive/15 p-2 text-destructive hover:bg-destructive/25"><Trash2 size={14} /></button>
+              )}
             </div>
           </div>
         ))}
@@ -135,6 +167,15 @@ const CompetitionsTab = () => {
       {managingFields && (
         <FieldManager comp={managingFields} onClose={() => setManagingFields(null)} />
       )}
+
+      <ConfirmModal
+        open={!!confirmDelete}
+        title="Hapus Lomba"
+        message={`Apakah kamu yakin ingin menghapus lomba "${confirmDelete?.name}"?`}
+        confirmLabel="Ya, Hapus"
+        onConfirm={() => { if (confirmDelete) del.mutate(confirmDelete.id); setConfirmDelete(null); }}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

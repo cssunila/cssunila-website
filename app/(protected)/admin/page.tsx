@@ -13,6 +13,7 @@ import SeminarsTab from "@/components/site/SeminarsTab";
 import GroupLinksTab from "@/components/site/GroupLinksTab";
 import WinnersTab from "@/components/site/WinnersTab";
 import SiteSettingsTab from "@/components/site/SiteSettingsTab";
+import UsersTab from "@/components/site/UsersTab";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -20,17 +21,17 @@ import { useRouter } from "next/navigation";
 const AdminPage = () => {
   const { role, loading, user } = useAuth();
   const router = useRouter();
-  const isAdmin = role === "admin";
+  const isAllowed = role === "admin" || role === "lomba" || role === "petugas";
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
         router.replace("/auth");
-      } else if (!isAdmin) {
+      } else if (!isAllowed) {
         router.replace("/");
       }
     }
-  }, [loading, user, isAdmin, router]);
+  }, [loading, user, isAllowed, router]);
 
   if (loading) {
     return (
@@ -42,9 +43,11 @@ const AdminPage = () => {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAllowed) {
     return null;
   }
+
+  const defaultTab = role === "petugas" ? "news" : "reg";
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -58,23 +61,25 @@ const AdminPage = () => {
             <span className="gradient-text">Admin</span> Dashboard
           </h1>
 
-          <Tabs defaultValue="reg" className="mt-10">
+          <Tabs key={role} defaultValue={defaultTab} className="mt-10">
             <TabsList className="glass px-1 py-5 w-full md:w-fit pl-16 md:pl-1 overflow-y-hidden overflow-x-auto">
-              <TabsTrigger value="reg" className="p-4 cursor-pointer">Pendaftaran</TabsTrigger>
-              <TabsTrigger value="comp" className="p-4 cursor-pointer">Lomba</TabsTrigger>
-              <TabsTrigger value="news" className="p-4 cursor-pointer">Berita</TabsTrigger>
-              <TabsTrigger value="sem" className="p-4 cursor-pointer">Seminar</TabsTrigger>
-              <TabsTrigger value="groups" className="p-4 cursor-pointer">Grup</TabsTrigger>
-              <TabsTrigger value="winners" className="p-4 cursor-pointer">Juara</TabsTrigger>
-              <TabsTrigger value="website" className="p-4 cursor-pointer">Website</TabsTrigger>
+              {(role === "admin" || role === "lomba") && <TabsTrigger value="reg" className="p-4 cursor-pointer">Pendaftaran</TabsTrigger>}
+              {(role === "admin" || role === "lomba") && <TabsTrigger value="comp" className="p-4 cursor-pointer">Lomba</TabsTrigger>}
+              {(role === "admin" || role === "petugas") && <TabsTrigger value="news" className="p-4 cursor-pointer">Berita</TabsTrigger>}
+              {(role === "admin" || role === "petugas") && <TabsTrigger value="sem" className="p-4 cursor-pointer">Seminar</TabsTrigger>}
+              {(role === "admin" || role === "lomba") && <TabsTrigger value="groups" className="p-4 cursor-pointer">Grup</TabsTrigger>}
+              {(role === "admin" || role === "lomba") && <TabsTrigger value="winners" className="p-4 cursor-pointer">Juara</TabsTrigger>}
+              {role === "admin" && <TabsTrigger value="website" className="p-4 cursor-pointer">Website</TabsTrigger>}
+              {role === "admin" && <TabsTrigger value="users" className="p-4 cursor-pointer">Pengguna</TabsTrigger>}
             </TabsList>
-            <TabsContent value="reg" className="mt-6"><RegistrationsTab /></TabsContent>
-            <TabsContent value="comp" className="mt-6"><CompetitionsTab /></TabsContent>
-            <TabsContent value="news" className="mt-6"><NewsTab /></TabsContent>
-            <TabsContent value="sem" className="mt-6"><SeminarsTab /></TabsContent>
-            <TabsContent value="groups" className="mt-6"><GroupLinksTab /></TabsContent>
-            <TabsContent value="winners" className="mt-6"><WinnersTab /></TabsContent>
-            <TabsContent value="website" className="mt-6"><SiteSettingsTab /></TabsContent>
+            {(role === "admin" || role === "lomba") && <TabsContent value="reg" className="mt-6"><RegistrationsTab /></TabsContent>}
+            {(role === "admin" || role === "lomba") && <TabsContent value="comp" className="mt-6"><CompetitionsTab /></TabsContent>}
+            {(role === "admin" || role === "petugas") && <TabsContent value="news" className="mt-6"><NewsTab /></TabsContent>}
+            {(role === "admin" || role === "petugas") && <TabsContent value="sem" className="mt-6"><SeminarsTab /></TabsContent>}
+            {(role === "admin" || role === "lomba") && <TabsContent value="groups" className="mt-6"><GroupLinksTab /></TabsContent>}
+            {(role === "admin" || role === "lomba") && <TabsContent value="winners" className="mt-6"><WinnersTab /></TabsContent>}
+            {role === "admin" && <TabsContent value="website" className="mt-6"><SiteSettingsTab /></TabsContent>}
+            {role === "admin" && <TabsContent value="users" className="mt-6"><UsersTab /></TabsContent>}
           </Tabs>
         </div>
       </section>

@@ -613,3 +613,31 @@ INSERT INTO public.timeline_items (date, label, description, position) VALUES
   ('25 Oktober - 02 November 2026', 'Pelaksanaan Lomba', 'Seluruh cabang lomba berlangsung selama periode ini. Peserta bertanding untuk membuktikan kemampuan terbaik mereka.', 2),
   ('08 November 2026', 'Penutupan', 'Malam puncak dan pengumuman juara dari seluruh cabang lomba CSS 3.0.', 3)
 ON CONFLICT DO NOTHING;
+
+-- =========================================================================
+-- 7. NEW ROLES & USER COMPETITION ACCESS
+-- =========================================================================
+
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'lomba';
+ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'petugas';
+
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS suspended boolean DEFAULT false NOT NULL;
+
+CREATE TABLE IF NOT EXISTS public.user_competitions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  competition_id uuid REFERENCES public.competitions(id) ON DELETE CASCADE NOT NULL,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  CONSTRAINT unique_user_competition UNIQUE (user_id, competition_id)
+);
+
+ALTER TABLE public.user_competitions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public read of user_competitions" ON public.user_competitions
+  FOR SELECT USING (true);
+
+CREATE POLICY "Admins can manage user_competitions" ON public.user_competitions
+  FOR ALL TO authenticated
+  USING (public.has_role('admin', auth.uid()))
+  WITH CHECK (public.has_role('admin', auth.uid()));
+

@@ -14,10 +14,15 @@ import {
   X,
   ChevronUp,
   ChevronDown,
+  Star,
+  Newspaper,
+  Link as LinkIcon,
+  ImageIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
+import ConfirmModal from "./ConfirmModal";
 
 type SiteSetting = {
   id: string;
@@ -30,6 +35,22 @@ type TimelineItem = {
   end_date: string | null;
   label: string;
   description: string;
+  position: number;
+};
+
+type Sponsor = {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  website: string | null;
+  position: number;
+};
+
+type MediaPartner = {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  website: string | null;
   position: number;
 };
 
@@ -57,6 +78,12 @@ const SiteSettingsTab = () => {
   const [loadingFavicon, setLoadingFavicon] = useState(false);
 
   const [editingTimeline, setEditingTimeline] = useState<Partial<TimelineItem> | null>(null);
+  const [editingSponsor, setEditingSponsor] = useState<Partial<Sponsor> | null>(null);
+  const [editingMediaPartner, setEditingMediaPartner] = useState<Partial<MediaPartner> | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState<string | null>(null);
+  const [confirmDeleteTimeline, setConfirmDeleteTimeline] = useState<TimelineItem | null>(null);
+  const [confirmDeleteSponsor, setConfirmDeleteSponsor] = useState<Sponsor | null>(null);
+  const [confirmDeleteMediaPartner, setConfirmDeleteMediaPartner] = useState<MediaPartner | null>(null);
 
   const { data: settingsData, isLoading: settingsLoading } = useQuery({
     queryKey: ["admin-site-settings"],
@@ -161,6 +188,179 @@ const SiteSettingsTab = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-timeline-items"] }),
     onError: (e: Error) => toast.error(e.message),
   });
+
+  // ── Sponsors queries & mutations ─────────────────────────────────────────
+  const { data: sponsorsData, isLoading: sponsorsLoading } = useQuery({
+    queryKey: ["admin-sponsors"],
+    queryFn: async (): Promise<Sponsor[]> => {
+      const { data, error } = await suparef.current
+        .from("sponsors")
+        .select("*")
+        .order("position", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const saveSponsor = useMutation({
+    mutationFn: async (v: Partial<Sponsor>) => {
+      const supabase = suparef.current;
+      const payload = {
+        name: v.name!,
+        logo_url: v.logo_url ?? null,
+        website: v.website ?? null,
+        position: v.position ?? (sponsorsData?.length ?? 0) + 1,
+      };
+      if (v.id) {
+        const { error } = await supabase.from("sponsors").update(payload).eq("id", v.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("sponsors").insert(payload);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Sponsor berhasil disimpan");
+      setEditingSponsor(null);
+      qc.invalidateQueries({ queryKey: ["admin-sponsors"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteSponsor = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await suparef.current.from("sponsors").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Sponsor dihapus");
+      qc.invalidateQueries({ queryKey: ["admin-sponsors"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const reorderSponsor = useMutation({
+    mutationFn: async (items: Sponsor[]) => {
+      const supabase = suparef.current;
+      for (let i = 0; i < items.length; i++) {
+        const { error } = await supabase.from("sponsors").update({ position: i + 1 }).eq("id", items[i].id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-sponsors"] }),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const moveSponsor = (index: number, dir: "up" | "down") => {
+    if (!sponsorsData) return;
+    const items = [...sponsorsData];
+    const ti = dir === "up" ? index - 1 : index + 1;
+    if (ti < 0 || ti >= items.length) return;
+    [items[index], items[ti]] = [items[ti], items[index]];
+    reorderSponsor.mutate(items);
+  };
+
+  // ── Media Partners queries & mutations ───────────────────────────────────
+  const { data: mediaPartnersData, isLoading: mediaPartnersLoading } = useQuery({
+    queryKey: ["admin-media-partners"],
+    queryFn: async (): Promise<MediaPartner[]> => {
+      const { data, error } = await suparef.current
+        .from("media_partners")
+        .select("*")
+        .order("position", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const saveMediaPartner = useMutation({
+    mutationFn: async (v: Partial<MediaPartner>) => {
+      const supabase = suparef.current;
+      const payload = {
+        name: v.name!,
+        logo_url: v.logo_url ?? null,
+        website: v.website ?? null,
+        position: v.position ?? (mediaPartnersData?.length ?? 0) + 1,
+      };
+      if (v.id) {
+        const { error } = await supabase.from("media_partners").update(payload).eq("id", v.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("media_partners").insert(payload);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      toast.success("Media partner berhasil disimpan");
+      setEditingMediaPartner(null);
+      qc.invalidateQueries({ queryKey: ["admin-media-partners"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const deleteMediaPartner = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await suparef.current.from("media_partners").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Media partner dihapus");
+      qc.invalidateQueries({ queryKey: ["admin-media-partners"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const reorderMediaPartner = useMutation({
+    mutationFn: async (items: MediaPartner[]) => {
+      const supabase = suparef.current;
+      for (let i = 0; i < items.length; i++) {
+        const { error } = await supabase.from("media_partners").update({ position: i + 1 }).eq("id", items[i].id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-media-partners"] }),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const moveMediaPartner = (index: number, dir: "up" | "down") => {
+    if (!mediaPartnersData) return;
+    const items = [...mediaPartnersData];
+    const ti = dir === "up" ? index - 1 : index + 1;
+    if (ti < 0 || ti >= items.length) return;
+    [items[index], items[ti]] = [items[ti], items[index]];
+    reorderMediaPartner.mutate(items);
+  };
+
+  const handleLogoUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    bucket: "sponsors" | "media-partners",
+    onDone: (url: string) => void
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    if (!["png", "jpg", "jpeg", "webp", "svg"].includes(ext)) {
+      toast.error("Format gambar tidak valid (png/jpg/webp/svg)");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Ukuran file maksimal 2MB");
+      return;
+    }
+    setUploadingLogo(bucket);
+    const supabase = suparef.current;
+    const fileName = `${bucket}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("site_settings").upload(fileName, file, { upsert: false, contentType: file.type });
+    if (error) {
+      toast.error("Gagal upload logo: " + error.message);
+      setUploadingLogo(null);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("site_settings").getPublicUrl(fileName);
+    onDone(urlData.publicUrl);
+    toast.success("Logo berhasil diunggah");
+    setUploadingLogo(null);
+  };
 
   const moveItem = (index: number, dir: "up" | "down") => {
     if (!timelineData) return;
@@ -556,9 +756,7 @@ const SiteSettingsTab = () => {
                   </button>
                   <button
                     onClick={() => {
-                      if (confirm(`Hapus "${item.label}"?`)) {
-                        deleteTimeline.mutate(item.id);
-                      }
+                      setConfirmDeleteTimeline(item as TimelineItem);
                     }}
                     disabled={deleteTimeline.isPending}
                     className="rounded-full p-2 text-destructive hover:bg-destructive/15 cursor-pointer transition"
@@ -596,7 +794,7 @@ const SiteSettingsTab = () => {
 
             <div className="space-y-2">
               <label className="text-xs text-muted-foreground">Tanggal / Periode</label>
-              <div className="flex mt-1 p-2 px-3 glass rounded-2xl items-center gap-3 justify-between">
+              <div className="grid grid-cols-1 md:grid-cols-2 mt-1 items-center gap-3 rounded-2xl border border-white/10 p-4 justify-between">
                 <div className="space-y-1">
                   <label className="text-xs text-muted-foreground after:content-['*'] after:ml-1 after:text-red-500">Start</label>
                   <input
@@ -661,6 +859,330 @@ const SiteSettingsTab = () => {
           </form>
         </div>
       )}
+      <div className="border-t border-white/10 pt-8" />
+
+      <div className="space-y-5">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-amber-500/10">
+              <Star size={16} className="text-amber-400" />
+            </div>
+            <div>
+              <h3 className="font-display text-base font-bold text-foreground">Sponsor</h3>
+              <p className="text-xs text-muted-foreground">Tambah, edit, hapus, dan atur urutan sponsor yang tampil di landing page</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setEditingSponsor({ name: "", logo_url: "", website: "", position: (sponsorsData?.length ?? 0) + 1 })}
+            className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-4 py-2 text-sm font-semibold text-amber-400 hover:bg-amber-500/25 cursor-pointer transition"
+          >
+            <Plus size={14} /> Tambah Sponsor
+          </button>
+        </div>
+
+        {sponsorsLoading && (
+          <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
+            <Loader2 size={16} className="animate-spin" /> Memuat sponsor…
+          </div>
+        )}
+        {!sponsorsLoading && (sponsorsData ?? []).length === 0 && (
+          <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground">
+            Belum ada sponsor. Klik &quot;Tambah Sponsor&quot; untuk memulai.
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {(sponsorsData ?? []).map((sp, index) => (
+            <div key={sp.id} className="glass rounded-2xl p-4 border border-white/5 hover:border-white/10 transition-colors">
+              <div className="flex items-center gap-3">
+                {/* Reorder */}
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button onClick={() => moveSponsor(index, "up")} disabled={index === 0 || reorderSponsor.isPending} className="rounded-lg p-1 hover:bg-white/10 disabled:opacity-30 cursor-pointer transition">
+                    <ChevronUp size={12} />
+                  </button>
+                  <button onClick={() => moveSponsor(index, "down")} disabled={index === (sponsorsData?.length ?? 0) - 1 || reorderSponsor.isPending} className="rounded-lg p-1 hover:bg-white/10 disabled:opacity-30 cursor-pointer transition">
+                    <ChevronDown size={12} />
+                  </button>
+                </div>
+                {/* Logo preview */}
+                {sp.logo_url ? (
+                  <div className="size-10 shrink-0 rounded-xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+                    <Image src={sp.logo_url} alt={sp.name} width={40} height={40} className="h-8 w-auto object-contain" />
+                  </div>
+                ) : (
+                  <div className="size-10 shrink-0 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center">
+                    <ImageIcon size={14} className="text-muted-foreground" />
+                  </div>
+                )}
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-foreground truncate">{sp.name}</p>
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                    {sp.website && <span className="text-[10px] text-muted-foreground truncate max-w-[160px]">{sp.website}</span>}
+                  </div>
+                </div>
+                {/* Actions */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <button onClick={() => setEditingSponsor(sp)} className="rounded-full p-2 hover:bg-white/10 text-foreground/70 hover:text-foreground cursor-pointer transition">
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    onClick={() => { setConfirmDeleteSponsor(sp as Sponsor); }}
+                    disabled={deleteSponsor.isPending}
+                    className="rounded-full p-2 text-destructive hover:bg-destructive/15 cursor-pointer transition"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-5">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-purple-500/10">
+              <Newspaper size={16} className="text-purple-400" />
+            </div>
+            <div>
+              <h3 className="font-display text-base font-bold text-foreground">Media Partner</h3>
+              <p className="text-xs text-muted-foreground">Tambah, edit, hapus, dan atur urutan media partner yang tampil di landing page</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setEditingMediaPartner({ name: "", logo_url: "", website: "", position: (mediaPartnersData?.length ?? 0) + 1 })}
+            className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/15 px-4 py-2 text-sm font-semibold text-purple-400 hover:bg-purple-500/25 cursor-pointer transition"
+          >
+            <Plus size={14} /> Tambah Media Partner
+          </button>
+        </div>
+
+        {mediaPartnersLoading && (
+          <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
+            <Loader2 size={16} className="animate-spin" /> Memuat media partner…
+          </div>
+        )}
+        {!mediaPartnersLoading && (mediaPartnersData ?? []).length === 0 && (
+          <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground">
+            Belum ada media partner. Klik &quot;Tambah Media Partner&quot; untuk memulai.
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {(mediaPartnersData ?? []).map((mp, index) => (
+            <div key={mp.id} className="glass rounded-2xl p-4 border border-white/5 hover:border-white/10 transition-colors">
+              <div className="flex items-center gap-3">
+                {/* Reorder */}
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button onClick={() => moveMediaPartner(index, "up")} disabled={index === 0 || reorderMediaPartner.isPending} className="rounded-lg p-1 hover:bg-white/10 disabled:opacity-30 cursor-pointer transition">
+                    <ChevronUp size={12} />
+                  </button>
+                  <button onClick={() => moveMediaPartner(index, "down")} disabled={index === (mediaPartnersData?.length ?? 0) - 1 || reorderMediaPartner.isPending} className="rounded-lg p-1 hover:bg-white/10 disabled:opacity-30 cursor-pointer transition">
+                    <ChevronDown size={12} />
+                  </button>
+                </div>
+                {/* Logo preview */}
+                {mp.logo_url ? (
+                  <div className="size-10 shrink-0 rounded-xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+                    <Image src={mp.logo_url} alt={mp.name} width={40} height={40} className="h-8 w-auto object-contain" />
+                  </div>
+                ) : (
+                  <div className="size-10 shrink-0 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center">
+                    <ImageIcon size={14} className="text-muted-foreground" />
+                  </div>
+                )}
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-foreground truncate">{mp.name}</p>
+                  {mp.website && <p className="text-[10px] text-muted-foreground truncate mt-0.5">{mp.website}</p>}
+                </div>
+                {/* Actions */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <button onClick={() => setEditingMediaPartner(mp)} className="rounded-full p-2 hover:bg-white/10 text-foreground/70 hover:text-foreground cursor-pointer transition">
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    onClick={() => { setConfirmDeleteMediaPartner(mp as MediaPartner); }}
+                    disabled={deleteMediaPartner.isPending}
+                    className="rounded-full p-2 text-destructive hover:bg-destructive/15 cursor-pointer transition"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {editingSponsor !== null && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-background/80 p-4 backdrop-blur">
+          <form
+            onSubmit={(e) => { e.preventDefault(); saveSponsor.mutate(editingSponsor); }}
+            className="glass-strong mx-auto my-8 w-full max-w-lg space-y-4 rounded-3xl p-6"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-base font-bold">
+                {editingSponsor.id ? "Edit Sponsor" : "Tambah Sponsor"}
+              </h3>
+              <button type="button" onClick={() => setEditingSponsor(null)} className="rounded-full p-2 hover:bg-white/10 cursor-pointer">
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground after:content-['*'] after:ml-1 after:text-red-500">Nama Sponsor</label>
+              <input
+                className="inputCls" required
+                placeholder="Misal: Nusantech, Cloudana"
+                value={editingSponsor.name ?? ""}
+                onChange={(e) => setEditingSponsor((p) => ({ ...p, name: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">Website (opsional)</label>
+              <div className="relative">
+                <LinkIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  className="inputCls pl-9"
+                  placeholder="https://example.com"
+                  value={editingSponsor.website ?? ""}
+                  onChange={(e) => setEditingSponsor((p) => ({ ...p, website: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs text-muted-foreground after:content-['*'] after:ml-1 after:text-red-500">Logo</label>
+              {editingSponsor.logo_url && (
+                <div className="mb-2 flex items-center gap-3">
+                  <Image src={editingSponsor.logo_url} alt="preview" width={80} height={40} className="h-10 w-auto object-contain rounded-xl border border-white/10 bg-white/5 p-1" />
+                  <button type="button" onClick={() => setEditingSponsor((p) => ({ ...p, logo_url: "" }))} className="text-xs text-destructive hover:underline cursor-pointer">Hapus Logo</button>
+                </div>
+              )}
+              <label className={`flex items-center gap-2 rounded-xl border border-dashed border-white/20 px-4 py-3 text-sm text-muted-foreground transition ${
+                uploadingLogo === "sponsors" ? "opacity-60" : "cursor-pointer hover:border-white/40 hover:text-foreground"
+              }`}>
+                {uploadingLogo === "sponsors" ? <Loader2 size={14} className="animate-spin" /> : <ImageIcon size={14} />}
+                {uploadingLogo === "sponsors" ? "Mengunggah..." : "Upload logo (PNG/JPG/WebP/SVG, max 2MB)"}
+                <input
+                  type="file" className="hidden" accept="image/*"
+                  required
+                  disabled={uploadingLogo === "sponsors"}
+                  onChange={(e) => handleLogoUpload(e, "sponsors", (url) => setEditingSponsor((p) => ({ ...p, logo_url: url })))}
+                />
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setEditingSponsor(null)} className="rounded-full border border-white/10 px-4 py-2 text-sm cursor-pointer hover:bg-white/5">Batal</button>
+              <button type="submit" disabled={saveSponsor.isPending} className="btn-hero inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold cursor-pointer disabled:opacity-60">
+                {saveSponsor.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Simpan
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {editingMediaPartner !== null && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-background/80 p-4 backdrop-blur">
+          <form
+            onSubmit={(e) => { e.preventDefault(); saveMediaPartner.mutate(editingMediaPartner); }}
+            className="glass-strong mx-auto my-8 w-full max-w-lg space-y-4 rounded-3xl p-6"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-base font-bold">
+                {editingMediaPartner.id ? "Edit Media Partner" : "Tambah Media Partner"}
+              </h3>
+              <button type="button" onClick={() => setEditingMediaPartner(null)} className="rounded-full p-2 hover:bg-white/10 cursor-pointer">
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground after:content-['*'] after:ml-1 after:text-red-500">Nama Media Partner</label>
+              <input
+                className="inputCls" required
+                placeholder="Misal: TechDaily, CodeWeekly"
+                value={editingMediaPartner.name ?? ""}
+                onChange={(e) => setEditingMediaPartner((p) => ({ ...p, name: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">Website (opsional)</label>
+              <div className="relative">
+                <LinkIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  className="inputCls pl-9"
+                  placeholder="https://example.com"
+                  value={editingMediaPartner.website ?? ""}
+                  onChange={(e) => setEditingMediaPartner((p) => ({ ...p, website: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs text-muted-foreground after:content-['*'] after:ml-1 after:text-red-500">Logo</label>
+              {editingMediaPartner.logo_url && (
+                <div className="mb-2 flex items-center gap-3">
+                  <Image src={editingMediaPartner.logo_url} alt="preview" width={80} height={40} className="h-10 w-auto object-contain rounded-xl border border-white/10 bg-white/5 p-1" />
+                  <button type="button" onClick={() => setEditingMediaPartner((p) => ({ ...p, logo_url: "" }))} className="text-xs text-destructive hover:underline cursor-pointer">Hapus Logo</button>
+                </div>
+              )}
+              <label className={`flex items-center gap-2 rounded-xl border border-dashed border-white/20 px-4 py-3 text-sm text-muted-foreground transition ${
+                uploadingLogo === "media-partners" ? "opacity-60" : "cursor-pointer hover:border-white/40 hover:text-foreground"
+              }`}>
+                {uploadingLogo === "media-partners" ? <Loader2 size={14} className="animate-spin" /> : <ImageIcon size={14} />}
+                {uploadingLogo === "media-partners" ? "Mengunggah..." : "Upload logo (PNG/JPG/WebP/SVG, max 2MB)"}
+                <input
+                  type="file" className="hidden" accept="image/*"
+                  required
+                  disabled={uploadingLogo === "media-partners"}
+                  onChange={(e) => handleLogoUpload(e, "media-partners", (url) => setEditingMediaPartner((p) => ({ ...p, logo_url: url })))}
+                />
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setEditingMediaPartner(null)} className="rounded-full border border-white/10 px-4 py-2 text-sm cursor-pointer hover:bg-white/5">Batal</button>
+              <button type="submit" disabled={saveMediaPartner.isPending} className="btn-hero inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold cursor-pointer disabled:opacity-60">
+                {saveMediaPartner.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} Simpan
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      <ConfirmModal
+        open={!!confirmDeleteTimeline}
+        title="Hapus Timeline"
+        message={`Apakah kamu yakin ingin menghapus item timeline "${confirmDeleteTimeline?.label}"?`}
+        confirmLabel="Ya, Hapus"
+        onConfirm={() => { if (confirmDeleteTimeline) deleteTimeline.mutate(confirmDeleteTimeline.id); setConfirmDeleteTimeline(null); }}
+        onCancel={() => setConfirmDeleteTimeline(null)}
+      />
+
+      <ConfirmModal
+        open={!!confirmDeleteSponsor}
+        title="Hapus Sponsor"
+        message={`Apakah kamu yakin ingin menghapus sponsor "${confirmDeleteSponsor?.name}"?`}
+        confirmLabel="Ya, Hapus"
+        onConfirm={() => { if (confirmDeleteSponsor) deleteSponsor.mutate(confirmDeleteSponsor.id); setConfirmDeleteSponsor(null); }}
+        onCancel={() => setConfirmDeleteSponsor(null)}
+      />
+
+      <ConfirmModal
+        open={!!confirmDeleteMediaPartner}
+        title="Hapus Media Partner"
+        message={`Apakah kamu yakin ingin menghapus media partner "${confirmDeleteMediaPartner?.name}"?`}
+        confirmLabel="Ya, Hapus"
+        onConfirm={() => { if (confirmDeleteMediaPartner) deleteMediaPartner.mutate(confirmDeleteMediaPartner.id); setConfirmDeleteMediaPartner(null); }}
+        onCancel={() => setConfirmDeleteMediaPartner(null)}
+      />
     </div>
   );
 };

@@ -5,6 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, Trash2, Trophy, Medal, Star } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-auth";
+import ConfirmModal from "./ConfirmModal";
 
 type WinnerRow = {
   id: string;
@@ -32,10 +34,11 @@ type RegistrationOption = {
 
 const WinnersTab = () => {
   const qc = useQueryClient();
+  const { role, user } = useAuth();
   const suparef = useRef(createClient());
   const [selectedCompId, setSelectedCompId] = useState<string>("all");
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; title: string; compName: string } | null>(null);
   
-  // State for new winner form
   const [newWinner, setNewWinner] = useState<{
     competition_id: string;
     registration_id: string;
@@ -50,40 +53,72 @@ const WinnersTab = () => {
     prize_money: "",
   });
 
-  // Query competitions
-  const { data: competitions } = useQuery({
-    queryKey: ["admin-winners-competitions"],
-    queryFn: async (): Promise<CompetitionOption[]> => {
+  const { data: allowedComps } = useQuery({
+    queryKey: ["user-allowed-comps", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
       const supabase = suparef.current;
       const { data, error } = await supabase
+        .from("user_competitions")
+        .select("competition_id")
+        .eq("user_id", user.id);
+      if (error) throw error;
+      return (data ?? []).map((c) => c.competition_id);
+    },
+    enabled: !!user,
+  });
+
+  const { data: competitions } = useQuery({
+    queryKey: ["admin-winners-competitions", role, allowedComps],
+    queryFn: async (): Promise<CompetitionOption[]> => {
+      const supabase = suparef.current;
+      let query = supabase
         .from("competitions")
-        .select("id, name")
-        .order("position");
+        .select("id, name");
+
+      if (role === "lomba") {
+        if (!allowedComps || allowedComps.length === 0) {
+          return [];
+        }
+        query = query.in("id", allowedComps);
+      }
+
+      const { data, error } = await query.order("position");
       if (error) throw error;
       return data ?? [];
     },
+    enabled: role !== null,
   });
 
-  // Query registrations (all verified teams for dropdowns)
   const { data: registrations } = useQuery({
-    queryKey: ["admin-winners-registrations"],
+    queryKey: ["admin-winners-registrations", role, allowedComps],
     queryFn: async (): Promise<RegistrationOption[]> => {
       const supabase = suparef.current;
-      const { data, error } = await supabase
+      let query = supabase
         .from("registrations")
         .select("id, team_name, competition_id")
         .eq("status", "verified");
+
+      if (role === "lomba") {
+        if (!allowedComps || allowedComps.length === 0) {
+          return [];
+        }
+        query = query.in("competition_id", allowedComps);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
     },
+    enabled: role !== null,
   });
 
   // Query winners
   const { data: winners, isLoading } = useQuery({
-    queryKey: ["admin-winners-list"],
+    queryKey: ["admin-winners-list", role, allowedComps],
     queryFn: async (): Promise<WinnerRow[]> => {
       const supabase = suparef.current;
-      const { data, error } = await supabase
+      let query = supabase
         .from("winners")
         .select(`
           id,
@@ -93,14 +128,22 @@ const WinnersTab = () => {
           title,
           prize_money,
           registration:registrations(id, team_name)
-        `)
-        .order("rank", { ascending: true });
+        `);
+
+      if (role === "lomba") {
+        if (!allowedComps || allowedComps.length === 0) {
+          return [];
+        }
+        query = query.in("competition_id", allowedComps);
+      }
+
+      const { data, error } = await query.order("rank", { ascending: true });
       if (error) throw error;
       return (data ?? []) as unknown as WinnerRow[];
     },
+    enabled: role !== null,
   });
 
-  // Mutations
   const addWinner = useMutation({
     mutationFn: async (v: typeof newWinner) => {
       const supabase = suparef.current;
@@ -141,17 +184,14 @@ const WinnersTab = () => {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  // Filter registrations by selected competition for the add form
   const filteredRegOptions = (registrations ?? []).filter(
     (r) => r.competition_id === newWinner.competition_id
   );
 
-  // Group winners by competition for display
   const filteredWinners = (winners ?? []).filter((w) => {
     return selectedCompId === "all" || w.competition_id === selectedCompId;
   });
 
-  // Get rank icons
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
@@ -166,10 +206,10 @@ const WinnersTab = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Selection Filter */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-1.5 text-xs">
+    <>
+      <div className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap gap-1.5 text-xs">
           <button
             onClick={() => {
               setSelectedCompId("all");
@@ -199,11 +239,10 @@ const WinnersTab = () => {
               {c.name}
             </button>
           ))}
+          </div>
         </div>
-      </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Add Winner Form */}
+        <div className="grid gap-6 md:grid-cols-3">
         <div className="glass rounded-3xl p-6 h-fit space-y-4">
           <h3 className="font-display text-base font-bold text-foreground">
             Tambah Juara Lomba
@@ -324,7 +363,6 @@ const WinnersTab = () => {
           </form>
         </div>
 
-        {/* Winners List Display */}
         <div className="md:col-span-2 space-y-3">
           {isLoading && (
             <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
@@ -372,9 +410,7 @@ const WinnersTab = () => {
 
                   <button
                     onClick={() => {
-                      if (confirm(`Hapus data ${w.title} dari lomba ${compName}?`)) {
-                        deleteWinner.mutate(w.id);
-                      }
+                      setConfirmDelete({ id: w.id, title: w.title, compName });
                     }}
                     disabled={deleteWinner.isPending}
                     className="rounded-full bg-destructive/15 p-2 text-destructive hover:bg-destructive/25 shrink-0 transition cursor-pointer"
@@ -387,6 +423,16 @@ const WinnersTab = () => {
         </div>
       </div>
     </div>
+
+    <ConfirmModal
+      open={!!confirmDelete}
+      title="Hapus Juara"
+      message={`Apakah kamu yakin ingin menghapus data juara "${confirmDelete?.title}" dari lomba ${confirmDelete?.compName}?`}
+      confirmLabel="Ya, Hapus"
+      onConfirm={() => { if (confirmDelete) deleteWinner.mutate(confirmDelete.id); setConfirmDelete(null); }}
+      onCancel={() => setConfirmDelete(null)}
+    />
+    </>
   );
 };
 

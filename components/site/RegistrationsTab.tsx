@@ -24,6 +24,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { jsPDF } from "jspdf";
+import { useAuth } from "@/hooks/use-auth";
 
 type RegistrationAnswer = {
   field_key: string;
@@ -470,25 +471,50 @@ function DetailModal({
 
 const RegistrationsTab = () => {
   const qc = useQueryClient();
+  const { role, user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [competitionFilter, setCompetitionFilter] = useState<string>("all");
   const [selectedReg, setSelectedReg] = useState<AdminReg | null>(null);
   const [rejectTarget, setRejectTarget] = useState<AdminReg | null>(null);
   const suparef = useRef(createClient());
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin-regs"],
-    queryFn: async (): Promise<AdminReg[]> => {
+  const { data: allowedComps } = useQuery({
+    queryKey: ["user-allowed-comps", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
       const supabase = suparef.current;
       const { data, error } = await supabase
+        .from("user_competitions")
+        .select("competition_id")
+        .eq("user_id", user.id);
+      if (error) throw error;
+      return (data ?? []).map((c) => c.competition_id);
+    },
+    enabled: !!user,
+  });
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-regs", role, allowedComps],
+    queryFn: async (): Promise<AdminReg[]> => {
+      const supabase = suparef.current;
+      let query = supabase
         .from("registrations")
         .select(
           "id, team_name, leader_name, leader_whatsapp, leader_email, status, rejection_reason, created_at, verified_at, competition:competitions(id,name,slug), payments(amount_idr,status,midtrans_order_id,paid_at), registration_answers(field_key,field_label,value)"
-        )
-        .order("created_at", { ascending: false });
+        );
+
+      if (role === "lomba") {
+        if (!allowedComps || allowedComps.length === 0) {
+          return [];
+        }
+        query = query.in("competition_id", allowedComps);
+      }
+
+      const { data: regData, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as unknown as AdminReg[];
+      return (regData ?? []) as unknown as AdminReg[];
     },
+    enabled: role !== null,
   });
 
   const verify = useMutation({
@@ -684,7 +710,6 @@ const RegistrationsTab = () => {
 
   return (
     <div>
-      {/* Competition Filter */}
       <div className="mb-4">
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           Filter Cabang Lomba
@@ -714,7 +739,6 @@ const RegistrationsTab = () => {
         </div>
       </div>
 
-      {/* Status Filter */}
       <div className="mb-5">
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           Filter Status
@@ -735,7 +759,6 @@ const RegistrationsTab = () => {
         </div>
       </div>
 
-      {/* Count summary */}
       {!isLoading && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-4">
           <p className="text-xs text-muted-foreground">

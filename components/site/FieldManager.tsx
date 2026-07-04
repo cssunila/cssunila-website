@@ -113,9 +113,9 @@ const FieldManager = ({ comp, onClose }: { comp: { id: string; name: string }; o
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-display text-lg font-bold">Form Pendaftaran</h3>
-            <p className="text-xs text-muted-foreground">{comp.name} — atur input apa saja yang akan diisi peserta (mirip Google Form)</p>
+            <p className="text-xs text-muted-foreground">{comp.name} — atur input apa saja yang akan diisi peserta.</p>
           </div>
-          <button onClick={onClose} className="rounded-full border border-white/10 px-3 py-1.5 text-xs">Tutup</button>
+          <button onClick={onClose} className="rounded-full border border-white/10 px-3 py-1.5 text-xs cursor-pointer">Tutup</button>
         </div>
 
         {isLoading && <div className="glass rounded-2xl p-6 text-center text-sm text-muted-foreground">Memuat…</div>}
@@ -168,22 +168,25 @@ const FieldManager = ({ comp, onClose }: { comp: { id: string; name: string }; o
           <button type="button" onClick={add} className="inline-flex items-center gap-2 rounded-full border border-dashed border-white/15 px-4 py-2 text-xs hover:bg-white/5">
             <Plus size={14} /> Tambah input
           </button>
-          <button
-            type="button"
-            disabled={persist.isPending}
-            onClick={() => {
-              const keys = new Set<string>();
-              for (const f of items) {
-                if (!f.label.trim() || !f.key.trim()) { toast.error("Label dan key wajib diisi"); return; }
-                if (keys.has(f.key)) { toast.error(`Key duplikat: ${f.key}`); return; }
-                keys.add(f.key);
-              }
-              persist.mutate(items);
-            }}
-            className="btn-hero inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-60"
-          >
-            {persist.isPending && <Loader2 size={14} className="animate-spin" />} Simpan Form
-          </button>
+          <div className="flex gap-2">
+            <button type="button" onClick={onClose} className="rounded-full cursor-pointer border border-white/10 px-4 py-2 text-sm">Batal</button>
+            <button
+              type="button"
+              disabled={persist.isPending}
+              onClick={() => {
+                const keys = new Set<string>();
+                for (const f of items) {
+                  if (!f.label.trim() || !f.key.trim()) { toast.error("Label dan key wajib diisi"); return; }
+                  if (keys.has(f.key)) { toast.error(`Key duplikat: ${f.key}`); return; }
+                  keys.add(f.key);
+                }
+                persist.mutate(items);
+              }}
+              className="btn-hero inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-60"
+            >
+              {persist.isPending && <Loader2 size={14} className="animate-spin" />} Simpan Form
+            </button>
+          </div>
         </div>
       </div>
     </div>

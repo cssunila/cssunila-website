@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/supabase/client";
 
-export type AppRole = "admin" | "user";
+export type AppRole = "admin" | "user" | "lomba" | "petugas";
 
 export type AuthState = {
   user: User | null;
@@ -32,6 +32,19 @@ export function useAuth(): ReturnType {
   const fetchRole = async (userId: string | null): Promise<AppRole | null> => {
     if (userId) {
       const supabase = suparef.current;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("suspended")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (profile?.suspended) {
+        await supabase.auth.signOut();
+        setRole(null);
+        return null;
+      }
+
       const { data } = await supabase
         .from("user_roles")
         .select("role")
@@ -42,7 +55,10 @@ export function useAuth(): ReturnType {
         return null;
       } else {
         const roles = data.map((r) => r.role as AppRole);
-        const resolvedRole = roles.includes("admin") ? ("admin" as const) : ("user" as const);
+        let resolvedRole: AppRole = "user";
+        if (roles.includes("admin")) resolvedRole = "admin";
+        else if (roles.includes("lomba")) resolvedRole = "lomba";
+        else if (roles.includes("petugas")) resolvedRole = "petugas";
         setRole(resolvedRole);
         return resolvedRole;
       }
