@@ -158,8 +158,8 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                     </div>
 
                     {c.banner &&
-                        <div className="flex justify-end items-center">
-                            <Image src={c.banner} alt="banner" width={280} height={280} className="pointer-events-none opacity-60 object-cover w-full h-full animate-floating-smooth" />
+                        <div className="flex justify-center items-center">
+                            <Image src={c.banner} alt="banner" width={280} height={280} className="pointer-events-none opacity-80 object-contain w-full h-full animate-floating-smooth" />
                         </div>
                     }
                 </div>
