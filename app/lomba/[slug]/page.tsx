@@ -11,21 +11,24 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { createClient } from "@/supabase/client";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { dateActive } from "@/lib/formatTanggal";
 
 type CompetitionDetail = {
     slug: string; name: string; tagline: string | null; description: string | null;
     icon: string | null; accent: string | null; fee_idr: number; quota: number;
     team_size: string | null; prize: string | null; is_open: boolean;
+    pj_1: string; no_pj_1: string; pj_2: string; no_pj_2: string; banner: string;
     rules: string[]; timeline: { date: string; label: string }[];
 };
 
 type IconProps = {
-  icon: string;
+    icon: string;
 };
 
 const DynamicIcon = ({ icon }: IconProps) => {
-  const IconNew = getIcon(icon) as LucideIcon;
-  return <IconNew size={36} className="text-cyan-strong" />;
+    const IconNew = getIcon(icon) as LucideIcon;
+    return <IconNew size={36} className="text-cyan-strong" />;
 };
 
 const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
@@ -44,7 +47,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
             const supabase = suparef.current;
             const { data, error } = await supabase
                 .from("competitions")
-                .select("slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,prize,is_open,rules,timeline")
+                .select("slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,prize,is_open,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner")
                 .eq("slug", slug)
                 .maybeSingle();
             if (error) throw error;
@@ -117,7 +120,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                     <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {[
                             { icon: Wallet, label: "Biaya", value: `Rp ${c.fee_idr.toLocaleString("id-ID")}` },
-                            { icon: Users, label: "Kuota", value: `${c.quota > 0 ? c.quota+' tim' : 'Tidak ada batasan'}` },
+                            { icon: Users, label: "Kuota", value: `${c.quota > 0 ? c.quota + ' tim' : 'Tidak ada batasan'}` },
                             { icon: Users, label: "Tim", value: c.team_size ?? "-" },
                             { icon: Trophy, label: "Hadiah", value: c.prize ?? "-" },
                         ].map((s) => (
@@ -154,28 +157,72 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                         </ul>
                     </div>
 
-                    <div className="glass rounded-3xl p-7">
-                        <h2 className="font-display text-2xl font-bold">Timeline Lomba</h2>
-                        <ol className="mt-5 space-y-4">
-                            {c.timeline.length === 0 && (
-                                <li className="text-sm text-muted-foreground">Belum ada timeline.</li>
-                            )}
-                            {c.timeline.map((t) => (
-                                <li key={t.label} className="flex items-start gap-3">
-                                    <div className="glass mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg">
-                                        <CalendarCheck size={14} className="text-cyan-strong" />
-                                    </div>
+                    {c.banner &&
+                        <div className="flex justify-center items-center">
+                            <Image src={c.banner} alt="banner" width={140} height={140} className="object-cover w-96 animate-floating-smooth" />
+                        </div>
+                    }
+                </div>
+            </section>
+
+            <section className="py-12">
+                <ol className="relative flex flex-col max-w-5xl mx-auto px-4">
+                    <div className="absolute left-4 top-0 bottom-0 w-px bg-linear-to-b from-sapphire via-cyan-strong to-transparent md:left-1/2" />
+                    {c.timeline.map((item, i) => (
+                        <li
+                            key={`${item.label}-${i}`}
+                            className="relative group mb-8 md:mb-12 w-full"
+                        >
+                            <span
+                                className={`absolute left-4 top-6 size-4 -translate-x-1/2 rounded-full border-2 group-hover:scale-125 transition-all duration-200 border-cyan-strong ${dateActive(item.date) ? "bg-cyan-strong" : "bg-cyan-strong/60"} shadow-[0_0_14px_var(--cyan-strong)] md:left-1/2`}
+                                aria-hidden
+                            />
+                            <div
+                                className={`glass group-hover:scale-105 transition-all duration-300 ml-10 p-5 rounded-2xl md:ml-0 md:w-[calc(50%-2.5rem)] ${i % 2 === 0
+                                    ? "md:mr-auto md:text-right"
+                                    : "md:ml-auto md:text-left"
+                                    }`}
+                            >
+                                <div className="text-xs font-medium tracking-wider text-cyan-strong uppercase glass inline-flex justify-center items-center rounded-xl px-2.5 py-2">
+                                    {item.date}
+                                </div>
+                                <h3 className="mt-1 group-hover:text-cyan-strong transition-all duration-200 font-display text-xl font-semibold">
+                                    {item.label}
+                                </h3>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </section>
+
+            <section className="py-12">
+                <div className="mx-auto max-w-md px-4 space-y-2">
+                    <h2 className="font-display text-center text-3xl font-bold sm:text-4xl">Narahubung</h2>
+                    <p className="text-center text-sm text-muted-foreground mb-8">Jika terdapat pertanyaan atau kendala pendaftaran terkait lomba.
+                        Silahkan hubungin narahubung lomba {c.name}
+                    </p>
+                    <div className={`flex items-center ${c.pj_2 ? 'justify-between' : 'justify-center'} gap-5`}>
+                        {c.pj_1 &&
+                            <Link href={`https://wa.me`} className="flex items-center gap-3 group">
+                                <Image src={"/assets/whatsapp.svg"} width={30} height={30} alt="icon whatsapp" />
+                                <div>
+                                    <p className="font-semibold">{c.pj_1}</p>
+                                    <p className="text-sm text-muted-foreground group-hover:text-cyan-strong">{c.no_pj_1}</p>
+                                </div>
+                            </Link>
+                        }
+                        {c.pj_2 &&
+                            <>
+                                <div className="h-10 w-0.5 bg-muted"></div>
+                                <Link href={`https://wa.me`} className="flex items-center gap-3 group">
+                                    <Image src={"/assets/whatsapp.svg"} width={30} height={30} alt="icon whatsapp" />
                                     <div>
-                                        <div className="text-xs font-medium uppercase tracking-wider text-cyan-strong">
-                                            {t.date}
-                                        </div>
-                                        <div className="font-display text-sm font-semibold">
-                                            {t.label}
-                                        </div>
+                                        <p className="font-semibold">{c.pj_2}</p>
+                                        <p className="text-sm text-muted-foreground group-hover:text-cyan-strong">{c.no_pj_2}</p>
                                     </div>
-                                </li>
-                            ))}
-                        </ol>
+                                </Link>
+                            </>
+                        }
                     </div>
                 </div>
             </section>
@@ -188,7 +235,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                             <>
                                 <h2 className="font-display text-3xl font-bold sm:text-4xl">Pendaftaran Sedang Ditutup</h2>
                                 <p className="mt-3 text-muted-foreground">
-                                    Cabang ini belum membuka pendaftaran. Pantau pengumuman panitia ya.
+                                    Cabang ini belum membuka pendaftaran. Pantau pengumuman selanjutnya ya.
                                 </p>
                             </>
                         ) : (

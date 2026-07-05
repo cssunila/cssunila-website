@@ -8,7 +8,7 @@
   --color-cyan-strong: var(--cyan-strong);
   --color-twilight: var(--twilight);
   --color-evergreen: var(--evergreen);
-
+  --animate-floating-smooth: floatingSmooth 5s ease-in-out infinite;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-poppins: var(--font-poppins);
@@ -212,6 +212,28 @@
   }
   50% {
     transform: translate3d(0, -14px, 0);
+  }
+}
+
+@keyframes floatingSmooth {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate(6px, -10px) rotate(1deg);
+  }
+
+  50% {
+    transform: translate(0, -20px) rotate(0deg);
+  }
+
+  75% {
+    transform: translate(-6px, -10px) rotate(-1deg);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg);
   }
 }
 

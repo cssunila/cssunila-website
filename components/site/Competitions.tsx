@@ -69,7 +69,7 @@ const Competitions = () => {
                         return (
                             <article
                                 key={c.slug}
-                                className="glass group relative overflow-hidden rounded-3xl p-6 transition hover:-translate-y-1 hover:border-white/20"
+                                className="glass group flex flex-col relative overflow-hidden rounded-3xl p-6 transition hover:-translate-y-1 hover:border-white/20"
                             >
                                 <div
                                     className={`pointer-events-none absolute -top-20 -right-20 size-56 rounded-full bg-linear-to-br blur-3xl transition group-hover:scale-110 ${accentGlow[accent] ?? accentGlow.cyan}`}
@@ -93,7 +93,7 @@ const Competitions = () => {
                                     {c.description}
                                 </p>
 
-                                <dl className="mt-5 space-y-1.5 text-xs text-muted-foreground">
+                                <dl className="mt-5 mb-5 space-y-1.5 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-2">
                                         <Wallet size={12} className="text-cyan-strong" /> <span>Rp. {c.fee_idr.toLocaleString("id-ID")} / tim</span>
                                     </div>
@@ -107,7 +107,7 @@ const Competitions = () => {
 
                                 <Link
                                     href={`/lomba/${c.slug}`}
-                                    className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground group-hover:text-cyan-strong transition hover:gap-2.5"
+                                    className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground group-hover:text-cyan-strong transition hover:gap-2.5"
                                 >
                                     Lihat Detail <ArrowUpRight size={14} />
                                 </Link>

@@ -30,9 +30,9 @@ const Hero = ({ totalLomba, totalHadiah, totalPeserta, tagline, subtitle }: Hero
           {heroTagline}
         </span>
 
-        <h1 className="font-display text-6xl font-bold leading-[0.95] tracking-tight sm:text-7xl md:text-8xl lg:text-[9rem]">
-          <span className="gradient-text">CSS</span>{" "}
-          <span className="text-foreground">3.0</span>
+        <h1 className="font-display text-shadow italic text-6xl font-bold leading-[0.95] tracking-tight sm:text-7xl md:text-8xl lg:text-[9rem]">
+          <span className="gradient-text">CSS </span>{" "}
+          <span className="text-foreground">3.0 </span>
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">

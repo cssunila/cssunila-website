@@ -24,7 +24,15 @@ const About = ({ title, description1, description2, highlights, logo }: AboutPro
   const aboutLogo = logo || "/css-logo.png";
 
   return (
-    <section id="about" className="relative py-24">
+    <section id="about" className="relative isolate py-24">
+      <Image
+        src={"/assets/elektrik.png"}
+        alt=""
+        aria-hidden
+        width={1920}
+        height={1088}
+        className="pointer-events-none animate-floating-smooth absolute inset-0 -z-10 h-full w-full object-cover opacity-80"
+      />
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 md:grid-cols-2">
         <div className="relative">
           <div className="absolute -inset-8 -z-10 rounded-full bg-linear-to-br from-sapphire/30 to-cyan-strong/20 blur-3xl" />

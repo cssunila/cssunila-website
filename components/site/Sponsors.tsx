@@ -47,7 +47,7 @@ const Sponsors = () => {
           <div className="mb-12 text-center">
             <span className="text-xs font-medium uppercase tracking-widest text-cyan-strong">Didukung Oleh</span>
             <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">
-              <span className="gradient-text">Sponsor</span> &amp; Media Partner
+              <span className="gradient-text">Sponsor </span> &amp; Media Partner
             </h2>
           </div>
           <div className="flex items-center justify-center py-16">
@@ -74,7 +74,7 @@ const Sponsors = () => {
             Didukung Oleh
           </span>
           <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">
-            <span className="gradient-text">Sponsor</span> &amp; Media Partner
+            <span className="gradient-text">Sponsor </span> & Media Partner
           </h2>
         </div>
 

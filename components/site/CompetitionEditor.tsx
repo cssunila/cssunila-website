@@ -1,13 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { ArrowDown, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowDown, ArrowRight, Loader2, X } from "lucide-react";
 import HelpLabel from "./HelpLabel";
 import { accentOptions, iconNames } from "@/lib/icons";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import { createClient } from "@/supabase/client";
+import Image from "next/image";
 
 type CompRow = {
   id: string;
   slug: string;
+  banner: string | null;
   name: string;
   tagline: string | null;
   fee_idr: number;
@@ -23,6 +28,10 @@ type CompFull = CompRow & {
   team_size: string | null;
   prize: string | null;
   rules: string[];
+  pj_1: string | null;
+  no_pj_1: string | null;
+  pj_2: string | null;
+  no_pj_2: string | null;
   timeline: { date: string; label: string }[];
 };
 
@@ -41,6 +50,8 @@ const CompetitionEditor = ({
       .map((t) => `${t.date}${t.label ? ` | ${t.label}` : ""}`)
       .join("\n")
   );
+  const [loadingUpload, setLoadingUpload] = useState<boolean>(false);
+  const suparef = useRef(createClient());
 
   const parseTimeline = (text: string) => {
     return text
@@ -55,6 +66,49 @@ const CompetitionEditor = ({
       })
       .filter((item) => item.date || item.label);
   };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, value: Partial<CompFull>) => {
+    const file = e.target.files?.[0];
+    setLoadingUpload(true);
+    if (!file) {
+      setLoadingUpload(false);
+      toast.error("File tidak ditemukan");
+      return;
+    }
+
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    const allowed = ["jpg", "jpeg", "png", "webp", "svg"];
+    if (!allowed.includes(ext ?? "")) {
+      setLoadingUpload(false);
+      toast.error("Format file harus berupa JPG, JPEG, PNG, WEBP, atau SVG");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      setLoadingUpload(false);
+      toast.error("Ukuran file maksimal 2MB");
+      return;
+    }
+
+    try {
+      const supabase = suparef.current;
+      const path = `competitions/banner-${value.slug}/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("site_settings")
+        .upload(path, file, { upsert: false, contentType: file.type });
+
+      if (error) throw error;
+
+      const { data } = supabase.storage.from("site_settings").getPublicUrl(path);
+      onChange({ ...value, banner: data.publicUrl });
+      toast.success("Gambar berhasil diunggah");
+    } catch (err: any) {
+      toast.error("Gagal mengunggah gambar: " + err.message);
+    } finally {
+      setLoadingUpload(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-background/80 p-4 backdrop-blur">
       <form
@@ -63,6 +117,25 @@ const CompetitionEditor = ({
       >
         <h3 className="font-display text-lg font-bold">{value.id ? "Edit Lomba" : "Lomba Baru"}</h3>
 
+        <div>
+          <HelpLabel label="Banner" hint="Banner lomba, file ext yang diperbolehkan: jpg, jpeg, png, webp, dan svg" />
+          {value.banner &&
+            <div className="flex items-center gap-2">
+              <Image src={value.banner ?? ""} alt="Logo Website" width={70} height={70} className="object-contain w-16 h-16 my-1" />
+              <button type="button" onClick={() => onChange({ ...value, banner: null })} className="text-xs text-destructive hover:underline flex items-center gap-1">
+                <X size={12} /> Hapus Banner
+              </button>
+            </div>
+          }
+          {loadingUpload ? <Loader2 size={14} className="animate-spin" /> : (
+            <input
+              type="file"
+              className="inputCls inputFile"
+              accept=".png,.jpg,.jpeg,.svg,.webp"
+              onChange={(e) => handleUpload(e, value)}
+            />
+          )}
+        </div>
         <div>
           <HelpLabel label="Nama Lomba" hint="Nama yang ditampilkan ke peserta, misal 'Mobile Legends'." required />
           <input className={"inputCls"} placeholder="Mobile Legends" required value={value.name ?? ""} onChange={(e) => onChange({ ...value, name: e.target.value })} />
@@ -118,6 +191,28 @@ const CompetitionEditor = ({
           <div>
             <HelpLabel label="Hadiah" required hint="Total/ringkasan hadiah. Contoh: 'Rp 8.000.000 + Trophy'." />
             <input className={"inputCls"} placeholder="Rp 8.000.000 + Trophy" value={value.prize ?? ""} onChange={(e) => onChange({ ...value, prize: e.target.value })} />
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <HelpLabel label="Penanggung Jawab 1" required hint="Penanggung Jawab Lomba. Contoh: Bangraff." />
+            <input className={"inputCls"} required placeholder="Contoh: Bangraff" value={value.pj_1 ?? ""} onChange={(e) => onChange({ ...value, pj_1: e.target.value })} />
+          </div>
+          <div>
+            <HelpLabel label="Whatsapp Penanggung Jawab 1" required hint="Nomor Whatsapp. Contoh: '0858xxxxx'." />
+            <input className={"inputCls"} required placeholder="Contoh: 08533xxxxx" value={value.no_pj_1 ?? ""} onChange={(e) => onChange({ ...value, no_pj_1: e.target.value })} />
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <HelpLabel label="Penanggung Jawab 2" hint="Penanggung Jawab Lomba. Contoh: Bangraff." />
+            <input className={"inputCls"} placeholder="Contoh: Bangraff" value={value.pj_2 ?? ""} onChange={(e) => onChange({ ...value, pj_2: e.target.value })} />
+          </div>
+          <div>
+            <HelpLabel label="Whatsapp Penanggung Jawab 2" hint="Nomor Whatsapp. Contoh: '0858xxxxx'." />
+            <input className={"inputCls"} placeholder="Contoh: 08533xxxxx" value={value.no_pj_2 ?? ""} onChange={(e) => onChange({ ...value, no_pj_2: e.target.value })} />
           </div>
         </div>
 

@@ -14,6 +14,7 @@ type CompRow = {
   id: string;
   slug: string;
   name: string;
+  banner: string | null;
   tagline: string | null;
   fee_idr: number;
   quota: number;
@@ -28,6 +29,10 @@ type CompFull = CompRow & {
   team_size: string | null;
   prize: string | null;
   rules: string[];
+  pj_1: string | null;
+  no_pj_1: string | null;
+  pj_2: string | null;
+  no_pj_2: string | null;
   timeline: { date: string; label: string }[];
 };
 
@@ -60,7 +65,7 @@ const CompetitionsTab = () => {
       const supabase = suparef.current;
       let query = supabase
         .from("competitions")
-        .select("id,slug,name,tagline,fee_idr,quota,is_open,position,description,icon,accent,team_size,prize,rules,timeline");
+        .select("id,slug,name,tagline,fee_idr,quota,is_open,position,description,icon,accent,team_size,prize,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner");
 
       if (role === "lomba") {
         if (!allowedComps || allowedComps.length === 0) {
@@ -89,6 +94,11 @@ const CompetitionsTab = () => {
         description: v.description ?? null,
         icon: v.icon ?? "Trophy",
         accent: v.accent ?? "cyan",
+        banner: v.banner || null,
+        pj_1: v.pj_1 ?? null,
+        no_pj_1: v.no_pj_1 ?? null,
+        pj_2: v.pj_2 ?? null,
+        no_pj_2: v.no_pj_2 || null,
         team_size: v.team_size ?? null,
         prize: v.prize ?? null,
         rules: v.rules ?? [],
