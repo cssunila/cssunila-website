@@ -4,6 +4,7 @@ import Link from "next/link";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Pengumuman Juara | CSS UNILA 3.0",
@@ -20,6 +21,7 @@ type WinnerItem = {
   rank: number;
   title: string;
   prize_money: string | null;
+  status: 'draft' | 'published';
   competition: {
     name: string;
     slug: string;
@@ -43,6 +45,7 @@ export default async function PengumumanPage() {
         rank,
         title,
         prize_money,
+        status,
         competition:competitions(name, slug),
         registration:registrations(team_name, leader_name)
       `)
@@ -56,6 +59,8 @@ export default async function PengumumanPage() {
 
   const groupedWinners: Record<string, WinnerItem[]> = {};
   winners.forEach((w) => {
+    if(w.status == 'draft') return;
+    
     const compName = w.competition?.name ?? "Lainnya";
     if (!groupedWinners[compName]) {
       groupedWinners[compName] = [];
@@ -66,11 +71,11 @@ export default async function PengumumanPage() {
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Trophy className="text-yellow-400 size-6" />;
+        return <Image src={"/assets/juara_1.png"} width={20} height={20} alt="logo juara" className="w-full h-auto object-contain pointer-events-none" />;
       case 2:
-        return <Medal className="text-slate-300 size-6" />;
+        return <Image src={"/assets/juara_2.png"} width={20} height={20} alt="logo juara" className="w-full h-auto object-contain pointer-events-none" />;
       case 3:
-        return <Medal className="text-amber-600 size-6" />;
+        return <Image src={"/assets/juara_3.png"} width={20} height={20} alt="logo juara" className="w-full h-auto object-contain pointer-events-none" />;
       default:
         return <Star className="text-cyan-400 size-6" />;
     }
@@ -124,7 +129,7 @@ export default async function PengumumanPage() {
             </div>
           )}
 
-          {!errorMsg && winners.length === 0 && (
+          {!errorMsg && (winners.length === 0 || Object.entries(groupedWinners).length === 0) && (
             <div className="glass rounded-3xl p-12 text-center text-muted-foreground border border-white/5">
               <Trophy size={48} className="mx-auto text-muted-foreground/30 mb-4" />
               <p className="font-display text-lg font-semibold text-foreground/80">Pengumuman Belum Rilis</p>

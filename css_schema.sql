@@ -75,6 +75,14 @@ CREATE TABLE public.competitions (
   position integer NOT NULL DEFAULT 0,
   rules jsonb NOT NULL DEFAULT '[]'::jsonb,
   timeline jsonb NOT NULL DEFAULT '[]'::jsonb,
+  pj_1 text,
+  no_pj_1 text,
+  pj_2 text,
+  no_pj_2 text,
+  banner text,
+  juara_1 text,
+  juara_2 text,
+  juara_3 text,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
