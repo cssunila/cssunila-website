@@ -26,7 +26,6 @@ type CompFull = CompRow & {
   icon: string | null;
   accent: string | null;
   team_size: string | null;
-  prize: string | null;
   rules: string[];
   pj_1: string | null;
   no_pj_1: string | null;
@@ -171,18 +170,14 @@ const CompetitionEditor = ({
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <HelpLabel label="Biaya (Rp)" required hint="Nominal pembayaran per tim dalam Rupiah, hanya angka. Contoh: 150000." />
-            <input className={"inputCls"} type="number" min={0} value={value.fee_idr ?? 0} onChange={(e) => onChange({ ...value, fee_idr: +e.target.value })} />
+            <input className={"inputCls"} type="number" min={0} value={value.fee_idr ?? 0} onChange={(e) => onChange({ ...value, fee_idr: + e.target.value })} />
           </div>
           <div>
             <HelpLabel label="Kuota Tim" required hint="Jumlah maksimum tim yang bisa terdaftar. Jika tidak ada batasan kuota, isi dengan angka 0." />
-            <input className={"inputCls"} type="number" min={0} value={value.quota ?? 0} onChange={(e) => onChange({ ...value, quota: +e.target.value })} />
-          </div>
-          <div>
-            <HelpLabel label="Urutan" required hint="Urutan tampil di halaman beranda. Angka lebih kecil tampil dulu." />
-            <input className={"inputCls"} type="number" value={value.position ?? 0} onChange={(e) => onChange({ ...value, position: +e.target.value })} />
+            <input className={"inputCls"} type="number" min={0} value={value.quota ?? 0} onChange={(e) => onChange({ ...value, quota: + e.target.value })} />
           </div>
         </div>
 
@@ -207,8 +202,8 @@ const CompetitionEditor = ({
             <input className={"inputCls"} placeholder="5 pemain + 1 cadangan" value={value.team_size ?? ""} onChange={(e) => onChange({ ...value, team_size: e.target.value })} />
           </div>
           <div>
-            <HelpLabel label="Hadiah" required hint="Total/ringkasan hadiah. Contoh: 'Rp 8.000.000 + Trophy'." />
-            <input className={"inputCls"} placeholder="Rp 8.000.000 + Trophy" value={value.prize ?? ""} onChange={(e) => onChange({ ...value, prize: e.target.value })} />
+            <HelpLabel label="Urutan" required hint="Urutan tampil di halaman beranda. Angka lebih kecil tampil dulu." />
+            <input className={"inputCls"} type="number" value={value.position ?? 0} onChange={(e) => onChange({ ...value, position: +e.target.value })} />
           </div>
         </div>
 

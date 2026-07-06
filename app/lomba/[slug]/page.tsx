@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Users, Wallet, Trophy, CheckCircle2, Lock, Timer, Clock } from "lucide-react";
+import { ArrowLeft, Users, Wallet, Trophy, CheckCircle2, Lock, Timer, Clock, Search, UserCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
@@ -15,9 +15,9 @@ import Image from "next/image";
 import { dateActive } from "@/lib/formatTanggal";
 
 type CompetitionDetail = {
-    slug: string; name: string; tagline: string | null; description: string | null;
-    icon: string | null; accent: string | null; fee_idr: number; quota: number;
-    team_size: string | null; prize: string | null; is_open: boolean;
+    id: string; slug: string; name: string; tagline: string | null; description: string | null;
+    icon: string | null; accent: string | null; fee_idr: number; quota: number; pendaftar: number | null;
+    team_size: string | null; is_open: boolean;
     pj_1: string; no_pj_1: string; pj_2: string; no_pj_2: string; banner: string;
     juara_1: string; juara_2: string; juara_3: string;
     rules: string[]; timeline: { date: string; label: string }[];
@@ -48,16 +48,27 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
             const supabase = suparef.current;
             const { data, error } = await supabase
                 .from("competitions")
-                .select("slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,prize,is_open,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner,juara_1,juara_2,juara_3")
+                .select("id,slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,is_open,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner,juara_1,juara_2,juara_3")
                 .eq("slug", slug)
                 .maybeSingle();
             if (error) throw error;
             if (!data) return null;
-            return {
+
+            const { data: register } = await supabase
+                .from("registrations")
+                .select("competition_id")
+                .eq("competition_id", data.id)
+                .eq("status", "verified");
+
+            const newData: CompetitionDetail = {
                 ...data,
+                pendaftar: null,
                 rules: Array.isArray(data.rules) ? (data.rules as string[]) : [],
                 timeline: Array.isArray(data.timeline) ? (data.timeline as { date: string; label: string }[]) : [],
-            };
+            }
+
+            if (register) newData.pendaftar = register.length;
+            return newData;
         },
     });
 
@@ -72,9 +83,10 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
     if (!c) {
         return (
             <div className="flex min-h-screen items-center justify-center px-4 text-center">
-                <div>
-                    <h1 className="font-display text-4xl font-bold">Lomba tidak ditemukan</h1>
-                    <Link href="/" className="mt-6 inline-block text-cyan-strong underline">Kembali ke beranda</Link>
+                <div className="flex flex-col gap-2 items-center justify-center">
+                    <Search size={58} className="text-muted-foreground animate-floating-smooth" />
+                    <h1 className="text-4xl font-bold">Lomba tidak ditemukan</h1>
+                    <Link href="/" className="mt-3 inline-flex gap-2 items-center btn-hero rounded-lg px-4 py-3 text-black inline-block"><ArrowLeft size={18} /> Kembali ke beranda</Link>
                 </div>
             </div>
         );
@@ -123,7 +135,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                             { icon: Wallet, label: "Biaya", value: `Rp ${c.fee_idr.toLocaleString("id-ID")}` },
                             { icon: Users, label: "Kuota", value: `${c.quota > 0 ? c.quota + ' tim' : 'Tidak ada batasan'}` },
                             { icon: Users, label: "Tim", value: c.team_size ?? "-" },
-                            { icon: Trophy, label: "Hadiah", value: c.prize ?? "-" },
+                            { icon: UserCheck, label: "Pendaftar", value: c.pendaftar ?? "-" },
                         ].map((s) => (
                             <div key={s.label} className="glass rounded-2xl p-5">
                                 <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">

@@ -28,20 +28,46 @@ export default async function Home() {
   let siteLogo: string | undefined;
   let timelineItems: { start_date: string; end_date: string; label: string; description: string }[] | undefined;
 
+  function formatCurrencyShort(value: number) {
+    const num = Number(value);
+
+    if (num >= 1_000_000_000) {
+      return `${parseFloat((num / 1_000_000_000).toFixed(1))}B`;
+    }
+
+    if (num >= 1_000_000) {
+      return `${parseFloat((num / 1_000_000).toFixed(1))}M`;
+    }
+
+    if (num >= 1_000) {
+      return `${parseFloat((num / 1_000).toFixed(1))}k`;
+    }
+
+    return `${num}`;
+  }
+
   try {
     const supabase = await createClient();
 
-    const { data: comps } = await supabase.from("competitions").select("prize");
+    const { data: comps } = await supabase.from("competitions").select("juara_1,juara_2,juara_3");
     if (comps) {
       totalLomba = comps.length;
       let totalPrizeValue = 0;
       comps.forEach((c) => {
-        if (c.prize) {
-          const clean = c.prize.replace(/[^0-9]/g, "");
+        if (c.juara_1) {
+          const clean = c.juara_1.replace(/[^0-9]/g, "");
+          if (clean) totalPrizeValue += parseInt(clean, 10);
+        }
+        if (c.juara_2) {
+          const clean = c.juara_2.replace(/[^0-9]/g, "");
+          if (clean) totalPrizeValue += parseInt(clean, 10);
+        }
+        if (c.juara_3) {
+          const clean = c.juara_3.replace(/[^0-9]/g, "");
           if (clean) totalPrizeValue += parseInt(clean, 10);
         }
       });
-      totalHadiah = totalPrizeValue > 0 ? `${Math.floor(totalPrizeValue / 1000000)}Jt+` : "0";
+      totalHadiah = totalPrizeValue > 0 ? formatCurrencyShort(totalPrizeValue) : "0";
     }
 
     const { count } = await supabase

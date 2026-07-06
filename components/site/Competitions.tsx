@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowUpRight, Users, Wallet, Trophy, Lock } from "lucide-react";
+import { ArrowUpRight, Users, Wallet, Trophy, Lock, User } from "lucide-react";
 import { getIcon, accentGlow } from "@/lib/icons";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/supabase/client";
@@ -9,7 +9,7 @@ import Link from "next/link";
 type CompCard = {
     slug: string; name: string; tagline: string | null; description: string | null;
     icon: string | null; accent: string | null; fee_idr: number; quota: number;
-    team_size: string | null; prize: string | null; is_open: boolean;
+    team_size: string | null; is_open: boolean;
 };
 
 const Competitions = () => {
@@ -21,7 +21,7 @@ const Competitions = () => {
         const supabase = suparef.current;
         const { data, error } = await supabase
             .from("competitions")
-            .select("slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,prize,is_open")
+            .select("slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,is_open")
             .order("position");
         if (error || !data) {
             setData([]);
@@ -101,7 +101,7 @@ const Competitions = () => {
                                         <Users size={12} className="text-cyan-strong" /> <span>{c.team_size ?? "-"}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Trophy size={12} className="text-cyan-strong" /> <span className="truncate">Rp. {parseInt(c.prize ?? "0").toLocaleString("id-ID")}</span>
+                                        <User size={12} className="text-cyan-strong" /> <span className="truncate">{c.quota > 0 ? c.quota+" Tim" : "Tidak ada batasan"}</span>
                                     </div>
                                 </dl>
 

@@ -68,7 +68,6 @@ CREATE TABLE public.competitions (
   description text,
   accent text,
   icon text,
-  prize text,
   fee_idr integer NOT NULL DEFAULT 0,
   quota integer NOT NULL DEFAULT 0,
   team_size text,
