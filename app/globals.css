@@ -9,6 +9,7 @@
   --color-twilight: var(--twilight);
   --color-evergreen: var(--evergreen);
   --animate-floating-smooth: floatingSmooth 5s ease-in-out infinite;
+  --animate-shimmer: shimmer 2s linear infinite;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-poppins: var(--font-poppins);
@@ -234,6 +235,15 @@
 
   100% {
     transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes shimmer {
+  0% { 
+    background-position: 200% 0; 
+  }
+  100% { 
+    background-position: -200% 0; 
   }
 }
 

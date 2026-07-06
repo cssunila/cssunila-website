@@ -2,7 +2,7 @@ import { Wrench, Instagram, Mail } from "lucide-react";
 
 const Maintenance = () => {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-20">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-4">
       <div className="pointer-events-none absolute -left-24 top-1/4 -z-10 h-80 w-80 rounded-full bg-sapphire/30 blur-3xl animate-float" />
       <div className="pointer-events-none absolute -right-16 bottom-10 -z-10 h-96 w-96 rounded-full bg-cyan-strong/25 blur-3xl animate-float [animation-delay:1.5s]" />
 
@@ -17,18 +17,18 @@ const Maintenance = () => {
             Sedang Perawatan
           </span>
 
-          <h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-            Kami sedang <span className="gradient-text">berbenah</span>
+          <h1 className="mt-5 font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+            Kami sedang <span className="gradient-text">melakukan perawatan</span>
           </h1>
 
           <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground sm:text-base">
-            Tim CSS 3.0 sedang meningkatkan sistem agar pengalamanmu makin mulus.
+            Tim CSS 3.0 sedang meningkatkan sistem agar pengalamanmu makin lancar.
             Halaman ini akan kembali online sebentar lagi — terima kasih atas kesabarannya!
           </p>
 
           {/* progress bar */}
           <div className="mx-auto mt-8 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/5">
-            <div className="h-full w-1/2 rounded-full bg-linear-to-r from-sapphire via-cyan-strong to-sapphire bg-[length:200%_100%] animate-[shimmer_2s_linear_infinite]" />
+            <div className="h-full w-11/12 rounded-full bg-linear-to-r from-sapphire via-cyan-strong to-sapphire bg-[length:200%_100%] animate-shimmer" />
           </div>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

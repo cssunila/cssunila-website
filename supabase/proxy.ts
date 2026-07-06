@@ -54,7 +54,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (maintenance && !(maintenance.value == 'true') && ["/maintenance"].includes(request.nextUrl.pathname)) {
+  if (maintenance && !(maintenance.value == 'true') && ["/maintenance"].includes(request.nextUrl.pathname) && !isAdmin) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
