@@ -1049,14 +1049,16 @@ const SiteSettingsTab = () => {
               </div>
             </label>
           </div>
-          <button
-            onClick={handleSaveSettings}
-            disabled={saveSettings.isPending || settingsLoading}
-            className="btn-hero inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-60 cursor-pointer"
-          >
-            {saveSettings.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-            Simpan
-          </button>
+          <div className="flex items-center justify-end">
+            <button
+              onClick={handleSaveSettings}
+              disabled={saveSettings.isPending || settingsLoading}
+              className="btn-hero inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-60 cursor-pointer"
+            >
+              {saveSettings.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+              Simpan
+            </button>
+          </div>
         </div>
       </div>
 

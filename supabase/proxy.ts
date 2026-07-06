@@ -48,7 +48,7 @@ export async function updateSession(request: NextRequest) {
     .eq("id", "site_maintenance")
     .maybeSingle();
 
-  if (maintenance && (maintenance.value == 'true') && !isAdmin) {
+  if (maintenance && (maintenance.value == 'true') && !(["/maintenance"].includes(request.nextUrl.pathname)) && !isAdmin) {
     const url = request.nextUrl.clone();
     url.pathname = "/maintenance";
     return NextResponse.redirect(url);
