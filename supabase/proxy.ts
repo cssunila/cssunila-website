@@ -9,34 +9,61 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  const supabase = createServerClient(
-    supabaseUrl!,
-    supabaseKey!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
-          );
-        },
+  const supabase = createServerClient(supabaseUrl!, supabaseKey!, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value),
+        );
+        supabaseResponse = NextResponse.next({
+          request,
+        });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options),
+        );
       },
     },
-  );
+  });
 
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
+  let isAdmin = false;
+
+  if (user) {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.sub)
+      .maybeSingle();
+
+    if (data) isAdmin = data.role == "admin";
+  }
+
+  const { data: maintenance } = await supabase
+    .from("site_settings")
+    .select("id, value")
+    .eq("id", "site_maintenance")
+    .maybeSingle();
+
+  if (maintenance && (maintenance.value == 'true') && !isAdmin) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/maintenance";
+    return NextResponse.redirect(url);
+  }
+
+  if (maintenance && !(maintenance.value == 'true') && ["/maintenance"].includes(request.nextUrl.pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
 
   const isLogin = ["/auth"].includes(request.nextUrl.pathname);
-  const isLogout = ["/history","/admin","/api/midtrans/snap"].includes(request.nextUrl.pathname);
+  const isLogout = ["/history", "/admin", "/api/midtrans/snap"].includes(
+    request.nextUrl.pathname,
+  );
 
   if ((isLogout || request.nextUrl.pathname.startsWith("/daftar")) && !user) {
     const url = request.nextUrl.clone();
@@ -45,7 +72,13 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (isLogin && user) {
-    const url = request.nextUrl.clone(); 
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+
+  if (["/admin"].includes(request.nextUrl.pathname) && !isAdmin) {
+    const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
   }

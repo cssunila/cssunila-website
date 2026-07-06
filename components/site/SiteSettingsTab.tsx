@@ -190,7 +190,6 @@ const SiteSettingsTab = () => {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  // ── Sponsors queries & mutations ─────────────────────────────────────────
   const { data: sponsorsData, isLoading: sponsorsLoading } = useQuery({
     queryKey: ["admin-sponsors"],
     queryFn: async (): Promise<Sponsor[]> => {
@@ -261,7 +260,6 @@ const SiteSettingsTab = () => {
     reorderSponsor.mutate(items);
   };
 
-  // ── Media Partners queries & mutations ───────────────────────────────────
   const { data: mediaPartnersData, isLoading: mediaPartnersLoading } = useQuery({
     queryKey: ["admin-media-partners"],
     queryFn: async (): Promise<MediaPartner[]> => {
@@ -1047,10 +1045,18 @@ const SiteSettingsTab = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <input type="checkbox" id="maintenance" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
+                <input type="checkbox" onChange={(e) => setSettings({ ...settings, site_maintenance: String(e.target.checked)  })} checked={settings['site_maintenance'] && settings['site_maintenance'] == 'true' ? true : false} id="maintenance" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
               </div>
             </label>
           </div>
+          <button
+            onClick={handleSaveSettings}
+            disabled={saveSettings.isPending || settingsLoading}
+            className="btn-hero inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-60 cursor-pointer"
+          >
+            {saveSettings.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            Simpan
+          </button>
         </div>
       </div>
 
