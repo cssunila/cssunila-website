@@ -201,14 +201,14 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
                                 <Field label="Nama Tim" required>
                                     <input value={teamName} onChange={(e) => setTeamName(e.target.value)} className={"inputCls"} maxLength={100} placeholder="Radar" required />
                                 </Field>
-                                <Field label="Nama Ketua" required>
+                                <Field label="Nama Pendaftar" required>
                                     <input value={leaderName} onChange={(e) => setLeaderName(e.target.value)} className={"inputCls"} maxLength={100} placeholder="Bangraff" required />
                                 </Field>
                                 <div className="grid gap-5 sm:grid-cols-2">
-                                    <Field label="WhatsApp Ketua" required>
+                                    <Field label="WhatsApp Pendaftar" required>
                                         <input value={leaderWhatsapp} onChange={(e) => setLeaderWhatsapp(e.target.value)} className={"inputCls"} maxLength={20} required placeholder="08xxxxxxxxxx" />
                                     </Field>
-                                    <Field label="Email Ketua" required>
+                                    <Field label="Email Pendaftar" required>
                                         <input type="email" value={leaderEmail} onChange={(e) => setLeaderEmail(e.target.value)} className={"inputCls"} maxLength={255} required />
                                     </Field>
                                 </div>

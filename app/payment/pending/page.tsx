@@ -29,13 +29,11 @@ function PaymentPendingContent() {
     const transactionStatus = params.get("transaction_status");
     const statusCode = params.get("status_code");
 
-    // Tidak ada parameter valid → bukan dari Midtrans
     if (!orderId || !transactionStatus || !statusCode) {
       router.replace("/");
       return;
     }
 
-    // Hanya boleh masuk jika statusnya pending
     if (transactionStatus !== "pending") {
       if (["settlement", "capture"].includes(transactionStatus)) {
         router.replace("/payment/success?" + params.toString());

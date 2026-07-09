@@ -810,8 +810,8 @@ const RegistrationsTab = () => {
               key={r.id}
               className="glass rounded-2xl p-5 hover:border-white/20 border border-white/5 transition-colors"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="shrink-0 min-w-0">
                   <p className="text-xs text-muted-foreground">
                     {new Date(r.created_at).toLocaleString("id-ID", {
                       day: "2-digit",
@@ -836,7 +836,7 @@ const RegistrationsTab = () => {
                   </p>
                 </div>
 
-                <div className="flex flex-col items-end gap-2 shrink-0">
+                <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
                   <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${status.tone}`}>
                     {status.label}
                   </span>

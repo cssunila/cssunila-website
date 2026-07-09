@@ -29,13 +29,11 @@ function PaymentErrorContent() {
     const transactionStatus = params.get("transaction_status");
     const statusCode = params.get("status_code");
 
-    // Tidak ada parameter valid → bukan dari Midtrans, redirect ke home
     if (!orderId || !transactionStatus || !statusCode) {
       router.replace("/");
       return;
     }
 
-    // Kalau ternyata sukses, alihkan ke halaman sukses
     const successStatuses = ["settlement", "capture", "pending"];
     if (successStatuses.includes(transactionStatus)) {
       router.replace("/payment/success?" + params.toString());
