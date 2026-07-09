@@ -2,12 +2,13 @@
 
 import { createClient } from "@/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, Trash2, Trophy, Medal, Star } from "lucide-react";
+import { Eye, EyeOff, Loader2, Plus, Trash2, Trophy, Medal, Star } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import ConfirmModal from "./ConfirmModal";
 import Image from "next/image";
+import { usePageVisibility, useToggleVisibility } from "@/hooks/use-page-visibility";
 
 type WinnerRow = {
   id: string;
@@ -39,6 +40,8 @@ const WinnersTab = () => {
   const { role, user } = useAuth();
   const suparef = useRef(createClient());
   const [selectedCompId, setSelectedCompId] = useState<string>("all");
+  const { visibility } = usePageVisibility();
+  const toggleVis = useToggleVisibility("juara");
   const [confirmDelete, setConfirmDelete] = useState<{ id: string; title: string; compName: string } | null>(null);
 
   const [newWinner, setNewWinner] = useState<{
@@ -259,6 +262,27 @@ const WinnersTab = () => {
               </button>
             ))}
           </div>
+          {role === "admin" && (
+            <button
+              onClick={() => {
+                const next = !visibility.juara;
+                toggleVis.mutate(next, {
+                  onSuccess: () => toast.success(next ? "Halaman Pengumuman ditampilkan" : "Halaman Pengumuman disembunyikan"),
+                  onError: (e: Error) => toast.error(e.message),
+                });
+              }}
+              disabled={toggleVis.isPending}
+              title={visibility.juara ? "Sembunyikan halaman Pengumuman Juara" : "Tampilkan halaman Pengumuman Juara"}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+                visibility.juara
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                  : "border-amber-500/40 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+              }`}
+            >
+              {toggleVis.isPending ? <Loader2 size={13} className="animate-spin" /> : visibility.juara ? <Eye size={13} /> : <EyeOff size={13} />}
+              {visibility.juara ? "Pengumuman Ditampilkan" : "Pengumuman Disembunyikan"}
+            </button>
+          )}
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">

@@ -3,11 +3,12 @@
 
 import { createClient } from "@/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Pencil, Plus, Trash2, X, Upload } from "lucide-react";
+import { Eye, EyeOff, Loader2, Pencil, Plus, Trash2, X, Upload } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import ConfirmModal from "./ConfirmModal";
+import { usePageVisibility, useToggleVisibility } from "@/hooks/use-page-visibility";
 
 type NewsRow = {
   id: string;
@@ -29,6 +30,8 @@ const NewsTab = () => {
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<{ id: string; title: string } | null>(null);
+  const { visibility } = usePageVisibility();
+  const toggleVis = useToggleVisibility("berita");
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-news"],
@@ -161,7 +164,26 @@ const NewsTab = () => {
 
   return (
     <div>
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <button
+          onClick={() => {
+            const next = !visibility.berita;
+            toggleVis.mutate(next, {
+              onSuccess: () => toast.success(next ? "Section Berita ditampilkan" : "Section Berita disembunyikan"),
+              onError: (e: Error) => toast.error(e.message),
+            });
+          }}
+          disabled={toggleVis.isPending}
+          title={visibility.berita ? "Sembunyikan section Berita dari landing page" : "Tampilkan section Berita di landing page"}
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+            visibility.berita
+              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+              : "border-amber-500/40 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+          }`}
+        >
+          {toggleVis.isPending ? <Loader2 size={13} className="animate-spin" /> : visibility.berita ? <Eye size={13} /> : <EyeOff size={13} />}
+          {visibility.berita ? "Ditampilkan" : "Disembunyikan"}
+        </button>
         <button onClick={() => setEditing({ status: "draft", gallery: [] })} className="btn-hero inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold">
           <Plus size={14} /> Berita baru
         </button>

@@ -648,3 +648,30 @@ CREATE POLICY "Admins can manage user_competitions" ON public.user_competitions
   USING (public.has_role('admin', auth.uid()))
   WITH CHECK (public.has_role('admin', auth.uid()));
 
+-- =========================================================================
+-- 8. PAGE VISIBILITY CONFIGURATION (HIDE/SHOW PAGES)
+-- =========================================================================
+
+CREATE TABLE IF NOT EXISTS public.page_visibility (
+  id text PRIMARY KEY,
+  is_visible boolean DEFAULT true NOT NULL,
+  updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+INSERT INTO public.page_visibility (id, is_visible) VALUES
+  ('lomba', true),
+  ('berita', true),
+  ('seminar', true),
+  ('juara', true)
+ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE public.page_visibility ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public read of page_visibility" ON public.page_visibility
+  FOR SELECT USING (true);
+
+CREATE POLICY "Admins can manage page_visibility" ON public.page_visibility
+  FOR ALL TO authenticated
+  USING (public.has_role('admin', auth.uid()))
+  WITH CHECK (public.has_role('admin', auth.uid()));
+

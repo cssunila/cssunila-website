@@ -5,6 +5,7 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Metadata } from "next";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Pengumuman Juara | CSS UNILA 3.0",
@@ -33,11 +34,23 @@ type WinnerItem = {
 };
 
 export default async function PengumumanPage() {
+  const supabase = await createClient();
+
+  // Check if page_visibility is disabled for juara
+  const { data: visData } = await supabase
+    .from("page_visibility")
+    .select("is_visible")
+    .eq("id", "juara")
+    .single();
+
+  if (visData && visData.is_visible === false) {
+    notFound();
+  }
+
   let winners: WinnerItem[] = [];
   let errorMsg = "";
 
   try {
-    const supabase = await createClient();
     const { data, error } = await supabase
       .from("winners")
       .select(`

@@ -108,6 +108,28 @@ export default async function Home() {
     }
   } catch { }
 
+  const visibility = {
+    lomba: true,
+    berita: true,
+    seminar: true,
+    juara: true,
+  };
+
+  try {
+    const supabase = await createClient();
+    const { data: visData } = await supabase
+      .from("page_visibility")
+      .select("id, is_visible");
+    if (visData) {
+      visData.forEach((row) => {
+        if (row.id === "lomba") visibility.lomba = row.is_visible;
+        if (row.id === "berita") visibility.berita = row.is_visible;
+        if (row.id === "seminar") visibility.seminar = row.is_visible;
+        if (row.id === "juara") visibility.juara = row.is_visible;
+      });
+    }
+  } catch { }
+
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <Navbar />
@@ -127,9 +149,9 @@ export default async function Home() {
           logo={siteLogo}
         />
         <Timeline items={timelineItems} />
-        <Competitions />
-        <News />
-        <Seminars />
+        {visibility.lomba && <Competitions />}
+        {visibility.berita && <News />}
+        {visibility.seminar && <Seminars />}
         <Sponsors />
       </main>
       <Footer />

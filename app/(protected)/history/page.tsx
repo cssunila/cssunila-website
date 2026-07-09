@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   Inbox,
   ArrowLeft,
@@ -11,6 +11,7 @@ import {
   Download,
   Loader2,
   ShieldCheck,
+  X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -32,7 +33,20 @@ type Row = {
   status: string;
   created_at: string;
   competition: { id: string; slug: string; name: string } | null;
-  payments: { amount_idr: number; status: string };
+  payments:
+    | {
+        amount_idr: number;
+        status: string;
+        midtrans_token: string | null;
+        midtrans_order_id: string | null;
+      }
+    | {
+        amount_idr: number;
+        status: string;
+        midtrans_token: string | null;
+        midtrans_order_id: string | null;
+      }[]
+    | null;
 };
 
 type SnapResult = {
@@ -74,11 +88,11 @@ const statusMeta: Record<
 };
 
 const HistoryPage = () => {
-  const qc = useQueryClient();
   const [payingId, setPayingId] = useState<string | null>(null);
   const suparef = useRef(createClient());
   const [rows, setRows] = useState<Row[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [modalData, setModalData] = useState<{ registrationId: string; midtransToken: string } | null>(null);
   const { role, loading, user } = useAuth();
   const router = useRouter();
 
@@ -98,34 +112,44 @@ const HistoryPage = () => {
     document.head.appendChild(s);
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      if (!user) return;
+  const fetchRows = async () => {
+    if (!user) return;
 
-      const supabase = suparef.current;
-      setIsLoading(true);
+    const supabase = suparef.current;
+    setIsLoading(true);
 
-      const { data, error } = await supabase
-        .from("registrations")
-        .select(
-          "id, team_name, leader_name, leader_whatsapp, status, created_at, competition:competitions(id, slug, name), payments(amount_idr, status)"
-        )
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+    const { data, error } = await supabase
+      .from("registrations")
+      .select(
+        "id, team_name, leader_name, leader_whatsapp, status, created_at, competition:competitions(id, slug, name), payments(amount_idr, status, midtrans_token, midtrans_order_id)"
+      )
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
 
-      if (error) {
-        setIsLoading(false);
-        setRows([]);
-        return;
-      }
-
-      setRows((data ?? []) as unknown as Row[])
+    if (error) {
       setIsLoading(false);
+      setRows([]);
+      return;
+    }
+
+    setRows((data ?? []) as unknown as Row[]);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    (async()=>{
+      await fetchRows();
     })()
   }, [user]);
 
   const pay = useMutation({
-    mutationFn: async (registrationId: string) => {
+    mutationFn: async ({
+      registrationId,
+      forceNew,
+    }: {
+      registrationId: string;
+      forceNew?: boolean;
+    }) => {
       setPayingId(registrationId);
 
       const response = await fetch("/api/midtrans/snap", {
@@ -133,7 +157,7 @@ const HistoryPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ registrationId }),
+        body: JSON.stringify({ registrationId, forceNew }),
       });
 
       const res = (await response.json()) as SnapResult & {
@@ -190,7 +214,7 @@ const HistoryPage = () => {
     },
     onSettled: () => {
       setPayingId(null);
-      qc.invalidateQueries({ queryKey: ["my-registrations"] });
+      fetchRows();
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -247,7 +271,14 @@ const HistoryPage = () => {
             {rows?.map((r) => {
               const meta = statusMeta[r.status] ?? statusMeta.draft;
               const Icon = meta.icon;
-              const amount = r.payments?.amount_idr ?? 0;
+              
+              const paymentsArr = Array.isArray(r.payments)
+                ? r.payments
+                : r.payments
+                  ? [r.payments]
+                  : [];
+              const payment = paymentsArr[0];
+              const amount = payment?.amount_idr ?? 0;
 
               return (
                 <article key={r.id} className="glass rounded-2xl p-5">
@@ -283,7 +314,16 @@ const HistoryPage = () => {
 
                       {r.status === "pending_payment" && (
                         <button
-                          onClick={() => pay.mutate(r.id)}
+                          onClick={() => {
+                            if (payment?.midtrans_token) {
+                              setModalData({
+                                registrationId: r.id,
+                                midtransToken: payment.midtrans_token,
+                              });
+                            } else {
+                              pay.mutate({ registrationId: r.id });
+                            }
+                          }}
                           disabled={payingId === r.id}
                           className="btn-hero inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold disabled:opacity-60"
                         >
@@ -298,7 +338,18 @@ const HistoryPage = () => {
 
                       {r.status === "verified" ? (
                         <button
-                          onClick={() => downloadTicket(r)}
+                          onClick={() => {
+                            const paymentsArr = Array.isArray(r.payments)
+                              ? r.payments
+                              : r.payments
+                                ? [r.payments]
+                                : [];
+                            const payment = paymentsArr[0] || { amount_idr: 0, status: "pending" };
+                            downloadTicket({
+                              ...r,
+                              payments: payment,
+                            });
+                          }}
                           className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/25"
                         >
                           <Download size={12} /> Tiket PDF
@@ -324,6 +375,62 @@ const HistoryPage = () => {
           </div>
         </div>
       </section>
+
+      {modalData && (
+        <div
+          className="confirm-modal-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setModalData(null);
+          }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="confirm-modal-box max-w-md">
+            <div className="confirm-modal-icon bg-blue-500">
+              <Wallet size={22} />
+            </div>
+
+            <button
+              onClick={() => setModalData(null)}
+              className="confirm-modal-close"
+              aria-label="Tutup"
+            >
+              <X size={16} />
+            </button>
+
+            <div className="confirm-modal-content">
+              <h2 className="confirm-modal-title">Lanjutkan Pembayaran</h2>
+              <p className="confirm-modal-message">
+                Anda memiliki transaksi pembayaran yang sedang aktif untuk pendaftaran ini. 
+                Apakah Anda ingin melanjutkan pembayaran sebelumnya, atau membuat metode pembayaran baru (untuk mengganti metode pembayaran)?
+              </p>
+            </div>
+
+            <div className="confirm-modal-actions">
+              <button
+                onClick={() => {
+                  const regId = modalData.registrationId;
+                  setModalData(null);
+                  pay.mutate({ registrationId: regId, forceNew: false });
+                }}
+                className="confirm-btn-cancel"
+              >
+                Lanjutkan
+              </button>
+              <button
+                onClick={() => {
+                  const regId = modalData.registrationId;
+                  setModalData(null);
+                  pay.mutate({ registrationId: regId, forceNew: true });
+                }}
+                className="confirm-btn-confirm btn-hero"
+              >
+                Metode Baru
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

@@ -1019,46 +1019,33 @@ const SiteSettingsTab = () => {
       <div className="border-t border-white/10 pt-8" />
 
       <div className="space-y-5">
-        {sponsorsLoading && (
-          <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
-            <Loader2 size={16} className="animate-spin" /> Memuat sponsor…
-          </div>
-        )}
-        {!sponsorsLoading && (sponsorsData ?? []).length === 0 && (
-          <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground">
-            Belum ada sponsor. Klik &quot;Tambah Sponsor&quot; untuk memulai.
-          </div>
-        )}
-
-        <div className="space-y-3">
-          <div className="glass rounded-2xl p-4 border border-white/5 hover:border-white/10 transition-colors">
-            <label htmlFor="maintenance" className="flex cursor-pointer items-center gap-3">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-amber-500/10">
-                  <Wrench size={16} className="text-amber-500" />
-                </div>
-                <div>
-                  <h2 className="font-semibold text-lg text-foreground truncate">Maintenance</h2>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm text-muted-foreground truncate">Maintenance website anda</span>
-                  </div>
+        <div className="glass rounded-2xl p-4 border border-white/5 hover:border-white/10 transition-colors">
+          <label htmlFor="maintenance" className="flex cursor-pointer items-center gap-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-amber-500/10">
+                <Wrench size={16} className="text-amber-500" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-lg text-foreground truncate">Maintenance</h2>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm text-muted-foreground truncate">Maintenance website anda</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <input type="checkbox" onChange={(e) => setSettings({ ...settings, site_maintenance: String(e.target.checked)  })} checked={settings['site_maintenance'] && settings['site_maintenance'] == 'true' ? true : false} id="maintenance" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
-              </div>
-            </label>
-          </div>
-          <div className="flex items-center justify-end">
-            <button
-              onClick={handleSaveSettings}
-              disabled={saveSettings.isPending || settingsLoading}
-              className="btn-hero inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-60 cursor-pointer"
-            >
-              {saveSettings.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-              Simpan
-            </button>
-          </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <input type="checkbox" onChange={(e) => setSettings({ ...settings, site_maintenance: String(e.target.checked) })} checked={settings['site_maintenance'] && settings['site_maintenance'] == 'true' ? true : false} id="maintenance" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
+            </div>
+          </label>
+        </div>
+        <div className="flex items-center justify-end">
+          <button
+            onClick={handleSaveSettings}
+            disabled={saveSettings.isPending || settingsLoading}
+            className="btn-hero inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-60 cursor-pointer"
+          >
+            {saveSettings.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            Simpan
+          </button>
         </div>
       </div>
 

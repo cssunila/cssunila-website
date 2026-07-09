@@ -2,13 +2,14 @@
 
 import { createClient } from "@/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Settings2, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Pencil, Plus, Settings2, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import CompetitionEditor from "./CompetitionEditor";
 import FieldManager from "./FieldManager";
 import ConfirmModal from "./ConfirmModal";
+import { usePageVisibility, useToggleVisibility } from "@/hooks/use-page-visibility";
 
 type CompRow = {
   id: string;
@@ -45,6 +46,8 @@ const CompetitionsTab = () => {
   const [managingFields, setManagingFields] = useState<{ id: string; name: string } | null>(null);
   const suparef = useRef(createClient());
   const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
+  const { visibility } = usePageVisibility();
+  const toggleVis = useToggleVisibility("lomba");
 
   const { data: allowedComps } = useQuery({
     queryKey: ["user-allowed-comps", user?.id],
@@ -139,13 +142,40 @@ const CompetitionsTab = () => {
 
   return (
     <div>
-      {role !== "lomba" && (
+      {role === "admin" && (
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <button
+            onClick={() => {
+              const next = !visibility.lomba;
+              toggleVis.mutate(next, {
+                onSuccess: () => toast.success(next ? "Section Lomba ditampilkan" : "Section Lomba disembunyikan"),
+                onError: (e: Error) => toast.error(e.message),
+              });
+            }}
+            disabled={toggleVis.isPending}
+            title={visibility.lomba ? "Sembunyikan section Lomba dari landing page" : "Tampilkan section Lomba di landing page"}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+              visibility.lomba
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                : "border-amber-500/40 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+            }`}
+          >
+            {toggleVis.isPending ? <Loader2 size={13} className="animate-spin" /> : visibility.lomba ? <Eye size={13} /> : <EyeOff size={13} />}
+            {visibility.lomba ? "Ditampilkan" : "Disembunyikan"}
+          </button>
+          <button onClick={() => setEditing({ is_open: true, position: (data?.length ?? 0) + 1, accent: "cyan", icon: "Trophy", rules: [], timeline: [] })} className="btn-hero cursor-pointer inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold">
+            <Plus size={14} /> Lomba baru
+          </button>
+        </div>
+      )}
+      {role === "lomba" && (
         <div className="mb-4 flex justify-end">
           <button onClick={() => setEditing({ is_open: true, position: (data?.length ?? 0) + 1, accent: "cyan", icon: "Trophy", rules: [], timeline: [] })} className="btn-hero cursor-pointer inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold">
             <Plus size={14} /> Lomba baru
           </button>
         </div>
       )}
+
       {isLoading && <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground">Memuat…</div>}
       <div className="space-y-2">
         {data?.map((c) => (

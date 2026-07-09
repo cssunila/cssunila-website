@@ -25,6 +25,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { jsPDF } from "jspdf";
 import { useAuth } from "@/hooks/use-auth";
+import ConfirmModal from "./ConfirmModal";
 
 type RegistrationAnswer = {
   field_key: string;
@@ -439,7 +440,7 @@ function DetailModal({
             )}
           </div>
 
-          {(reg.status === "pending_verification" || reg.status === "pending_payment") && (
+          {reg.status === "pending_verification" && (
             <div className="mt-8 flex flex-col sm:flex-row gap-3 border-t border-white/10 pt-5">
               <button
                 onClick={() => onVerify(reg.id)}
@@ -477,6 +478,13 @@ const RegistrationsTab = () => {
   const [selectedReg, setSelectedReg] = useState<AdminReg | null>(null);
   const [rejectTarget, setRejectTarget] = useState<AdminReg | null>(null);
   const suparef = useRef(createClient());
+  const [confirmModal, setConfirmModal] = useState<{
+    open: boolean;
+    type: "verify" | "reject";
+    regId: string;
+    teamName: string;
+  } | null>(null);
+  const [pendingRejectReg, setPendingRejectReg] = useState<AdminReg | null>(null);
 
   const { data: allowedComps } = useQuery({
     queryKey: ["user-allowed-comps", user?.id],
@@ -539,16 +547,28 @@ const RegistrationsTab = () => {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const handleVerify = (id: string) => {
-    verify.mutate({ id, status: "verified" });
+  const handleVerify = (id: string, teamName: string) => {
+    setConfirmModal({ open: true, type: "verify", regId: id, teamName });
   };
 
   const handleRejectRequest = (reg: AdminReg) => {
-    setRejectTarget(reg);
+    setPendingRejectReg(reg);
+    setConfirmModal({ open: true, type: "reject", regId: reg.id, teamName: reg.team_name });
   };
 
   const handleRejectConfirm = (id: string, reason: string) => {
     verify.mutate({ id, status: "rejected", reason });
+  };
+
+  const handleConfirmModalProceed = () => {
+    if (!confirmModal) return;
+    if (confirmModal.type === "verify") {
+      verify.mutate({ id: confirmModal.regId, status: "verified" });
+    } else if (confirmModal.type === "reject" && pendingRejectReg) {
+      setRejectTarget(pendingRejectReg);
+    }
+    setConfirmModal(null);
+    setPendingRejectReg(null);
   };
 
   const exportToPdf = () => {
@@ -832,7 +852,7 @@ const RegistrationsTab = () => {
                     {r.status === "pending_verification" && (
                       <>
                         <button
-                          onClick={() => handleVerify(r.id)}
+                          onClick={() => handleVerify(r.id, r.team_name)}
                           disabled={verify.isPending}
                           className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-3 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/30 disabled:opacity-60 cursor-pointer transition"
                         >
@@ -865,7 +885,10 @@ const RegistrationsTab = () => {
         <DetailModal
           reg={selectedReg}
           onClose={() => setSelectedReg(null)}
-          onVerify={handleVerify}
+          onVerify={(id) => {
+            const reg = data?.find((r) => r.id === id);
+            handleVerify(id, reg?.team_name ?? "");
+          }}
           onReject={(id) => {
             const reg = data?.find((r) => r.id === id);
             if (reg) handleRejectRequest(reg);
@@ -882,6 +905,21 @@ const RegistrationsTab = () => {
           isLoading={verify.isPending}
         />
       )}
+
+      <ConfirmModal
+        open={!!confirmModal?.open}
+        variant="warning"
+        title={confirmModal?.type === "verify" ? "Konfirmasi Verifikasi" : "Konfirmasi Penolakan"}
+        message={
+          confirmModal?.type === "verify"
+            ? `Anda akan memverifikasi pendaftaran tim "${confirmModal.teamName}". Tindakan ini bersifat permanen dan tidak dapat diubah lagi. Lanjutkan?`
+            : `Anda akan menolak pendaftaran tim "${confirmModal?.teamName}". Tindakan ini bersifat permanen dan tidak dapat diubah lagi. Lanjutkan?`
+        }
+        confirmLabel={confirmModal?.type === "verify" ? "Ya, Verifikasi" : "Ya, Tolak"}
+        cancelLabel="Batal"
+        onConfirm={handleConfirmModalProceed}
+        onCancel={() => { setConfirmModal(null); setPendingRejectReg(null); }}
+      />
     </div>
   );
 };

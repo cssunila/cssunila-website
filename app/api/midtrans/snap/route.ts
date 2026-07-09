@@ -28,7 +28,7 @@ export const POST = async (req: Request) => {
       );
     }
 
-    const data = (await req.json()) as { registrationId: string };
+    const data = (await req.json()) as { registrationId: string; forceNew?: boolean };
 
     const isProd = (isProduction ?? "false").toLowerCase() === "true";
 
@@ -93,7 +93,7 @@ export const POST = async (req: Request) => {
       );
     }
 
-    if (payment.midtrans_token && payment.status === "pending") {
+    if (!data.forceNew && payment.midtrans_token && payment.status === "pending") {
       const result: SnapResult = {
         token: payment.midtrans_token,
         redirect_url: "",

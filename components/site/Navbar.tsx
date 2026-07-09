@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/supabase/client";
 import Link from "next/link";
 import Image from "next/image";
+import ConfirmModal from "./ConfirmModal";
 
 const links = [
     { href: "/#about", label: "Tentang" },
@@ -39,6 +40,13 @@ const Navbar = () => {
         site_title_sub: "3.0",
     });
 
+    const [visibility, setVisibility] = useState<Record<string, boolean>>({
+        lomba: true,
+        berita: true,
+        seminar: true,
+        juara: true,
+    });
+
     useEffect(() => {
         const fetchSettings = async () => {
             const supabase = suparef.current;
@@ -57,7 +65,32 @@ const Navbar = () => {
                 }));
             }
         };
+
+        const fetchVisibility = async () => {
+            try {
+                const supabase = suparef.current;
+                const { data } = await supabase
+                    .from("page_visibility")
+                    .select("id, is_visible");
+                if (data && data.length > 0) {
+                    const map: Record<string, boolean> = {
+                        lomba: true,
+                        berita: true,
+                        seminar: true,
+                        juara: true,
+                    };
+                    data.forEach((row: any) => {
+                        map[row.id] = row.is_visible;
+                    });
+                    setVisibility(map);
+                }
+            } catch (e) {
+                console.error("Gagal memuat visibilitas halaman", e);
+            }
+        };
+
         fetchSettings();
+        fetchVisibility();
     }, []);
 
     useEffect(() => {
@@ -79,7 +112,7 @@ const Navbar = () => {
             .from("notifications")
             .select("*")
             .order("created_at", { ascending: false })
-            .limit(10);
+            .limit(8);
 
         if (role === "admin") {
             query.or(`user_id.eq.${user.id},is_for_admin.eq.true`);
@@ -147,7 +180,7 @@ const Navbar = () => {
                     (payload: any) => {
                         const newNotif = payload.new;
                         const isForMe = newNotif.user_id === user.id ||
-                            (newNotif.is_for_admin && role === "admin");
+                            (newNotif.is_for_admin && (role === "admin" || role === "lomba"));
 
                         if (isForMe) {
                             setNotifications((prev) => [newNotif, ...prev.slice(0, 9)]);
@@ -177,12 +210,26 @@ const Navbar = () => {
 
     const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-    async function handleSignOut() {
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+    async function doSignOut() {
         const supabase = suparef.current;
         await supabase.auth.signOut();
         toast.success("Berhasil keluar");
         router.push("/");
     }
+
+    function handleSignOut() {
+        setShowLogoutConfirm(true);
+    }
+
+    const activeLinks = links.filter((link) => {
+        if (link.href === "/#lomba") return visibility.lomba;
+        if (link.href === "/#berita") return visibility.berita;
+        if (link.href === "/#seminar") return visibility.seminar;
+        if (link.href === "/pengumuman") return visibility.juara;
+        return true;
+    });
 
     return (
         <header
@@ -202,7 +249,7 @@ const Navbar = () => {
                     </Link>
 
                     <ul className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-                        {links.map((l) => (
+                        {activeLinks.map((l) => (
                             <li key={l.href}>
                                 <a
                                     href={l.href}
@@ -232,7 +279,7 @@ const Navbar = () => {
                                     </button>
 
                                     {showNotif && (
-                                        <div className="absolute right-0 mt-12 w-80 rounded-2xl border border-white/10 bg-slate-950/95 backdrop-blur-xl p-4 shadow-2xl z-50">
+                                        <div className="absolute -right-10 md:right-0 mt-12 w-80 rounded-2xl border border-white/10 bg-slate-950/95 backdrop-blur-xl p-4 shadow-2xl z-50">
                                             <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
                                                 <h4 className="font-display text-sm font-semibold">Notifikasi</h4>
                                                 {unreadCount > 0 && (
@@ -337,7 +384,7 @@ const Navbar = () => {
                 {open && (
                     <div className="glass-strong mt-2 rounded-2xl p-4 md:hidden">
                         <ul className="flex flex-col gap-1">
-                            {links.map((l) => (
+                            {activeLinks.map((l) => (
                                 <li key={l.href}>
                                     <a
                                         href={l.href}
@@ -394,6 +441,17 @@ const Navbar = () => {
                     </div>
                 )}
             </div>
+
+            <ConfirmModal
+                open={showLogoutConfirm}
+                variant="danger"
+                title="Konfirmasi Logout"
+                message="Apakah Anda yakin ingin keluar dari akun?"
+                confirmLabel="Ya, Keluar"
+                cancelLabel="Batal"
+                onConfirm={() => { setShowLogoutConfirm(false); doSignOut(); }}
+                onCancel={() => setShowLogoutConfirm(false)}
+            />
         </header>
     );
 }
