@@ -19,6 +19,7 @@ import {
   ExternalLink,
   ZoomIn,
   AlertTriangle,
+  Wallet,
 } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -44,7 +45,7 @@ type AdminReg = {
   created_at: string;
   verified_at: string | null;
   competition: { name: string; slug: string; id: string } | null;
-  payments: { amount_idr: number; status: string; midtrans_order_id: string | null; paid_at: string | null };
+  payments: { amount_idr: number; status: string; midtrans_order_id: string | null; paid_at: string | null; midtrans_payment_type: string | null };
   registration_answers: RegistrationAnswer[];
 };
 
@@ -367,6 +368,11 @@ function DetailModal({
                   value={`Rp. ${(payment?.amount_idr ?? 0).toLocaleString("id-ID")}`}
                 />
                 <InfoRow
+                  icon={<Wallet size={14} />}
+                  label="Metode Payment"
+                  value={payment?.midtrans_payment_type ?? "-"}
+                />
+                <InfoRow
                   icon={<Trophy size={14} />}
                   label="Status Bayar"
                   value={payment?.status ?? "—"}
@@ -508,7 +514,7 @@ const RegistrationsTab = () => {
       let query = supabase
         .from("registrations")
         .select(
-          "id, team_name, leader_name, leader_whatsapp, leader_email, status, rejection_reason, created_at, verified_at, competition:competitions(id,name,slug), payments(amount_idr,status,midtrans_order_id,paid_at), registration_answers(field_key,field_label,value)"
+          "id, team_name, leader_name, leader_whatsapp, leader_email, status, rejection_reason, created_at, verified_at, competition:competitions(id,name,slug), payments(amount_idr,status,midtrans_order_id,midtrans_payment_type,paid_at), registration_answers(field_key,field_label,value)"
         );
 
       if (role === "lomba") {
@@ -713,7 +719,6 @@ const RegistrationsTab = () => {
     ).values()
   ).sort((a, b) => a.name.localeCompare(b.name));
 
-  // Filter
   const rows = (data ?? []).filter((r) => {
     const statusOk = statusFilter === "all" || r.status === statusFilter;
     const compOk = competitionFilter === "all" || r.competition?.id === competitionFilter;
