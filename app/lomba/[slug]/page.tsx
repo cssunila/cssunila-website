@@ -107,7 +107,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
 
                     <div className="mt-6 flex flex-col items-start gap-6 md:flex-row md:items-center">
                         {!c.is_open && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
+                            <span className="inline-flex md:hidden items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
                                 <Lock size={10} /> Pendaftaran Ditutup
                             </span>
                         )}
@@ -115,6 +115,11 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                             <DynamicIcon icon={c.icon ?? "Trophy"} />
                         </div>
                         <div>
+                            {!c.is_open && (
+                                <span className="hidden md:inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
+                                    <Lock size={10} /> Pendaftaran Ditutup
+                                </span>
+                            )}
                             <div className="flex items-center gap-2">
                                 <span className="text-xs font-medium uppercase tracking-widest text-cyan-strong">
                                     {c.tagline}
