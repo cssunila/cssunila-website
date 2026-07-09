@@ -315,7 +315,7 @@ function DetailModal({
           {/* Header */}
           <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-5">
             <div>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex flex-col gap-2 mb-1">
                 <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${status.tone}`}>
                   {status.label}
                 </span>

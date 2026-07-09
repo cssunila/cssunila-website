@@ -267,7 +267,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
             </section>
 
             <section className="py-12">
-                <div className={`mx-auto grid grid-cols-1 justify-center ${c.banner && 'md:grid-cols-2'} items-center max-w-5xl px-4 gap-8`}>
+                <div className={`mx-auto grid grid-cols-1 justify-center ${c.banner ? 'md:grid-cols-2' : ''} items-center max-w-5xl px-4 gap-8`}>
                     <div className={`glass order-2 lg:order-1 rounded-3xl p-7 ${c.banner ? '' : 'max-w-lg'}`}>
                         <h2 className="font-display text-3xl font-bold mb-1">Narahubung</h2>
                         <p className="text-sm text-muted-foreground mb-8">Jika terdapat pertanyaan atau kendala pendaftaran terkait lomba.
