@@ -345,10 +345,10 @@ function DetailModal({
             {/* Leader Info */}
             <section>
               <h3 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <User size={12} /> Data Ketua Tim
+                <User size={12} /> Data Pendaftar
               </h3>
               <div className="glass rounded-2xl p-4 space-y-3">
-                <InfoRow icon={<User size={14} />} label="Nama Ketua" value={reg.leader_name} />
+                <InfoRow icon={<User size={14} />} label="Nama Pendaftar" value={reg.leader_name} />
                 <InfoRow icon={<Phone size={14} />} label="WhatsApp" value={reg.leader_whatsapp} />
                 {reg.leader_email && (
                   <InfoRow icon={<Mail size={14} />} label="Email" value={reg.leader_email} />
