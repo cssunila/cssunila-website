@@ -113,7 +113,7 @@ const FormAuth = () => {
                 });
 
                 if (error) throw error;
-                toast.success("Akun dibuat. Silakan login.");
+                toast.success("Akun berhasil dibuat. Silakan login.");
                 setMode("login");
             } else {
                 const { error } = await supabase.auth.signInWithPassword({ email, password });

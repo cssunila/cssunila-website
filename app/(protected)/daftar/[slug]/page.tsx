@@ -249,6 +249,7 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
                                                     <input
                                                         type="file"
                                                         className="hidden"
+                                                        accept=".jpg,.jpeg,.png,.webp"
                                                         onChange={(e) => {
                                                             const file = e.target.files?.[0];
                                                             if (file) uploadFile(f.key, file);
