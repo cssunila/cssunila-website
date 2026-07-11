@@ -251,12 +251,12 @@ const Navbar = () => {
                     <ul className="hidden items-center gap-7 text-sm text-muted-foreground lg:flex">
                         {activeLinks.map((l) => (
                             <li key={l.href}>
-                                <a
+                                <Link
                                     href={l.href}
                                     className="transition-colors hover:text-foreground"
                                 >
                                     {l.label}
-                                </a>
+                                </Link>
                             </li>
                         ))}
                     </ul>
@@ -386,13 +386,13 @@ const Navbar = () => {
                         <ul className="flex flex-col gap-1">
                             {activeLinks.map((l) => (
                                 <li key={l.href}>
-                                    <a
+                                    <Link
                                         href={l.href}
                                         onClick={() => setOpen(false)}
                                         className="block rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground"
                                     >
                                         {l.label}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                             <li className="mt-2">

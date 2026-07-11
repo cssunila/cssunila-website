@@ -1,8 +1,14 @@
 import Footer from "@/components/site/Footer";
 import Navbar from "@/components/site/Navbar";
 import { ArrowLeft } from "lucide-react";
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Tentang Kami",
+  description: "Sejarah CSS 3.0",
+}
 
 const TentangKami = () => {
     return (

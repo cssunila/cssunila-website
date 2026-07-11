@@ -11,7 +11,7 @@ import { createClient } from "@/supabase/server";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Landing Page | CSS UNILA 3.0",
+  title: "Landing Page",
 }
 
 export default async function Home() {

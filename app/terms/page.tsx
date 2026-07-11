@@ -4,7 +4,7 @@ import Link from "next/link";
 
 
 export const metadata: Metadata = {
-    title: "Syarat & Ketentuan — CSS 3.0",
+    title: "Syarat & Ketentuan",
     description: "Aturan main penggunaan platform pendaftaran lomba CSS 3.0.",
     openGraph: {
       title: "Syarat & Ketentuan — CSS 3.0",

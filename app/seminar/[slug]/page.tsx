@@ -2,19 +2,10 @@ import { createClient } from "@/supabase/server";
 import { ArrowLeft, Calendar, MapPin, Mic, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Seminar | CSS 3.0",
-  description: "Seminar terbaru CSS 3.0",
-  openGraph: {
-    title: "Seminar | CSS 3.0",
-    description: "Seminar terbaru CSS 3.0",
-  }
-}
+import NotFound from "@/components/site/NotFound";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -30,7 +21,47 @@ type SeminarItem = {
   scheduled_at: string | null;
 };
 
-export default async function SeminarDetailPage({ params }: Props) {
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { slug } = await params;
+  let seminar: SeminarItem | null = null;
+
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("seminars")
+      .select("title, description, image_url")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle();
+
+    seminar = data as SeminarItem | null;
+  } catch (error) {
+    console.error("Failed to fetch seminar detail:", error);
+  }
+
+  if (!seminar) {
+    return {
+      title: "Seminar Tidak Ditemukan",
+    };
+  }
+
+  return {
+    title: seminar.title,
+    description: seminar.description,
+    alternates: {
+      canonical: `/seminar/${slug}`,
+    },
+    openGraph: {
+      title: seminar.title,
+      description: seminar.description ?? "",
+      images: seminar.image_url ? [seminar.image_url] : [],
+    },
+  };
+}
+
+const SeminarDetailPage = async ({ params }: Props) => {
   const { slug } = await params;
   let seminar: SeminarItem | null = null;
 
@@ -48,9 +79,8 @@ export default async function SeminarDetailPage({ params }: Props) {
     console.error("Failed to fetch seminar detail:", error);
   }
 
-  if (!seminar) {
-    notFound();
-  }
+  if (!seminar) return NotFound();
+  
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -108,7 +138,7 @@ export default async function SeminarDetailPage({ params }: Props) {
                 {/* Speaker Card */}
                 <div className="glass rounded-3xl p-6 text-center border border-cyan-strong/20">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-cyan-strong block mb-4">Pembicara Utama</span>
-                  
+
                   <div className="relative mx-auto size-24 overflow-hidden rounded-full border border-white/10 bg-slate-900 shadow-inner">
                     {seminar.speaker_image_url ? (
                       <Image
@@ -179,3 +209,5 @@ export default async function SeminarDetailPage({ params }: Props) {
     </div>
   );
 }
+
+export default SeminarDetailPage;

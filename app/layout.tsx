@@ -15,46 +15,50 @@ const space = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "CSS UNILA 3.0",
-  description: "CSS UNILA 3.0 adalah event terbesar bagi himakom yang mencakup berbagai sekolah di provinsi lampung.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_DOMAIN_URL!),
+  title: {
+    default: "CSS UNILA 3.0",
+    template: "%s | CSS UNILA 3.0",
+  },
+  description: "CSS UNILA 3.0 adalah event perlombaan teknologi dan olahraga yang diselenggarakan oleh Himakom Jurusan Ilmu Komputer Universitas Lampung.",
   keywords: [
-    "CSS UNILA 3.0",
-    "CSS UNILA 3.0 Platform",
-    "CSS UNILA 3.0 Platform Digital",
-    "CSS UNILA 3.0 Event",
-    "CSS UNILA 3.0 Event Unila",
-    "CSS UNILA 3.0 Platform Digital Unila",
-    "CSS UNILA 3.0 Platform Digital Unila Terbesar Himakom",
+    "CSS UNILA",
+    "CSS 3.0",
+    "event UNILA",
+    "lomba komputer",
+    "lomba mahasiswa",
   ],
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    }
   },
-  authors: [
-    {
-      name: "M. Rafly Saputra",
-      url: "https://github.com/Raflysaputra23",
-    },
-  ],
+  alternates: {
+    canonical: "/",
+  },
+  authors: [{ name: "CSS UNILA" }],
   openGraph: {
     title: "CSS UNILA 3.0",
-    description: "CSS UNILA 3.0 adalah event terbesar bagi himakom yang mencakup berbagai sekolah di provinsi lampung.",
+    url: process.env.NEXT_PUBLIC_DOMAIN_URL!,
+    description: "Ikuti berbagai perlombaan menarik dalam event CSS UNILA 3.0.",
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_DOMAIN_URL!}/css-logo.png`,
-        width: 800,
-        height: 600,
+        url: `/css-logo.png`,
+        width: 1200,
+        height: 630,
+        alt: "CSS UNILA 3.0",
       },
     ],
+    locale: "id_ID",
+    type: "website",
     siteName: "CSS UNILA 3.0",
-  }
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CSS UNILA 3.0",
+    description:
+    "Ikuti berbagai perlombaan dalam event CSS UNILA 3.0.",
+    images: ["/css-logo.png"],
+  },
 };
 
 export default function RootLayout({

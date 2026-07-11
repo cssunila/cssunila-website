@@ -1,5 +1,5 @@
 import { createClient } from "@/supabase/server";
-import { ArrowLeft, Trophy, Medal, Star, Gift, Users } from "lucide-react";
+import { ArrowLeft, Trophy, Star, Gift, Users } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
@@ -8,13 +8,12 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Pengumuman Juara | CSS UNILA 3.0",
+  title: "Pengumuman Juara",
   description: "Pengumuman juara lomba CSS UNILA 3.0",
   openGraph: {
     title: "Pengumuman Juara | CSS UNILA 3.0",
     description: "Pengumuman juara lomba CSS UNILA 3.0",
   },
-  keywords: ["CSS UNILA 3.0", "Pengumuman Juara", "Computer Science Showdown 3.0", "Himakom FMIPA UNILA"],
 }
 
 type WinnerItem = {
@@ -36,7 +35,6 @@ type WinnerItem = {
 export default async function PengumumanPage() {
   const supabase = await createClient();
 
-  // Check if page_visibility is disabled for juara
   const { data: visData } = await supabase
     .from("page_visibility")
     .select("is_visible")

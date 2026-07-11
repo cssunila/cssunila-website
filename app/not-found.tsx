@@ -1,7 +1,7 @@
 import NotFound from '@/components/site/NotFound';
 
 export const metadata = {
-  title: "Not Found | CSS UNILA 3.0",
+  title: "404 Not Found",
 }
 
 const NotFoundPage = () => {

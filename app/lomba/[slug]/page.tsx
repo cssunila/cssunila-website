@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Users, Wallet, Trophy, CheckCircle2, Lock, Timer, Clock, Search, UserCheck } from "lucide-react";
+import { ArrowLeft, Users, Wallet, Trophy, CheckCircle2, Lock, Clock, Search, UserCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
@@ -80,6 +80,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
             </div>
         );
     }
+
     if (!c) {
         return (
             <div className="flex min-h-screen items-center justify-center px-4 text-center">

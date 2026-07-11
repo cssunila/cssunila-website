@@ -7,15 +7,6 @@ import Footer from "@/components/site/Footer";
 import NotFound from "@/components/site/NotFound";
 import { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Berita | CSS 3.0",
-  description: "Berita terbaru CSS 3.0",
-  openGraph: {
-    title: "Berita | CSS 3.0",
-    description: "Berita terbaru CSS 3.0",
-  }
-}
-
 type Props = {
   params: Promise<{ slug: string }>;
 };
@@ -30,7 +21,48 @@ type NewsItem = {
   gallery: string[] | null;
 };
 
-export default async function NewsDetailPage({ params }: Props) {
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { slug } = await params;
+  let news: NewsItem | null = null;
+
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("news")
+      .select("title, content, image_url")
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle();
+
+    news = data as NewsItem | null;
+  } catch (error) {
+    console.error("Failed to fetch news detail:", error);
+  }
+
+  if (!news) {
+    return {
+      title: "News Tidak Ditemukan",
+    };
+  }
+
+  return {
+    title: news.title,
+    description: news.content,
+    alternates: {
+      canonical: `/news/${slug}`,
+    },
+    openGraph: {
+      title: news.title,
+      description: news.content ?? "",
+      images: news.image_url ? [news.image_url] : [],
+    },
+  };
+}
+
+
+const NewsDetailPage = async ({ params }: Props) => {
   const { slug } = await params;
   let news: NewsItem | null = null;
 
@@ -164,3 +196,5 @@ export default async function NewsDetailPage({ params }: Props) {
     </div>
   );
 }
+
+export default NewsDetailPage;

@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-    title: "Kebijakan Privasi — CSS 3.0",
+    title: "Kebijakan Privasi",
     description: "Bagaimana CSS 3.0 mengumpulkan, menggunakan, dan melindungi data pribadi peserta.",
     openGraph: {
       title: "Kebijakan Privasi — CSS 3.0",
