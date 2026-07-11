@@ -2,7 +2,7 @@
 
 import { createClient } from "@/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -115,7 +115,7 @@ const GroupLinkRow = ({
       return;
     }
 
-    const filename = `${comp.slug}_qr_${crypto.randomUUID()}.${fileExtension}`;
+    const filename = `group/${comp.slug}/${crypto.randomUUID()}-${comp.slug}.${fileExtension}`;
 
     const supabase = suparef.current;
     const { error } = await supabase.storage
@@ -145,7 +145,7 @@ const GroupLinkRow = ({
       const blob = await response.blob();
 
       const supabase = suparef.current;
-      const filename = `${crypto.randomUUID()}-${comp.slug}.png`;
+      const filename = `group/${comp.slug}/${crypto.randomUUID()}-${comp.slug}.png`;
       const { error } = await supabase.storage
         .from("site_settings")
         .upload(filename, blob, { upsert: false, contentType: "image/png" });
@@ -175,7 +175,14 @@ const GroupLinkRow = ({
       <p className="text-xs text-muted-foreground">/{comp.slug}</p>
       <div className="mt-3 flex flex-col gap-2">
         <div className="space-y-2">
-          {loading ? <div className="flex items-center justify-start"><Loader2 className="animate-spin w-12 h-12" /></div> : qr && <Image src={qr} alt="Gambar QR" width={100} height={100} className="object-contain w-24 h-24 rounded-lg" />}
+          {loading ? <div className="flex items-center justify-start"><Loader2 className="animate-spin w-12 h-12" /></div> : qr && 
+          <div className="flex items-center gap-3">
+            <Image src={qr} alt="Gambar QR" width={100} height={100} className="object-contain w-24 h-24 rounded-lg" />
+            <button type="button" onClick={() => setQr("")} className="text-xs text-destructive hover:underline flex items-center gap-1">
+                <X size={12} /> Hapus Gambar
+            </button>
+          </div>
+          }
           <input type="file" accept=".jpg,.png,.jpeg,.webp" className={"inputCls inputFile"} onChange={(e) => handleGambar(e)} />
         </div>
         <input className={"inputCls"} placeholder="Link grup (WA/Telegram)" value={link} onChange={(e) => setLink(e.target.value)} />

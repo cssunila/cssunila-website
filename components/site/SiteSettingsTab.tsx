@@ -19,6 +19,7 @@ import {
   Link as LinkIcon,
   ImageIcon,
   Wrench,
+  Lock,
 } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
@@ -383,7 +384,7 @@ const SiteSettingsTab = () => {
 
     let acceptExtension = [];
     if (key == 'site_logo') acceptExtension = ['png', 'jpg', 'jpeg', 'webp'];
-    else acceptExtension = ['png', 'ico', 'webp'];
+    else acceptExtension = ['png', 'ico'];
 
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     if (!acceptExtension.includes(fileExtension ?? '')) {
@@ -495,7 +496,7 @@ const SiteSettingsTab = () => {
                   <input
                     type="file"
                     className="inputCls inputFile"
-                    accept=".png,.jpg,.jpeg,.gif,.webp"
+                    accept=".png,.jpg,.jpeg,.webp"
                     onChange={(e) => handleGambar(e, "site_logo")}
                   />
                 )}
@@ -1019,7 +1020,7 @@ const SiteSettingsTab = () => {
       <div className="border-t border-white/10 pt-8" />
 
       <div className="space-y-5">
-        <div className="glass rounded-2xl p-4 border border-white/5 hover:border-white/10 transition-colors">
+        <div className="glass rounded-2xl p-4 border space-y-4 border-white/5 hover:border-white/10 transition-colors">
           <label htmlFor="maintenance" className="flex cursor-pointer items-center gap-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-amber-500/10">
@@ -1028,12 +1029,29 @@ const SiteSettingsTab = () => {
               <div>
                 <h2 className="font-semibold text-lg text-foreground truncate">Maintenance</h2>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-muted-foreground truncate">Maintenance website anda</span>
+                  <span className="text-sm text-muted-foreground truncate">Maintenance / Publish website</span>
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <input type="checkbox" onChange={(e) => setSettings({ ...settings, site_maintenance: String(e.target.checked) })} checked={settings['site_maintenance'] && settings['site_maintenance'] == 'true' ? true : false} id="maintenance" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
+            </div>
+          </label>
+          <hr />
+          <label htmlFor="registrasi" className="flex cursor-pointer items-center gap-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-cyan-strong/10">
+                <Lock size={16} className="text-cyan-strong" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-lg text-foreground truncate">Pendaftaran Akun</h2>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm text-muted-foreground truncate">Tutup / Aktifkan pendaftaran akun website</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <input type="checkbox" onChange={(e) => setSettings({ ...settings, site_registrasi: String(e.target.checked) })} checked={settings['site_registrasi'] && settings['site_registrasi'] == 'true' ? true : false} id="registrasi" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
             </div>
           </label>
         </div>
@@ -1100,7 +1118,7 @@ const SiteSettingsTab = () => {
                 {uploadingLogo === "sponsors" ? <Loader2 size={14} className="animate-spin" /> : <ImageIcon size={14} />}
                 {uploadingLogo === "sponsors" ? "Mengunggah..." : "Upload logo (PNG/JPG/WebP/SVG, max 2MB)"}
                 <input
-                  type="file" className="hidden" accept="image/*"
+                  type="file" className="hidden" accept=".jpg,.jpeg,.png,.webp,.svg"
                   required
                   disabled={uploadingLogo === "sponsors"}
                   onChange={(e) => handleLogoUpload(e, "sponsors", (url) => setEditingSponsor((p) => ({ ...p, logo_url: url })))}
@@ -1169,7 +1187,7 @@ const SiteSettingsTab = () => {
                 {uploadingLogo === "media-partners" ? <Loader2 size={14} className="animate-spin" /> : <ImageIcon size={14} />}
                 {uploadingLogo === "media-partners" ? "Mengunggah..." : "Upload logo (PNG/JPG/WebP/SVG, max 2MB)"}
                 <input
-                  type="file" className="hidden" accept="image/*"
+                  type="file" className="hidden" accept=".jpg,.jpeg,.png,.webp,.svg"
                   required
                   disabled={uploadingLogo === "media-partners"}
                   onChange={(e) => handleLogoUpload(e, "media-partners", (url) => setEditingMediaPartner((p) => ({ ...p, logo_url: url })))}

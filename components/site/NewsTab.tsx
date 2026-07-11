@@ -261,7 +261,7 @@ const NewsTab = () => {
                   {uploadingBanner ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                   {uploadingBanner ? "Mengunggah..." : "Upload banner berita (PNG/JPG/WebP/SVG, max 2MB)"}
                   <input
-                    type="file" className="hidden" accept="image/*"
+                    type="file" className="hidden" accept=".jpg,.jpeg,.png,.webp,.svg"
                     disabled={uploadingBanner}
                     onChange={(e) => handleBannerUpload(e)}
                   />
@@ -307,7 +307,7 @@ const NewsTab = () => {
                 {uploadingGallery ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
                 {uploadingGallery ? "Mengunggah..." : "Tambah Foto ke Galeri (PNG/JPG/WebP/SVG, max 1MB)"}
                 <input
-                  type="file" className="hidden" accept="image/*"
+                  type="file" className="hidden" accept=".jpg,.jpeg,.png,.webp,.svg"
                   disabled={uploadingGallery}
                   onChange={(e) => handleGalleryUpload(e)}
                 />

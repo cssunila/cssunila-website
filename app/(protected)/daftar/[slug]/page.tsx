@@ -57,10 +57,11 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
 
     async function uploadFile(fieldKey: string, file: File) {
         if (!user) return;
-        if (file.size > 5 * 1024 * 1024) {
+        if (file.size > 2 * 1024 * 1024) {
             toast.error("Ukuran file maksimum 2 MB");
             return;
         }
+
         setUploading((u) => ({ ...u, [fieldKey]: true }));
         try {
             const ext = file.name.split(".").pop() ?? "bin";
@@ -69,7 +70,8 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
                 toast.error("Ekstensi file tidak didukung");
                 return;
             }
-            const path = `${user.id}/${slug}/${fieldKey}-${crypto.randomUUID()}.${ext}`;
+
+            const path = `${slug}/${user.id}/${fieldKey}-${crypto.randomUUID()}.${ext}`;
             const supabase = suparef.current;
             const { error } = await supabase.storage
                 .from("registration-files")

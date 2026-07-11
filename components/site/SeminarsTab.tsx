@@ -229,7 +229,7 @@ const SeminarsTab = () => {
                     {uploadingSpeaker ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                     {uploadingSpeaker ? "Mengunggah..." : "Upload foto pembicara (PNG/JPG/WebP/SVG, max 2MB)"}
                     <input
-                      type="file" className="hidden" accept="image/*"
+                      type="file" className="hidden" accept=".jpg,.jpeg,.png,.webp,.svg"
                       disabled={uploadingSpeaker}
                       onChange={(e) => handleUpload(e, "speaker_image_url")}
                     />

@@ -57,7 +57,7 @@ const STATUS_LABELS: Record<string, { label: string; tone: string }> = {
   rejected: { label: "Ditolak", tone: "bg-red-500/15 text-red-400" },
 };
 
-const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "heic"];
+const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
 
 function isImagePath(value: string): boolean {
   const ext = value.split(".").pop()?.toLowerCase() ?? "";
