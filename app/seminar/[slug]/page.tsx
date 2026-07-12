@@ -92,7 +92,7 @@ const SeminarDetailPage = async ({ params }: Props) => {
             href="/#seminar"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            <ArrowLeft size={14} /> Kembali ke Seminar
+            <ArrowLeft size={14} /> Kembali ke Beranda
           </Link>
 
           <article className="mt-8">

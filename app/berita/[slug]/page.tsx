@@ -101,7 +101,7 @@ const NewsDetailPage = async ({ params }: Props) => {
             href="/#berita"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            <ArrowLeft size={14} /> Kembali ke Berita
+            <ArrowLeft size={14} /> Kembali ke Beranda
           </Link>
 
           <article className="mt-8">
@@ -146,7 +146,7 @@ const NewsDetailPage = async ({ params }: Props) => {
             <div className="glass mt-10 rounded-3xl p-6 md:p-10 leading-relaxed text-foreground/90 space-y-6 text-base sm:text-lg">
               <h2 className="text-muted-foreground mb-1 text-lg">Deskripsi</h2>
               {news.content?.split("\n").map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
+                <p key={index} className="text-justify text-muted-foreground">{paragraph}</p>
               ))}
 
               {news.drive_link && (

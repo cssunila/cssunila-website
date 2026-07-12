@@ -7,7 +7,7 @@ import { createClient } from "@/supabase/client";
 import Link from "next/link";
 
 type CompCard = {
-    slug: string; name: string; tagline: string | null; description: string | null;
+    slug: string; name: string; tagline: string | null; description: string[];
     icon: string | null; accent: string | null; fee_idr: number; quota: number;
     team_size: string | null; is_open: boolean;
 };
@@ -90,7 +90,7 @@ const Competitions = () => {
                                 </div>
                                 <h3 className="mt-5 group-hover:text-cyan-strong transition-colors font-display text-xl font-semibold">{c.name}</h3>
                                 <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
-                                    {c.description}
+                                    {(c.description ?? []).join(". ")}
                                 </p>
 
                                 <dl className="mt-5 mb-5 space-y-1.5 text-xs text-muted-foreground">

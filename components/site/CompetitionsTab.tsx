@@ -24,7 +24,7 @@ type CompRow = {
 };
 
 type CompFull = CompRow & {
-  description: string | null;
+  description: string[];
   icon: string | null;
   accent: string | null;
   team_size: string | null;
@@ -97,7 +97,7 @@ const CompetitionsTab = () => {
       const payload = {
         slug: v.slug!, name: v.name!, tagline: v.tagline ?? null,
         fee_idr: v.fee_idr ?? 0, quota: v.quota ?? 0, is_open: !!v.is_open, position: v.position ?? 0,
-        description: v.description ?? null,
+        description: v.description ?? [],
         icon: v.icon ?? "Trophy",
         accent: v.accent ?? "cyan",
         banner: v.banner || null,

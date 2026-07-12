@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowLeft, Users, Wallet, Trophy, CheckCircle2, Lock, Clock, Search, UserCheck } from "lucide-react";
+import { ArrowLeft, Users, Wallet, Trophy, CheckCircle2, Lock, Clock, Search, UserCheck, Download } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 type CompetitionDetail = {
-    id: string; slug: string; name: string; tagline: string | null; description: string | null;
+    id: string; slug: string; name: string; tagline: string | null; description: string[];
     icon: string | null; accent: string | null; fee_idr: number; quota: number; pendaftar: number | null;
     team_size: string | null; is_open: boolean;
     pj_1: string; no_pj_1: string; pj_2: string; no_pj_2: string; banner: string; panduan: string;
@@ -114,7 +114,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                 <div className="flex flex-col gap-2 items-center justify-center">
                     <Search size={58} className="text-muted-foreground animate-floating-smooth" />
                     <h1 className="text-4xl font-bold">Lomba tidak ditemukan</h1>
-                    <Link href="/" className="mt-3 inline-flex gap-2 items-center btn-hero rounded-lg px-4 py-3 text-black inline-block"><ArrowLeft size={18} /> Kembali ke beranda</Link>
+                    <Link href="/" className="mt-3 inline-flex gap-2 items-center btn-hero rounded-lg px-4 py-3 text-black inline-block"><ArrowLeft size={18} /> Kembali ke Beranda</Link>
                 </div>
             </div>
         );
@@ -130,12 +130,12 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                         href="/"
                         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
                     >
-                        <ArrowLeft size={14} /> Kembali
+                        <ArrowLeft size={14} /> Kembali ke Beranda
                     </Link>
 
                     <div className="mt-6 flex flex-col items-start gap-6 md:flex-row md:items-center">
                         {!c.is_open && (
-                            <span className="inline-flex md:hidden items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
+                            <span className="inline-flex md:hidden items-center gap-1 rounded-full bg-amber-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
                                 <Lock size={10} /> Pendaftaran Ditutup
                             </span>
                         )}
@@ -144,7 +144,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                         </div>
                         <div>
                             {!c.is_open && (
-                                <span className="hidden md:inline-flex items-center mb-1 gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
+                                <span className="hidden md:inline-flex items-center mb-2 gap-1 rounded-full bg-amber-500/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
                                     <Lock size={10} /> Pendaftaran Ditutup
                                 </span>
                             )}
@@ -158,10 +158,14 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                             </h1>
                         </div>
                     </div>
-
-                    <p className="mt-8 max-w-3xl text-lg text-muted-foreground">
-                        {c.description}
-                    </p>
+                    
+                    <div className="mt-8 max-w-5xl">
+                        {c.description.length > 0 && c.description.map((text, i) => (
+                            <p key={i} className="text-lg text-muted-foreground mb-4 text-justify">
+                                {text}
+                            </p>
+                        ))}
+                    </div>
 
                     <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {[
@@ -304,7 +308,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                     <div className={`glass order-2 lg:order-1 rounded-3xl p-7 ${c.panduan ? '' : 'max-w-lg mx-auto'}`}>
                         <h2 className="font-display text-3xl font-bold mb-1">Narahubung</h2>
                         <p className="text-sm text-muted-foreground mb-8">Jika terdapat pertanyaan atau kendala pendaftaran terkait lomba.
-                            Silahkan hubungin narahubung lomba {c.name}
+                            Silahkan hubungin narahubung {c.name}
                         </p>
                         <div className={`flex items-center flex-wrap gap-8`}>
                             {c.pj_1 &&
@@ -330,9 +334,9 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                     {c.panduan && 
                         <div className={`glass order-2 lg:order-1 rounded-3xl p-7`}>
                             <h2 className="font-display text-3xl font-bold mb-1">Panduan Lomba</h2>
-                            <p className="text-sm text-muted-foreground mb-6">Untuk teknis dan pelaksanaan lomba lebih lanjut. Silahkan unduh dan membaca terlebih dahulu buku panduan lomba {c.name}
+                            <p className="text-sm text-muted-foreground mb-4">Untuk teknis dan pelaksanaan lomba lebih lanjut. Silahkan unduh dan membaca terlebih dahulu buku panduan {c.name}
                             </p>
-                            <Button onClick={() => downloadPdf(c.panduan)} className="glass px-3 py-2 rounded-lg text-sm text-white">Unduh buku panduan lomba disini</Button>
+                            <Button onClick={() => downloadPdf(c.panduan)} className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-7 py-3.5 text-sm font-semibold text-foreground/90 backdrop-blur-md transition hover:bg-white/10 cursor-pointer"><Download size={14} /> Unduh</Button>
                         </div>
                     }
                 </div>
