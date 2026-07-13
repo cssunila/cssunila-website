@@ -6,6 +6,7 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import { Metadata } from "next";
 import NotFound from "@/components/site/NotFound";
+import ShareButton from "@/components/site/ShareButton";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -80,7 +81,7 @@ const SeminarDetailPage = async ({ params }: Props) => {
   }
 
   if (!seminar) return NotFound();
-  
+
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -88,12 +89,15 @@ const SeminarDetailPage = async ({ params }: Props) => {
 
       <section className="pt-30 md:pt-32 pb-26 md:pb-30">
         <div className="mx-auto max-w-5xl px-4">
-          <Link
-            href="/#seminar"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft size={14} /> Kembali ke Beranda
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              href="/#seminar"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft size={14} /> Kembali ke Beranda
+            </Link>
+            <ShareButton title={seminar.title} url={`${process.env.NEXT_PUBLIC_DOMAIN_URL}/seminar/${slug}`} text={seminar.description ?? ""} />
+          </div>
 
           <article className="mt-8">
             <header className="space-y-4">

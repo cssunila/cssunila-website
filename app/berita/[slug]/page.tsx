@@ -6,6 +6,7 @@ import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
 import NotFound from "@/components/site/NotFound";
 import { Metadata } from "next";
+import ShareButton from "@/components/site/ShareButton";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -83,8 +84,8 @@ const NewsDetailPage = async ({ params }: Props) => {
   let galleryImages: string[] = [];
   if (news.gallery) {
     try {
-      galleryImages = Array.isArray(news.gallery) 
-        ? news.gallery 
+      galleryImages = Array.isArray(news.gallery)
+        ? news.gallery
         : JSON.parse(JSON.stringify(news.gallery));
     } catch {
       galleryImages = [];
@@ -97,12 +98,15 @@ const NewsDetailPage = async ({ params }: Props) => {
 
       <section className="pt-30 md:pt-32 pb-26 md:pb-30">
         <div className="mx-auto max-w-5xl px-4">
-          <Link
-            href="/#berita"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft size={14} /> Kembali ke Beranda
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              href="/#berita"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft size={14} /> Kembali ke Beranda
+            </Link>
+            <ShareButton title={news.title} url={`${process.env.NEXT_PUBLIC_DOMAIN_URL}/berita/${slug}`} text={news.content ?? ""} />
+          </div>
 
           <article className="mt-8">
             <header className="space-y-4">

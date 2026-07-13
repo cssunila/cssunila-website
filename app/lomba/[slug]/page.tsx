@@ -15,6 +15,7 @@ import Image from "next/image";
 import { dateActive } from "@/lib/formatTanggal";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import ShareButton from "@/components/site/ShareButton";
 
 type CompetitionDetail = {
     id: string; slug: string; name: string; tagline: string | null; description: string[];
@@ -126,12 +127,15 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
 
             <section className="relative pt-30 md:pt-32 pb-26 md:pb-30">
                 <div className="mx-auto max-w-5xl px-4">
-                    <Link
-                        href="/"
-                        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-                    >
-                        <ArrowLeft size={14} /> Kembali ke Beranda
-                    </Link>
+                    <div className="flex items-center justify-between gap-3">
+                        <Link
+                            href="/"
+                            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                        >
+                            <ArrowLeft size={14} /> Kembali ke Beranda
+                        </Link>
+                        <ShareButton title={c.name} url={currentUrl} text={(c.description ?? []).join("/n")} />
+                    </div>
 
                     <div className="mt-6 flex flex-col items-start gap-6 md:flex-row md:items-center">
                         {!c.is_open && (
