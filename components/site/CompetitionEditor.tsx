@@ -306,7 +306,7 @@ const CompetitionEditor = ({
             <input className={"inputCls"} required placeholder="Contoh: Bangraff" value={value.pj_1 ?? ""} onChange={(e) => onChange({ ...value, pj_1: e.target.value })} />
           </div>
           <div>
-            <HelpLabel label="Whatsapp Penanggung Jawab 1" required hint="Nomor Whatsapp. Contoh: '0858xxxxx'." />
+            <HelpLabel label="Whatsapp Penanggung Jawab 1" required hint="Nomor Whatsapp tanpa spasi. Contoh: '0858xxxxx'." />
             <input className={"inputCls"} required placeholder="Contoh: 08533xxxxx" value={value.no_pj_1 ?? ""} onChange={(e) => onChange({ ...value, no_pj_1: e.target.value })} />
           </div>
         </div>
@@ -317,7 +317,7 @@ const CompetitionEditor = ({
             <input className={"inputCls"} placeholder="Contoh: Bangraff" value={value.pj_2 ?? ""} onChange={(e) => onChange({ ...value, pj_2: e.target.value })} />
           </div>
           <div>
-            <HelpLabel label="Whatsapp Penanggung Jawab 2" hint="Nomor Whatsapp. Contoh: '0858xxxxx'." />
+            <HelpLabel label="Whatsapp Penanggung Jawab 2" hint="Nomor Whatsapp tanpa spasi. Contoh: '0858xxxxx'." />
             <input className={"inputCls"} placeholder="Contoh: 08533xxxxx" value={value.no_pj_2 ?? ""} onChange={(e) => onChange({ ...value, no_pj_2: e.target.value })} />
           </div>
         </div>

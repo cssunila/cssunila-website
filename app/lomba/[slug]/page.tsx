@@ -315,7 +315,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                         </p>
                         <div className={`flex items-center flex-wrap gap-8`}>
                             {c.pj_1 &&
-                                <Link href={`https://wa.me/${c.no_pj_1}`} className="flex shrink-0 items-center gap-3 group">
+                                <Link href={`https://wa.me/${c.no_pj_1.replace(/^0/, "62")}`} className="flex shrink-0 items-center gap-3 group">
                                     <Image src={"/assets/whatsapp.svg"} width={30} height={30} alt="icon whatsapp" />
                                     <div>
                                         <p className="font-semibold">{c.pj_1}</p>
@@ -324,7 +324,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                                 </Link>
                             }
                             {c.pj_2 &&
-                                <Link href={`https://wa.me/${c.no_pj_2}`} className="flex shrink-0 items-center gap-3 group">
+                                <Link href={`https://wa.me/${c.no_pj_2.replace(/^0/, "62")}`} className="flex shrink-0 items-center gap-3 group">
                                     <Image src={"/assets/whatsapp.svg"} width={30} height={30} alt="icon whatsapp" />
                                     <div>
                                         <p className="font-semibold">{c.pj_2}</p>
