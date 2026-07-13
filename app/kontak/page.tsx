@@ -79,7 +79,7 @@ const KontakPage = () => {
         <div className="relative min-h-screen overflow-x-hidden">
             <Navbar />
 
-            <div className="overflow-hidden px-6 py-20 pt-26 sm:py-28">
+            <div className="overflow-hidden py-20 pt-26 sm:py-28">
                 <div className="pointer-events-none absolute -left-20 top-24 -z-10 h-96 w-96 rounded-full bg-cyan-strong/25 blur-3xl animate-float" />
                 <div className="pointer-events-none absolute -right-24 top-1/2 -z-10 h-104 w-104 rounded-full bg-sapphire/25 blur-3xl animate-float [animation-delay:2s]" />
 

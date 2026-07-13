@@ -15,7 +15,7 @@ const TentangKami = () => {
         <div className="relative min-h-screen overflow-x-hidden">
             <Navbar />
 
-            <section className="relative isolate overflow-hidden px-6 pt-24 pb-20 md:pt-26 md:pb-22">
+            <section className="relative isolate overflow-hidden pt-24 pb-20 md:pt-26 md:pb-22">
                 <Image
                     src={"/css-logo.png"}
                     alt=""
