@@ -112,8 +112,8 @@ export default async function PengumumanPage() {
       <div className="pointer-events-none absolute -left-20 top-20 -z-10 h-72 w-72 rounded-full bg-sapphire/30 blur-3xl" />
       <div className="pointer-events-none absolute -right-20 bottom-20 -z-10 h-72 w-72 rounded-full bg-cyan-strong/25 blur-3xl" />
 
-      <main className="pt-32 pb-24 md:pt-40">
-        <div className="mx-auto max-w-4xl px-4">
+      <main className="pt-30 md:pt-32 pb-26 md:pb-30">
+        <div className="mx-auto max-w-5xl px-4">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"

@@ -15,7 +15,7 @@ const TentangKami = () => {
         <div className="relative min-h-screen overflow-x-hidden">
             <Navbar />
 
-            <section className="relative isolate overflow-hidden pt-24 pb-20 md:pt-26 md:pb-22">
+            <section className="relative isolate overflow-hidden pt-30 md:pt-32 pb-26 md:pb-30">
                 <Image
                     src={"/css-logo.png"}
                     alt=""
@@ -26,7 +26,7 @@ const TentangKami = () => {
                 />
                 <div className="pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-background/50 via-background/80 to-background" />
 
-                <div className="mx-auto max-w-6xl">
+                <div className="mx-auto max-w-5xl px-4">
                     <Link
                         href="/"
                         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"

@@ -237,7 +237,7 @@ const HistoryPage = () => {
     <div className="relative min-h-screen overflow-x-hidden">
       <Navbar />
 
-      <section className="pt-32 pb-12 md:pt-40">
+      <section className="pt-30 md:pt-32 pb-26 md:pb-30">
         <div className="mx-auto max-w-5xl px-4">
           <Link
             href="/"

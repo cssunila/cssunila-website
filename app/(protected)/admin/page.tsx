@@ -52,8 +52,8 @@ const AdminPage = () => {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <Navbar />
-      <section className="pt-32 pb-16 md:pt-40">
-        <div className="mx-auto max-w-6xl px-4">
+      <section className="pt-30 md:pt-32 pb-26 md:pb-30">
+        <div className="mx-auto max-w-5xl px-4">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft size={14} /> Kembali ke Beranda
           </Link>

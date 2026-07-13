@@ -86,8 +86,8 @@ const SeminarDetailPage = async ({ params }: Props) => {
     <div className="relative min-h-screen overflow-x-hidden">
       <Navbar />
 
-      <section className="pt-32 pb-24 md:pt-40">
-        <div className="mx-auto max-w-4xl px-4">
+      <section className="pt-30 md:pt-32 pb-26 md:pb-30">
+        <div className="mx-auto max-w-5xl px-4">
           <Link
             href="/#seminar"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"

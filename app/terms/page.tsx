@@ -53,11 +53,11 @@ const sections = [
 
 const TermsPage = () => {
   return (
-    <div className="relative min-h-screen overflow-hidden px-4 py-20">
+    <div className="relative min-h-screen overflow-hidden pt-20 md:pt-24 pb-26 md:pb-30">
       <div className="pointer-events-none absolute -left-24 top-32 -z-10 h-80 w-80 rounded-full bg-sapphire/25 blur-3xl animate-float" />
       <div className="pointer-events-none absolute -right-16 top-1/2 -z-10 h-96 w-96 rounded-full bg-cyan-strong/20 blur-3xl animate-float [animation-delay:2s]" />
 
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-3xl px-4">
         <Link
           href="/"
           className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition hover:text-foreground"
