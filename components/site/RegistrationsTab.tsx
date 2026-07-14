@@ -20,6 +20,7 @@ import {
   ZoomIn,
   AlertTriangle,
   Wallet,
+  Users,
 } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -41,6 +42,7 @@ type AdminReg = {
   leader_name: string;
   leader_whatsapp: string;
   leader_email: string | null;
+  slot: number;
   status: string;
   rejection_reason: string | null;
   created_at: string;
@@ -334,6 +336,11 @@ function DetailModal({
               </h3>
               <div className="glass rounded-2xl p-4 space-y-3">
                 <InfoRow
+                  icon={<Users size={14} />}
+                  label="Slot"
+                  value={`${reg.slot} Slot`}
+                />
+                <InfoRow
                   icon={<CreditCard size={14} />}
                   label="Nominal"
                   value={`Rp. ${(payment?.amount_idr ?? 0).toLocaleString("id-ID")}`}
@@ -485,7 +492,7 @@ const RegistrationsTab = () => {
       let query = supabase
         .from("registrations")
         .select(
-          "id, team_name, leader_name, leader_whatsapp, leader_email, status, rejection_reason, created_at, verified_at, competition:competitions(id,name,slug), payments(amount_idr,status,midtrans_order_id,midtrans_payment_type,paid_at), registration_answers(field_key,field_label,value)"
+          "id, team_name, leader_name, leader_whatsapp, leader_email, status, rejection_reason, created_at, verified_at, slot, competition:competitions(id,name,slug), payments(amount_idr,status,midtrans_order_id,midtrans_payment_type,paid_at), registration_answers(field_key,field_label,value)"
         );
 
       if (role === "lomba") {
