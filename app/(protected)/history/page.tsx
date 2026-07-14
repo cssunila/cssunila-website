@@ -316,7 +316,7 @@ const HistoryPage = () => {
                       </p>
 
                       <p className="mt-1 text-xs text-muted-foreground">
-                        Rp. {amount.toLocaleString("id-ID")}{r.slot > 1 && `- ${r.slot} Slot`}
+                        Rp. {amount.toLocaleString("id-ID")}{r.slot > 1 && ` - ${r.slot} Slot`}
                       </p>
                     </div>
 

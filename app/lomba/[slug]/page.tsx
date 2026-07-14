@@ -22,7 +22,7 @@ type CompetitionDetail = {
     icon: string | null; accent: string | null; fee_idr: number; quota: number; pendaftar: number | null;
     team_size: string | null; is_open: boolean;
     pj_1: string; no_pj_1: string; pj_2: string; no_pj_2: string; banner: string; panduan: string;
-    juara_1: string; juara_2: string; juara_3: string;
+    juara_1: string; juara_2: string; juara_3: string; is_multi_slot: boolean;
     rules: string[]; timeline: { date: string; label: string }[];
 };
 
@@ -51,7 +51,7 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
             const supabase = suparef.current;
             const { data, error } = await supabase
                 .from("competitions")
-                .select("id,slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,is_open,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner,juara_1,juara_2,juara_3,panduan")
+                .select("id,slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,is_open,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner,juara_1,juara_2,juara_3,panduan, is_multi_slot")
                 .eq("slug", slug)
                 .maybeSingle();
             if (error) throw error;
@@ -187,6 +187,16 @@ const LombaDetail = ({ params }: { params: Promise<{ slug: string }> }) => {
                                 </div>
                             </div>
                         ))}
+                        {c.is_multi_slot && (
+                            <div className="glass rounded-2xl p-5">
+                                <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+                                    <Users size={14} /> Multi Slot
+                                </div>
+                                <div className="mt-2 font-display text-base font-semibold">
+                                    Tersedia
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
