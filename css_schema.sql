@@ -225,6 +225,12 @@ CREATE TABLE public.export_logs (
   export_type text NOT NULL,
   filters jsonb,
   row_count integer,
+  action text,
+  entity_type text,
+  entity_id uuid,
+  status text DEFAULT 'info' CHECK (status IN ('success','error','warning','info')),
+  actor_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
+  metadata jsonb,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -483,8 +489,11 @@ CREATE POLICY "Admins can manage all user roles" ON public.user_roles
   FOR ALL TO authenticated USING (public.has_role('admin', auth.uid()));
 
 -- Policies: Export Logs
-CREATE POLICY "Admins can manage export logs" ON public.export_logs 
-  FOR ALL TO authenticated USING (public.has_role('admin', auth.uid()));
+CREATE POLICY "Admins can read activity logs" ON public.export_logs 
+  FOR SELECT TO authenticated USING (public.has_role('admin', auth.uid()));
+
+CREATE POLICY "Service role can insert logs" ON public.export_logs
+  FOR INSERT TO authenticated, service_role WITH CHECK (true);
 
 -- Enable RLS on notifications
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
@@ -701,4 +710,363 @@ CREATE POLICY "Allow users to manage their own push_subscriptions" ON public.pus
 CREATE POLICY "Admins can view push_subscriptions" ON public.push_subscriptions
   FOR SELECT TO authenticated
   USING (public.has_role('admin', auth.uid()));
+
+
+-- =========================================================================
+-- 10. ACTIVITY LOG FUNCTIONS & TRIGGERS
+-- =========================================================================
+
+-- FUNGSI HELPER: catat activity log
+CREATE OR REPLACE FUNCTION public.log_activity(
+  p_action text,
+  p_entity_type text,
+  p_entity_id uuid DEFAULT NULL,
+  p_status text DEFAULT 'info',
+  p_actor_id uuid DEFAULT NULL,
+  p_metadata jsonb DEFAULT NULL
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  INSERT INTO public.export_logs (
+    export_type,
+    action,
+    entity_type,
+    entity_id,
+    status,
+    actor_id,
+    metadata,
+    created_at
+  ) VALUES (
+    p_entity_type,
+    p_action,
+    p_entity_type,
+    p_entity_id,
+    p_status,
+    p_actor_id,
+    p_metadata,
+    now()
+  );
+EXCEPTION WHEN OTHERS THEN
+  RAISE WARNING 'Failed to log activity: %', SQLERRM;
+END;
+$$;
+
+-- TRIGGER: Pendaftaran (registrations)
+CREATE OR REPLACE FUNCTION public.trg_log_registrations()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_action text;
+  v_status text;
+  v_meta jsonb;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    v_action := 'Pendaftaran baru dibuat';
+    v_status := 'success';
+    v_meta := jsonb_build_object(
+      'team_name', NEW.team_name,
+      'status', NEW.status,
+      'competition_id', NEW.competition_id
+    );
+    PERFORM public.log_activity(v_action, 'registration', NEW.id::uuid, v_status, NEW.user_id, v_meta);
+
+  ELSIF TG_OP = 'UPDATE' THEN
+    IF OLD.status IS DISTINCT FROM NEW.status THEN
+      v_action := format('Status pendaftaran diubah: %s → %s', OLD.status, NEW.status);
+      v_status := CASE NEW.status
+        WHEN 'verified' THEN 'success'
+        WHEN 'rejected' THEN 'error'
+        WHEN 'pending_verification' THEN 'info'
+        WHEN 'pending_payment' THEN 'warning'
+        ELSE 'info'
+      END;
+      v_meta := jsonb_build_object(
+        'team_name', NEW.team_name,
+        'old_status', OLD.status,
+        'new_status', NEW.status,
+        'competition_id', NEW.competition_id,
+        'rejection_reason', NEW.rejection_reason
+      );
+      PERFORM public.log_activity(v_action, 'registration', NEW.id::uuid, v_status, NEW.user_id, v_meta);
+    END IF;
+
+  ELSIF TG_OP = 'DELETE' THEN
+    v_meta := jsonb_build_object(
+      'team_name', OLD.team_name,
+      'status', OLD.status
+    );
+    PERFORM public.log_activity('Pendaftaran dihapus', 'registration', OLD.id::uuid, 'warning', OLD.user_id, v_meta);
+  END IF;
+
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS log_registrations ON public.registrations;
+CREATE TRIGGER log_registrations
+  AFTER INSERT OR UPDATE OR DELETE ON public.registrations
+  FOR EACH ROW EXECUTE FUNCTION public.trg_log_registrations();
+
+-- TRIGGER: Pembayaran (payments)
+CREATE OR REPLACE FUNCTION public.trg_log_payments()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_action text;
+  v_status text;
+  v_meta jsonb;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    v_action := 'Transaksi pembayaran diinisialisasi';
+    v_meta := jsonb_build_object(
+      'amount', NEW.amount_idr,
+      'status', NEW.status,
+      'order_id', NEW.midtrans_order_id,
+      'registration_id', NEW.registration_id
+    );
+    PERFORM public.log_activity(v_action, 'payment', NEW.id::uuid, 'info', NEW.user_id, v_meta);
+
+  ELSIF TG_OP = 'UPDATE' THEN
+    IF OLD.status IS DISTINCT FROM NEW.status THEN
+      v_action := format('Status transaksi pembayaran diubah: %s → %s', OLD.status, NEW.status);
+      v_status := CASE NEW.status
+        WHEN 'success' THEN 'success'
+        WHEN 'failed' THEN 'error'
+        WHEN 'expired' THEN 'error'
+        WHEN 'refunded' THEN 'warning'
+        ELSE 'info'
+      END;
+      v_meta := jsonb_build_object(
+        'amount', NEW.amount_idr,
+        'old_status', OLD.status,
+        'new_status', NEW.status,
+        'order_id', NEW.midtrans_order_id,
+        'registration_id', NEW.registration_id
+      );
+      PERFORM public.log_activity(v_action, 'payment', NEW.id::uuid, v_status, NEW.user_id, v_meta);
+    END IF;
+  END IF;
+
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS log_payments ON public.payments;
+CREATE TRIGGER log_payments
+  AFTER INSERT OR UPDATE ON public.payments
+  FOR EACH ROW EXECUTE FUNCTION public.trg_log_payments();
+
+-- TRIGGER: Lomba (competitions)
+CREATE OR REPLACE FUNCTION public.trg_log_competitions()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_meta jsonb;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    v_meta := jsonb_build_object('name', NEW.name, 'is_open', NEW.is_open);
+    PERFORM public.log_activity('Lomba baru dibuat', 'competition', NEW.id::uuid, 'success', NULL, v_meta);
+  ELSIF TG_OP = 'UPDATE' THEN
+    v_meta := jsonb_build_object(
+      'name', NEW.name,
+      'old_open', OLD.is_open,
+      'new_open', NEW.is_open
+    );
+    PERFORM public.log_activity('Data lomba diperbarui', 'competition', NEW.id::uuid, 'info', NULL, v_meta);
+  ELSIF TG_OP = 'DELETE' THEN
+    v_meta := jsonb_build_object('name', OLD.name);
+    PERFORM public.log_activity('Lomba dihapus', 'competition', OLD.id::uuid, 'warning', NULL, v_meta);
+  END IF;
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS log_competitions ON public.competitions;
+CREATE TRIGGER log_competitions
+  AFTER INSERT OR UPDATE OR DELETE ON public.competitions
+  FOR EACH ROW EXECUTE FUNCTION public.trg_log_competitions();
+
+-- TRIGGER: User baru mendaftar (profiles)
+CREATE OR REPLACE FUNCTION public.trg_log_user_signup()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_meta jsonb;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    v_meta := jsonb_build_object('full_name', NEW.full_name, 'institution', NEW.institution);
+    PERFORM public.log_activity('Pengguna baru mendaftar', 'user', NEW.id::uuid, 'success', NEW.id, v_meta);
+  ELSIF TG_OP = 'UPDATE' THEN
+    IF OLD.suspended IS DISTINCT FROM NEW.suspended THEN
+      v_meta := jsonb_build_object('full_name', NEW.full_name, 'suspended', NEW.suspended);
+      PERFORM public.log_activity(
+        CASE WHEN NEW.suspended THEN 'Pengguna disuspend' ELSE 'Suspense pengguna dicabut' END,
+        'user', NEW.id::uuid,
+        CASE WHEN NEW.suspended THEN 'warning' ELSE 'success' END,
+        NEW.id, v_meta
+      );
+    END IF;
+  ELSIF TG_OP = 'DELETE' THEN
+    v_meta := jsonb_build_object('full_name', OLD.full_name);
+    PERFORM public.log_activity('Akun pengguna dihapus', 'user', OLD.id::uuid, 'warning', OLD.id, v_meta);
+  END IF;
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS log_user_signup ON public.profiles;
+CREATE TRIGGER log_user_signup
+  AFTER INSERT OR UPDATE OR DELETE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.trg_log_user_signup();
+
+-- TRIGGER: Perubahan role pengguna (user_roles)
+CREATE OR REPLACE FUNCTION public.trg_log_user_roles()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_meta jsonb;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    v_meta := jsonb_build_object('user_id', NEW.user_id, 'role', NEW.role);
+    PERFORM public.log_activity('Role pengguna ditetapkan: ' || NEW.role, 'user', NEW.user_id::uuid, 'info', NULL, v_meta);
+  ELSIF TG_OP = 'UPDATE' THEN
+    v_meta := jsonb_build_object('user_id', NEW.user_id, 'old_role', OLD.role, 'new_role', NEW.role);
+    PERFORM public.log_activity('Role pengguna diubah: ' || OLD.role || ' → ' || NEW.role, 'user', NEW.user_id::uuid, 'info', NULL, v_meta);
+  ELSIF TG_OP = 'DELETE' THEN
+    v_meta := jsonb_build_object('user_id', OLD.user_id, 'role', OLD.role);
+    PERFORM public.log_activity('Role pengguna dihapus: ' || OLD.role, 'user', OLD.user_id::uuid, 'warning', NULL, v_meta);
+  END IF;
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS log_user_roles ON public.user_roles;
+CREATE TRIGGER log_user_roles
+  AFTER INSERT OR UPDATE OR DELETE ON public.user_roles
+  FOR EACH ROW EXECUTE FUNCTION public.trg_log_user_roles();
+
+-- TRIGGER: Berita (news)
+CREATE OR REPLACE FUNCTION public.trg_log_news()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_meta jsonb;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    v_meta := jsonb_build_object('title', NEW.title, 'slug', NEW.slug);
+    PERFORM public.log_activity('Berita baru diterbitkan', 'news', NEW.id::uuid, 'success', NULL, v_meta);
+  ELSIF TG_OP = 'UPDATE' THEN
+    v_meta := jsonb_build_object('title', NEW.title, 'slug', NEW.slug);
+    PERFORM public.log_activity('Berita diperbarui', 'news', NEW.id::uuid, 'info', NULL, v_meta);
+  ELSIF TG_OP = 'DELETE' THEN
+    v_meta := jsonb_build_object('title', OLD.title);
+    PERFORM public.log_activity('Berita dihapus', 'news', OLD.id::uuid, 'warning', NULL, v_meta);
+  END IF;
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS log_news ON public.news;
+CREATE TRIGGER log_news
+  AFTER INSERT OR UPDATE OR DELETE ON public.news
+  FOR EACH ROW EXECUTE FUNCTION public.trg_log_news();
+
+-- TRIGGER: Seminar
+CREATE OR REPLACE FUNCTION public.trg_log_seminars()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_meta jsonb;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    v_meta := jsonb_build_object('title', NEW.title);
+    PERFORM public.log_activity('Seminar baru dibuat', 'seminar', NEW.id::uuid, 'success', NULL, v_meta);
+  ELSIF TG_OP = 'UPDATE' THEN
+    v_meta := jsonb_build_object('title', NEW.title);
+    PERFORM public.log_activity('Data seminar diperbarui', 'seminar', NEW.id::uuid, 'info', NULL, v_meta);
+  ELSIF TG_OP = 'DELETE' THEN
+    v_meta := jsonb_build_object('title', OLD.title);
+    PERFORM public.log_activity('Seminar dihapus', 'seminar', OLD.id::uuid, 'warning', NULL, v_meta);
+  END IF;
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS log_seminars ON public.seminars;
+CREATE TRIGGER log_seminars
+  AFTER INSERT OR UPDATE OR DELETE ON public.seminars
+  FOR EACH ROW EXECUTE FUNCTION public.trg_log_seminars();
+
+-- TRIGGER: Pengiriman notifikasi
+CREATE OR REPLACE FUNCTION public.trg_log_notifications()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_meta jsonb;
+BEGIN
+  v_meta := jsonb_build_object(
+    'title', NEW.title,
+    'is_for_admin', NEW.is_for_admin,
+    'user_id', NEW.user_id
+  );
+  PERFORM public.log_activity('Notifikasi dikirim: ' || NEW.title, 'notification', NEW.id::uuid, 'info', NEW.user_id, v_meta);
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS log_notifications ON public.notifications;
+CREATE TRIGGER log_notifications
+  AFTER INSERT ON public.notifications
+  FOR EACH ROW EXECUTE FUNCTION public.trg_log_notifications();
+
+-- TRIGGER: Site settings / Pengaturan website
+CREATE OR REPLACE FUNCTION public.trg_log_site_settings()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_meta jsonb;
+BEGIN
+  IF TG_OP = 'INSERT' THEN
+    v_meta := jsonb_build_object('id', NEW.id, 'value', NEW.value);
+    PERFORM public.log_activity('Pengaturan website dibuat: ' || NEW.id, 'site_settings', NULL, 'info', NULL, v_meta);
+  ELSIF TG_OP = 'UPDATE' THEN
+    v_meta := jsonb_build_object('id', NEW.id, 'old_value', OLD.value, 'new_value', NEW.value);
+    PERFORM public.log_activity('Pengaturan website diubah: ' || NEW.id, 'site_settings', NULL, 'info', NULL, v_meta);
+  END IF;
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS log_site_settings ON public.site_settings;
+CREATE TRIGGER log_site_settings
+  AFTER INSERT OR UPDATE ON public.site_settings
+  FOR EACH ROW EXECUTE FUNCTION public.trg_log_site_settings();
+
+-- INDEX untuk performa query logs
+CREATE INDEX IF NOT EXISTS idx_export_logs_created_at ON public.export_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_export_logs_status ON public.export_logs(status);
+CREATE INDEX IF NOT EXISTS idx_export_logs_entity_type ON public.export_logs(entity_type);
+CREATE INDEX IF NOT EXISTS idx_export_logs_actor_id ON public.export_logs(actor_id);
+
 

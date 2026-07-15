@@ -14,6 +14,7 @@ import GroupLinksTab from "@/components/site/GroupLinksTab";
 import WinnersTab from "@/components/site/WinnersTab";
 import SiteSettingsTab from "@/components/site/SiteSettingsTab";
 import UsersTab from "@/components/site/UsersTab";
+import LogsTab from "@/components/site/LogsTab";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -72,6 +73,7 @@ const AdminPage = () => {
                 {(role === "admin" || role === "lomba") && <TabsTrigger value="winners" className="p-4 cursor-pointer">Juara</TabsTrigger>}
                 {role === "admin" && <TabsTrigger value="website" className="p-4 cursor-pointer">Website</TabsTrigger>}
                 {role === "admin" && <TabsTrigger value="users" className="p-4 cursor-pointer">Pengguna</TabsTrigger>}
+                {role === "admin" && <TabsTrigger value="logs" className="p-4 cursor-pointer">Logs</TabsTrigger>}
               </TabsList>
             </div>
             {(role === "admin" || role === "lomba") && <TabsContent value="reg" className="mt-6"><RegistrationsTab /></TabsContent>}
@@ -82,6 +84,7 @@ const AdminPage = () => {
             {(role === "admin" || role === "lomba") && <TabsContent value="winners" className="mt-6"><WinnersTab /></TabsContent>}
             {role === "admin" && <TabsContent value="website" className="mt-6"><SiteSettingsTab /></TabsContent>}
             {role === "admin" && <TabsContent value="users" className="mt-6"><UsersTab /></TabsContent>}
+            {role === "admin" && <TabsContent value="logs" className="mt-6"><LogsTab /></TabsContent>}
           </Tabs>
         </div>
       </section>

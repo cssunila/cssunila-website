@@ -56,7 +56,7 @@ const Timeline = ({ items }: TimelineProps) => {
                 <h3 className="mt-1 group-hover:text-cyan-strong transition-all duration-200 font-display text-xl font-semibold">
                   {item.label}
                 </h3>
-                <p className="text-sm text-muted-foreground text-justify mt-2">
+                <p className="text-sm text-muted-foreground mt-2">
                   {item.description}
                 </p>
               </div>
