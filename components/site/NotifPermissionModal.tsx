@@ -70,29 +70,12 @@ export default function NotifPermissionModal({
         {/* Content */}
         <div className="notif-modal-content">
           <h2 id="notif-modal-title" className="notif-modal-title">
-            Aktifkan Notifikasi
+            Izinkan Notifikasi
           </h2>
           <p id="notif-modal-desc" className="notif-modal-desc">
-            Aktifkan notifikasi push agar kamu bisa langsung mendapatkan update
-            terbaru seputar pendaftaran, pembayaran, dan pengumuman lomba —
-            bahkan saat kamu sedang tidak membuka halaman ini.
+            Izinkan notifikasi agar kamu bisa langsung mendapatkan update
+            terbaru tentang pendaftaran, pembayaran dan pengumuman lomba.
           </p>
-
-          {/* Features */}
-          <ul className="notif-modal-features">
-            <li>
-              <span className="notif-feature-dot" />
-              Status pendaftaran &amp; verifikasi
-            </li>
-            <li>
-              <span className="notif-feature-dot" />
-              Konfirmasi pembayaran real-time
-            </li>
-            <li>
-              <span className="notif-feature-dot" />
-              Pengumuman lomba terbaru
-            </li>
-          </ul>
         </div>
 
         {/* Actions */}
