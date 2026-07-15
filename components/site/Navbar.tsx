@@ -10,6 +10,7 @@ import { createClient } from "@/supabase/client";
 import Link from "next/link";
 import Image from "next/image";
 import ConfirmModal from "./ConfirmModal";
+import { useBrowserNotification } from "@/hooks/use-browser-notification";
 
 const links = [
     { href: "/", label: "Beranda" },
@@ -33,6 +34,8 @@ const Navbar = () => {
     const [notifications, setNotifications] = useState<any[]>([]);
     const [showNotif, setShowNotif] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
+    useBrowserNotification(!!user);
+    const [allowedComps, setAllowedComps] = useState<string[]>([]);
 
     const [settings, setSettings] = useState<Record<string, string>>({
         site_logo: "/css-logo.png",
@@ -115,8 +118,20 @@ const Navbar = () => {
             .order("created_at", { ascending: false })
             .limit(8);
 
-        if (role === "admin" || role === "lomba") {
+        if (role === "admin") {
             query.or(`user_id.eq.${user.id},is_for_admin.eq.true`);
+        } else if (role === "lomba") {
+            const { data: allowedCompsData } = await supabase
+                .from("user_competitions")
+                .select("competition_id")
+                .eq("user_id", user.id);
+            const allowedCompIds = (allowedCompsData ?? []).map((c) => c.competition_id);
+            
+            if (allowedCompIds.length > 0) {
+                query.or(`user_id.eq.${user.id},and(is_for_admin.eq.true,competition_id.in.(${allowedCompIds.join(",")}))`);
+            } else {
+                query.eq("user_id", user.id);
+            }
         } else {
             query.eq("user_id", user.id);
         }
@@ -166,6 +181,22 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
+        const fetchAllowedComps = async () => {
+            if (user && role === "lomba") {
+                const supabase = suparef.current;
+                const { data } = await supabase
+                    .from("user_competitions")
+                    .select("competition_id")
+                    .eq("user_id", user.id);
+                setAllowedComps((data ?? []).map((c) => c.competition_id));
+            } else {
+                setAllowedComps([]);
+            }
+        };
+        fetchAllowedComps();
+    }, [user, role]);
+
+    useEffect(() => {
         if (user) {
             fetchNotifications();
             const supabase = suparef.current;
@@ -181,7 +212,10 @@ const Navbar = () => {
                     (payload: any) => {
                         const newNotif = payload.new;
                         const isForMe = newNotif.user_id === user.id ||
-                            (newNotif.is_for_admin && (role === "admin" || role === "lomba"));
+                            (newNotif.is_for_admin && (
+                                role === "admin" || 
+                                (role === "lomba" && newNotif.competition_id && allowedComps.includes(newNotif.competition_id))
+                            ));
 
                         if (isForMe) {
                             setNotifications((prev) => [newNotif, ...prev.slice(0, 9)]);
@@ -197,7 +231,7 @@ const Navbar = () => {
                 supabase.removeChannel(channel);
             };
         }
-    }, [user, role]);
+    }, [user, role, allowedComps]);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {

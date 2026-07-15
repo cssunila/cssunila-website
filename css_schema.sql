@@ -232,6 +232,7 @@ CREATE TABLE public.export_logs (
 CREATE TABLE public.notifications (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  competition_id uuid REFERENCES public.competitions(id) ON DELETE SET NULL,
   title text NOT NULL,
   message text NOT NULL,
   is_read boolean NOT NULL DEFAULT false,
@@ -292,39 +293,43 @@ BEGIN
 
   -- 1. On INSERT (when user first registers)
   IF (TG_OP = 'INSERT') THEN
-    INSERT INTO public.notifications (title, message, is_for_admin)
+    INSERT INTO public.notifications (title, message, is_for_admin, competition_id)
     VALUES (
       'Pendaftaran Baru',
       'Tim ' || NEW.team_name || ' mendaftar untuk cabang ' || COALESCE(comp_name, 'Lomba') || '.',
-      true
+      true,
+      NEW.competition_id
     );
   -- 2. On UPDATE (when status changes)
   ELSIF (TG_OP = 'UPDATE') THEN
     -- If status changes to pending_verification (meaning they paid, waiting for admin verification)
     IF NEW.status = 'pending_verification' AND OLD.status <> 'pending_verification' THEN
-      INSERT INTO public.notifications (title, message, is_for_admin)
+      INSERT INTO public.notifications (title, message, is_for_admin, competition_id)
       VALUES (
         'Pembayaran Baru',
         'Tim ' || NEW.team_name || ' telah melakukan pembayaran untuk ' || COALESCE(comp_name, 'Lomba') || ' dan menunggu verifikasi.',
-        true
+        true,
+        NEW.competition_id
       );
     -- If status changes to verified (verified by admin)
     ELSIF NEW.status = 'verified' AND OLD.status <> 'verified' THEN
-      INSERT INTO public.notifications (user_id, title, message, is_for_admin)
+      INSERT INTO public.notifications (user_id, title, message, is_for_admin, competition_id)
       VALUES (
         NEW.user_id,
         'Pendaftaran Terverifikasi',
         'Selamat! Pendaftaran Tim ' || NEW.team_name || ' untuk cabang ' || COALESCE(comp_name, 'Lomba') || ' telah diverifikasi oleh panitia.',
-        false
+        false,
+        NEW.competition_id
       );
     -- If status changes to rejected (rejected by admin)
     ELSIF NEW.status = 'rejected' AND OLD.status <> 'rejected' THEN
-      INSERT INTO public.notifications (user_id, title, message, is_for_admin)
+      INSERT INTO public.notifications (user_id, title, message, is_for_admin, competition_id)
       VALUES (
         NEW.user_id,
         'Pendaftaran Ditolak',
         'Pendaftaran Tim ' || NEW.team_name || ' untuk cabang ' || COALESCE(comp_name, 'Lomba') || ' ditolak. Alasan: ' || COALESCE(NEW.rejection_reason, 'Tidak ditentukan'),
-        false
+        false,
+        NEW.competition_id
       );
     END IF;
   END IF;
@@ -674,4 +679,26 @@ CREATE POLICY "Admins can manage page_visibility" ON public.page_visibility
   FOR ALL TO authenticated
   USING (public.has_role('admin', auth.uid()))
   WITH CHECK (public.has_role('admin', auth.uid()));
+
+-- =========================================================================
+-- 9. WEB PUSH NOTIFICATIONS SUBSCRIPTIONS
+-- =========================================================================
+
+CREATE TABLE IF NOT EXISTS public.push_subscriptions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  subscription jsonb NOT NULL,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow users to manage their own push_subscriptions" ON public.push_subscriptions
+  FOR ALL TO authenticated
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "Admins can view push_subscriptions" ON public.push_subscriptions
+  FOR SELECT TO authenticated
+  USING (public.has_role('admin', auth.uid()));
 
