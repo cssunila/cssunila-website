@@ -10,6 +10,7 @@ import { createClient } from "@/supabase/client";
 import Link from "next/link";
 import Image from "next/image";
 import ConfirmModal from "./ConfirmModal";
+import NotifPermissionModal from "./NotifPermissionModal";
 import { useBrowserNotification } from "@/hooks/use-browser-notification";
 
 const links = [
@@ -34,7 +35,7 @@ const Navbar = () => {
     const [notifications, setNotifications] = useState<any[]>([]);
     const [showNotif, setShowNotif] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
-    useBrowserNotification(!!user);
+    const { shouldShowModal: showNotifModal, requestPermission, dismissModal } = useBrowserNotification(!!user);
     const [allowedComps, setAllowedComps] = useState<string[]>([]);
 
     const [settings, setSettings] = useState<Record<string, string>>({
@@ -486,6 +487,12 @@ const Navbar = () => {
                 cancelLabel="Batal"
                 onConfirm={() => { setShowLogoutConfirm(false); doSignOut(); }}
                 onCancel={() => setShowLogoutConfirm(false)}
+            />
+
+            <NotifPermissionModal
+                open={showNotifModal}
+                onAllow={requestPermission}
+                onDismiss={dismissModal}
             />
         </header>
     );
