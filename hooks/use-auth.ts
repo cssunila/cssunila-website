@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { createClient } from "@/supabase/client";
+import { toast } from "sonner";
 
 export type AppRole = "admin" | "user" | "lomba" | "petugas";
 
@@ -42,6 +43,7 @@ export function useAuth(): ReturnType {
       if (profile?.suspended) {
         await supabase.auth.signOut();
         setRole(null);
+        toast.error("Akun Anda telah dinonaktifkan");
         return null;
       }
 

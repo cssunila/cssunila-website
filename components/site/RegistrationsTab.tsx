@@ -634,56 +634,57 @@ const RegistrationsTab = () => {
       y += 20;
 
       list.forEach((r, idx) => {
-        if (y > h - 60) {
-          doc.addPage();
-          y = 50;
-          drawHeader();
-
-          doc.setFillColor(241, 245, 249);
-          doc.rect(40, y, w - 80, 20, "F");
-          doc.setTextColor(15, 23, 42);
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(9);
-          doc.text("No", 45, y + 13);
-          doc.text("Nama Tim / Instansi", 75, y + 13);
-          doc.text("Ketua", 225, y + 13);
-          doc.text("WhatsApp", 345, y + 13);
-          doc.text("Biaya & Status", 445, y + 13);
-          y += 20;
+        if (r.status === "verified") {
+          if (y > h - 60) {
+            doc.addPage();
+            y = 50;
+            drawHeader();
+  
+            doc.setFillColor(241, 245, 249);
+            doc.rect(40, y, w - 80, 20, "F");
+            doc.setTextColor(15, 23, 42);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.text("No", 45, y + 13);
+            doc.text("Nama Tim / Instansi", 75, y + 13);
+            doc.text("Ketua", 225, y + 13);
+            doc.text("WhatsApp", 345, y + 13);
+            doc.text("Biaya & Status", 445, y + 13);
+            y += 20;
+          }
+  
+          if (idx % 2 === 1) {
+            doc.setFillColor(248, 250, 252);
+            doc.rect(40, y, w - 80, 20, "F");
+          }
+  
+          doc.setTextColor(71, 85, 105);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8.5);
+  
+          doc.text(String(idx + 1), 45, y + 13);
+  
+          const teamText = doc.splitTextToSize(r.team_name, 140);
+          doc.text(teamText, 75, y + 13);
+  
+          const leaderText = doc.splitTextToSize(r.leader_name, 110);
+          doc.text(leaderText, 225, y + 13);
+  
+          doc.text(r.leader_whatsapp, 345, y + 13);
+  
+          const amount = r.payments?.amount_idr ?? 0;
+          const pStatus = r.payments?.status || "—";
+          const feeText = `Rp ${amount.toLocaleString("id-ID")} (${pStatus})`;
+          doc.text(feeText, 445, y + 13);
+  
+          const linesCount = Math.max(teamText.length, leaderText.length);
+          y += Math.max(20, linesCount * 10 + 5);
+  
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(0.5);
+          doc.line(40, y, w - 40, y);
         }
-
-        if (idx % 2 === 1) {
-          doc.setFillColor(248, 250, 252);
-          doc.rect(40, y, w - 80, 20, "F");
-        }
-
-        doc.setTextColor(71, 85, 105);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8.5);
-
-        doc.text(String(idx + 1), 45, y + 13);
-
-        const teamText = doc.splitTextToSize(r.team_name, 140);
-        doc.text(teamText, 75, y + 13);
-
-        const leaderText = doc.splitTextToSize(r.leader_name, 110);
-        doc.text(leaderText, 225, y + 13);
-
-        doc.text(r.leader_whatsapp, 345, y + 13);
-
-        const amount = r.payments?.amount_idr ?? 0;
-        const pStatus = r.payments?.status || "—";
-        const feeText = `Rp ${amount.toLocaleString("id-ID")} (${pStatus})`;
-        doc.text(feeText, 445, y + 13);
-
-        const linesCount = Math.max(teamText.length, leaderText.length);
-        y += Math.max(20, linesCount * 10 + 5);
-
-        doc.setDrawColor(226, 232, 240);
-        doc.setLineWidth(0.5);
-        doc.line(40, y, w - 40, y);
       });
-
       y += 20;
     });
 

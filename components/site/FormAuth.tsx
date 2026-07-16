@@ -22,6 +22,7 @@ const Field = ({
     placeholder: string;
     type?: string;
     value: string;
+    autoComplete: string;
     onChange: (v: string) => void;
     required?: boolean;
 }) => {
@@ -34,6 +35,7 @@ const Field = ({
                 type={props.type === "password" ? (eye ? "text" : "password") : props.type ?? "text"}
                 placeholder={props.placeholder}
                 value={props.value}
+                autoComplete={props.autoComplete}
                 required={props.required}
                 onChange={(e) => props.onChange(e.target.value)}
                 className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
@@ -172,16 +174,16 @@ const FormAuth = () => {
             <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
                 <div className="h-px flex-1 bg-border" /> atau <div className="h-px flex-1 bg-border" />
             </div>
-
+            
             <form onSubmit={handleSubmit} className="space-y-3">
                 {mode === "register" && (
-                    <Field icon={UserIcon} placeholder="Nama lengkap" value={fullName} onChange={setFullName} />
+                    <Field icon={UserIcon} placeholder="Nama lengkap" autoComplete={"name"} value={fullName} onChange={setFullName} />
                 )}
-                <Field icon={Mail} placeholder="Email" type="email" value={email} onChange={setEmail} required />
-                <Field icon={Lock} placeholder="Password" type="password" value={password} onChange={setPassword} required />
+                <Field icon={Mail} placeholder="Email" type="email" autoComplete={"email"} value={email} onChange={setEmail} required />
+                <Field icon={Lock} placeholder="Password" type="password" autoComplete={mode === "register" ? "new-password" : "current-password"} value={password} onChange={setPassword} required />
                 {mode === "register" && (
                     <>
-                        <Field icon={Lock} placeholder="Confirm Password" type="password" value={confirmPassword} onChange={setConfirmPassword} required />
+                        <Field icon={Lock} placeholder="Confirm Password" autoComplete="new-password" type="password" value={confirmPassword} onChange={setConfirmPassword} required />
                         <label htmlFor="agree" className="flex items-start gap-3 my-2">
                             <input onChange={(e) => setAgree(e.target.checked)} checked={agree} type="checkbox" id="agree" className="appearance-none mt-1 shrink-0 w-5 h-5 checked:bg-secondary rounded-md border" />
                             <span className="text-sm text-muted-foreground">Dengan mendaftar, saya menyetujui <Link href="terms" target="_blank" className="text-secondary font-semibold">Syarat & Ketentuan</Link> dan <Link href="privacy" target="_blank" className="text-secondary font-semibold">Kebijakan Privasi</Link></span>

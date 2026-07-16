@@ -5,7 +5,6 @@ import {
     Mail,
     Instagram,
     MapPin,
-    Clock,
     Github,
     Linkedin,
     Globe,
