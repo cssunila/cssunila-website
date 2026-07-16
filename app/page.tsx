@@ -19,11 +19,13 @@ export default async function Home() {
   let totalHadiah = "35Jt+";
   let totalPeserta = 0;
 
+  let heroTitle: string | undefined;
+  let titleSub: string | undefined;
   let heroTagline: string | undefined;
   let heroSubtitle: string | undefined;
+  let heroTema: string | undefined;
   let aboutTitle: string | undefined;
-  let aboutDesc1: string | undefined;
-  let aboutDesc2: string | undefined;
+  let aboutDesc: string | undefined;
   let aboutHighlights: string[] | undefined;
   let siteLogo: string | undefined;
   let timelineItems: { start_date: string; end_date: string; label: string; description: string }[] | undefined;
@@ -84,11 +86,13 @@ export default async function Home() {
       const map: Record<string, string> = {};
       settings.forEach((s) => { map[s.id] = s.value; });
 
+      heroTitle = map["site_title_main"] || undefined;
+      titleSub = map["site_title_sub"] || undefined;
       heroTagline = map["hero_tagline"] || undefined;
       heroSubtitle = map["hero_subtitle"] || undefined;
+      heroTema = map["hero_tema"] || undefined;
       aboutTitle = map["about_title"] || undefined;
-      aboutDesc1 = map["about_description_1"] || undefined;
-      aboutDesc2 = map["about_description_2"] || undefined;
+      aboutDesc = map["about_description"] || undefined;
       siteLogo = map["site_logo"] || undefined;
 
       if (map["about_highlights"]) {
@@ -139,13 +143,16 @@ export default async function Home() {
           totalLomba={totalLomba}
           totalHadiah={totalHadiah}
           totalPeserta={totalPeserta}
+          logo={siteLogo}
+          title={heroTitle}
+          sub={titleSub}
           tagline={heroTagline}
           subtitle={heroSubtitle}
+          tema={heroTema}
         />
         <About
           title={aboutTitle}
-          description1={aboutDesc1}
-          description2={aboutDesc2}
+          description={aboutDesc}
           highlights={aboutHighlights}
           logo={siteLogo}
         />

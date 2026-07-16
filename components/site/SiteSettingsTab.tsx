@@ -61,8 +61,10 @@ const SiteSettingsTab = () => {
   const suparef = useRef(createClient());
 
   const [settings, setSettings] = useState<Record<string, string>>({});
+  const [editingSettings, setEditingSettings] = useState<Record<string, string>>({});
   const [highlightInput, setHighlightInput] = useState("");
   const [highlights, setHighlights] = useState<string[]>([]);
+  const [editingHighlights, setEditingHighlights] = useState<string[]>([]);
   const [loadingLogo, setLoadingLogo] = useState(false);
   const [loadingFavicon, setLoadingFavicon] = useState(false);
 
@@ -92,8 +94,14 @@ const SiteSettingsTab = () => {
         setSettings(map);
         try {
           const parsed = JSON.parse(map["about_highlights"] ?? "[]");
-          if (Array.isArray(parsed)) setHighlights(parsed);
-        } catch { setHighlights([]); }
+          if (Array.isArray(parsed)) {
+            setHighlights(parsed);
+            setEditingHighlights(parsed);
+          };
+        } catch {
+          setHighlights([]);
+          setEditingHighlights([]);
+        }
       }
     })()
   }, [settingsData]);
@@ -416,14 +424,23 @@ const SiteSettingsTab = () => {
       .getPublicUrl(fileName);
 
     setSettings((prev) => ({ ...prev, [key]: imageUrl.publicUrl }));
+    setEditingSettings((prev) => ({ ...prev, [key]: imageUrl.publicUrl }));
   }
 
   const handleSaveSettings = () => {
-    const final = {
-      ...settings,
-      about_highlights: JSON.stringify(highlights),
+    let final = {
+      ...editingSettings,
     };
+
+    if (editingHighlights.length != highlights.length) {
+      final = {
+        ...final,
+        about_highlights: JSON.stringify(highlights),
+      }
+    }
+
     saveSettings.mutate(final);
+    setEditingSettings({});
   };
 
   const formatTanggal = (date: string) => {
@@ -461,7 +478,10 @@ const SiteSettingsTab = () => {
                   className="inputCls"
                   placeholder="Contoh: CSS"
                   value={settings["site_title_main"] ?? ""}
-                  onChange={(e) => setSettings((prev) => ({ ...prev, site_title_main: e.target.value }))}
+                  onChange={(e) => {
+                    setSettings((prev) => ({ ...prev, site_title_main: e.target.value }));
+                    setEditingSettings((prev) => ({ ...prev, site_title_main: e.target.value }));
+                  }}
                 />
               </div>
               <div className="space-y-1">
@@ -470,15 +490,19 @@ const SiteSettingsTab = () => {
                   className="inputCls"
                   placeholder="Contoh: 3.0"
                   value={settings["site_title_sub"] ?? ""}
-                  onChange={(e) => setSettings((prev) => ({ ...prev, site_title_sub: e.target.value }))}
+                  onChange={(e) => {
+                    setSettings((prev) => ({ ...prev, site_title_sub: e.target.value }));
+                    setEditingSettings((prev) => ({ ...prev, site_title_sub: e.target.value }));
+                  }}
                 />
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1">
                 <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Logo Website</label>
-                {settings["site_logo"] && <Image src={settings["site_logo"] ?? ""} alt="Logo Website" width={70} height={70} className="object-contain w-16 h-16 my-1" />}
-                <input type="hidden" name="site_logo" value={settings["site_logo"] ?? ""} />
+                {settings["site_logo"] &&
+                  <Image src={settings["site_logo"] ?? ""} alt="Logo CSS" width={70} height={70} className="object-contain w-16 h-16 my-1" />
+                }
                 {loadingLogo ? <Loader2 size={14} className="animate-spin" /> : (
                   <input
                     type="file"
@@ -490,8 +514,9 @@ const SiteSettingsTab = () => {
               </div>
               <div className="space-y-1">
                 <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Favicon Tab Browser</label>
-                {settings["site_favicon"] && <Image src={settings["site_favicon"] ?? ""} alt="Favicon Tab Browser" width={70} height={70} className="object-contain w-16 h-16 my-1" />}
-                <input type="hidden" name="site_favicon" value={settings["site_favicon"] ?? ""} />
+                {settings["site_favicon"] &&
+                  <Image src={settings["site_favicon"] ?? ""} alt="Favicon Tab Browser" width={70} height={70} className="object-contain w-16 h-16 my-1" />
+                }
                 {loadingFavicon ? <Loader2 size={14} className="animate-spin" /> : (
                   <input
                     type="file"
@@ -505,6 +530,18 @@ const SiteSettingsTab = () => {
           </div>
         )}
       </div>
+      <div className="flex justify-end">
+        <button
+          onClick={handleSaveSettings}
+          disabled={saveSettings.isPending || settingsLoading}
+          className="btn-hero inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-60 cursor-pointer"
+        >
+          {saveSettings.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          Simpan
+        </button>
+      </div>
+
+      <div className="border-t border-white/10 pt-8" />
 
       <div className="glass rounded-3xl p-6 space-y-5">
         <div className="flex items-center gap-3">
@@ -529,7 +566,22 @@ const SiteSettingsTab = () => {
                 className="inputCls"
                 placeholder="Computer Science Showdown 2026"
                 value={settings["hero_tagline"] ?? ""}
-                onChange={(e) => setSettings((prev) => ({ ...prev, hero_tagline: e.target.value }))}
+                onChange={(e) => {
+                  setSettings((prev) => ({ ...prev, hero_tagline: e.target.value }));
+                  setEditingSettings((prev) => ({ ...prev, hero_tagline: e.target.value }));
+                }}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Tema</label>
+              <input
+                className="inputCls"
+                placeholder="Dare to Grow, Ready to Glow"
+                value={settings["hero_tema"] ?? ""}
+                onChange={(e) => {
+                  setSettings((prev) => ({ ...prev, hero_tema: e.target.value }));
+                  setEditingSettings((prev) => ({ ...prev, hero_tema: e.target.value }));
+                }}
               />
             </div>
             <div className="space-y-1">
@@ -539,12 +591,27 @@ const SiteSettingsTab = () => {
                 rows={3}
                 placeholder="Deskripsi singkat event..."
                 value={settings["hero_subtitle"] ?? ""}
-                onChange={(e) => setSettings((prev) => ({ ...prev, hero_subtitle: e.target.value }))}
+                onChange={(e) => {
+                  setSettings((prev) => ({ ...prev, hero_subtitle: e.target.value }));
+                  setEditingSettings((prev) => ({ ...prev, hero_subtitle: e.target.value }));
+                }}
               />
             </div>
           </div>
         )}
       </div>
+      <div className="flex justify-end">
+        <button
+          onClick={handleSaveSettings}
+          disabled={saveSettings.isPending || settingsLoading}
+          className="btn-hero inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-60 cursor-pointer"
+        >
+          {saveSettings.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          Simpan
+        </button>
+      </div>
+
+      <div className="border-t border-white/10 pt-8" />
 
       <div className="glass rounded-3xl p-6 space-y-5">
         <div className="flex items-center gap-3">
@@ -569,27 +636,23 @@ const SiteSettingsTab = () => {
                 className="inputCls"
                 placeholder="Apa itu Computer Science Showdown 3.0?"
                 value={settings["about_title"] ?? ""}
-                onChange={(e) => setSettings((prev) => ({ ...prev, about_title: e.target.value }))}
+                onChange={(e) => {
+                  setSettings((prev) => ({ ...prev, about_title: e.target.value }));
+                  setEditingSettings((prev) => ({ ...prev, about_title: e.target.value }));
+                }}
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Paragraf 1</label>
+              <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Paragraf</label>
               <textarea
                 className="inputCls"
                 rows={4}
                 placeholder="Deskripsi paragraf pertama tentang event..."
-                value={settings["about_description_1"] ?? ""}
-                onChange={(e) => setSettings((prev) => ({ ...prev, about_description_1: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Paragraf 2</label>
-              <textarea
-                className="inputCls"
-                rows={4}
-                placeholder="Deskripsi paragraf kedua tentang event..."
-                value={settings["about_description_2"] ?? ""}
-                onChange={(e) => setSettings((prev) => ({ ...prev, about_description_2: e.target.value }))}
+                value={settings["about_description"] ?? ""}
+                onChange={(e) => {
+                  setSettings((prev) => ({ ...prev, about_description: e.target.value }));
+                  setEditingSettings((prev) => ({ ...prev, about_description: e.target.value }));
+                }}
               />
             </div>
 
@@ -655,7 +718,7 @@ const SiteSettingsTab = () => {
           className="btn-hero inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold disabled:opacity-60 cursor-pointer"
         >
           {saveSettings.isPending ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-          Simpan Pengaturan Hero & About
+          Simpan
         </button>
       </div>
 
@@ -1007,37 +1070,49 @@ const SiteSettingsTab = () => {
       <div className="border-t border-white/10 pt-8" />
 
       <div className="space-y-5">
-        <div className="glass rounded-2xl p-4 border space-y-4 border-white/5 hover:border-white/10 transition-colors">
-          <label htmlFor="maintenance" className="flex cursor-pointer items-center gap-3">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-amber-500/10">
-                <Wrench size={16} className="text-amber-500" />
+        {settingsLoading ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 size={14} className="animate-spin" /> Memuat…
+          </div>
+        ) : (
+          <div className="glass rounded-2xl p-4 border space-y-4 border-white/5 hover:border-white/10 transition-colors">
+            <label htmlFor="maintenance" className="flex cursor-pointer items-center gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-amber-500/10">
+                  <Wrench size={16} className="text-amber-500" />
+                </div>
+                <div>
+                  <h2 className="font-semibold text-lg text-foreground truncate">Maintenance</h2>
+                  <span className="text-sm text-muted-foreground">Maintenance / Publish website</span>
+                </div>
               </div>
-              <div>
-                <h2 className="font-semibold text-lg text-foreground truncate">Maintenance</h2>
-                <span className="text-sm text-muted-foreground">Maintenance / Publish website</span>
+              <div className="flex items-center gap-2 shrink-0">
+                <input type="checkbox" onChange={(e) => {
+                  setSettings((prev) => ({ ...prev, site_maintenance: String(e.target.checked) }));
+                  setEditingSettings((prev) => ({ ...prev, site_maintenance: String(e.target.checked) }));
+                }} checked={settings['site_maintenance'] && settings['site_maintenance'] == 'true' ? true : false} id="maintenance" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
               </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <input type="checkbox" onChange={(e) => setSettings({ ...settings, site_maintenance: String(e.target.checked) })} checked={settings['site_maintenance'] && settings['site_maintenance'] == 'true' ? true : false} id="maintenance" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
-            </div>
-          </label>
-          <hr />
-          <label htmlFor="registrasi" className="flex cursor-pointer items-center gap-3">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-cyan-strong/10">
-                <Lock size={16} className="text-cyan-strong" />
+            </label>
+            <hr />
+            <label htmlFor="registrasi" className="flex cursor-pointer items-center gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="flex shrink-0 size-9 items-center justify-center rounded-xl bg-cyan-strong/10">
+                  <Lock size={16} className="text-cyan-strong" />
+                </div>
+                <div>
+                  <h2 className="font-semibold text-lg text-foreground truncate">Pendaftaran Akun</h2>
+                  <span className="text-sm text-muted-foreground">Tutup / Aktifkan pendaftaran akun website</span>
+                </div>
               </div>
-              <div>
-                <h2 className="font-semibold text-lg text-foreground truncate">Pendaftaran Akun</h2>
-                <span className="text-sm text-muted-foreground">Tutup / Aktifkan pendaftaran akun website</span>
+              <div className="flex items-center gap-2 shrink-0">
+                <input type="checkbox" onChange={(e) => {
+                  setSettings((prev) => ({ ...prev, site_registrasi: String(e.target.checked) }));
+                  setEditingSettings((prev) => ({ ...prev, site_registrasi: String(e.target.checked) }));
+                }} checked={settings['site_registrasi'] && settings['site_registrasi'] == 'true' ? true : false} id="registrasi" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
               </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <input type="checkbox" onChange={(e) => setSettings({ ...settings, site_registrasi: String(e.target.checked) })} checked={settings['site_registrasi'] && settings['site_registrasi'] == 'true' ? true : false} id="registrasi" className="appearance-none mt-1 shrink-0 size-5 rounded-2xl border-none bg-white/20 checked:bg-primary" />
-            </div>
-          </label>
-        </div>
+            </label>
+          </div>
+        )}
         <div className="flex items-center justify-end">
           <button
             onClick={handleSaveSettings}

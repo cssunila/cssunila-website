@@ -5,20 +5,30 @@ type HeroProps = {
   totalLomba: number;
   totalHadiah: string;
   totalPeserta: number;
+  logo?: string;
+  title?: string;
+  sub?: string;
   tagline?: string;
   subtitle?: string;
+  tema?: string;
 };
 
-const Hero = ({ totalLomba, totalHadiah, totalPeserta, tagline, subtitle }: HeroProps) => {
+const Hero = ({ totalLomba, totalHadiah, totalPeserta, logo, title, sub, tagline, subtitle, tema }: HeroProps) => {
+  const siteLogo = logo || "/css-logo.png";
+  const heroTitle = title || "CSS";
+  const titleSub = sub || "3.0";
   const heroTagline = tagline || "Computer Science Showdown 2026";
   const heroSubtitle = subtitle || "Event teknologi & esports terbesar yang diadakan oleh himakom. Tersedia beberapa cabang lomba menarik dibidang akademik maupun non-akademik. Segera daftar dan buktikan kemampuanmu!";
+  const heroTema = tema || "Dare to Grow Ready to Glow";
 
   return (
     <section className="relative isolate overflow-hidden pt-32 pb-24 md:pt-44 md:pb-32">
       <Image
-        src={"/css-logo.png"}
-        alt=""
+        src={siteLogo}
+        alt="CSS LOGO BACKGROUND"
         aria-hidden
+        priority
+        loading="eager"
         width={1920}
         height={1088}
         className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover opacity-20"
@@ -30,12 +40,12 @@ const Hero = ({ totalLomba, totalHadiah, totalPeserta, tagline, subtitle }: Hero
           {heroTagline}
         </span>
 
-        <h1 className="font-display text-shadow italic text-6xl font-bold leading-[0.95] tracking-tight sm:text-7xl md:text-8xl lg:text-[9rem]">
-          <span className="gradient-text">CSS </span>{" "}
-          <span className="text-foreground">3.0 </span>
+        <h1 className="font-display text-shadow italic text-7xl font-bold leading-[0.95] tracking-tight sm:text-8xl lg:text-[9rem]">
+          <span className="gradient-text">{heroTitle} </span>{" "}
+          <span className="text-foreground">{titleSub} </span>
         </h1>
-
-        <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
+        <h3 className="text-shadow text-sm sm:text-md md:text-lg font-semibold tracking-tight my-6">&quot;{heroTema}&quot;</h3>
+        <p className="mx-auto max-w-2xl text-md text-muted-foreground sm:text-lg">
           {heroSubtitle}
         </p>
 

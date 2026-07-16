@@ -47,7 +47,7 @@ const Footer = ({ marginTop = true }: { marginTop?: boolean }) => {
               <Image src={"/himakom-logo.png"} width={80} height={80} alt={`logo himakom`} className="h-9 w-auto" />
               <Image src={settings.site_logo} width={80} height={80} alt={`${settings.site_title_main} ${settings.site_title_sub}`} className="h-9 w-auto" />
               <span className="font-display text-lg font-bold tracking-wider">
-                <span className="gradient-text">{settings.site_title_main} {settings.site_title_sub}</span>
+                {settings.site_title_main}<span className="gradient-text"> {settings.site_title_sub}</span>
               </span>
             </div>
             <p className="mt-4 max-w-md text-sm text-muted-foreground">

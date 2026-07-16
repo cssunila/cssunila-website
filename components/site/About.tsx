@@ -4,8 +4,7 @@ import Link from "next/link";
 
 type AboutProps = {
   title?: string;
-  description1?: string;
-  description2?: string;
+  description?: string;
   highlights?: string[];
   logo?: string;
 };
@@ -17,10 +16,13 @@ const DEFAULT_HIGHLIGHTS = [
   "Hadiah uang tunai",
 ];
 
-const About = ({ title, description1, description2, highlights, logo }: AboutProps) => {
+const About = ({ title, description, highlights, logo }: AboutProps) => {
   const aboutTitle = title || "Apa itu Computer Science Showdown 3.0?";
-  const aboutDesc1 = description1 || "Dalam rangka Dies Natalis Jurusan, kami ingin mengadakan serangkaian acara besar yang bersifat pengembangan keilmuan sebagai refleksi dari Visi dan Misi FMIPA yang menuntut kami untuk selalu menjujung tinggi tentang penelitian.";
-  const aboutDesc2 = description2 || "Maka melalui acara ini kami berupaya untuk mengoptimalkan kehidupan saintis dengan kreatifitas yang kaya akan imajinasi dalam memberikan terobosan - terobosan baru bagi perkembangan ilmu pengetahuan dan teknologi.";
+  const aboutDesc = description || `
+  Dalam rangka Dies Natalis Jurusan, kami ingin mengadakan serangkaian acara besar yang bersifat pengembangan keilmuan sebagai refleksi dari Visi dan Misi FMIPA yang menuntut kami untuk selalu menjujung tinggi tentang penelitian. Dies Natalis Jurusan Ilmu Komputer ini juga merupakan momentum untuk memberikan kesempatan kepada para pelajar dan umum di luar sana.
+
+  Maka melalui acara ini kami berupaya untuk mengoptimalkan kehidupan saintis dengan kreatifitas yang kaya akan imajinasi dalam memberikan terobosan - terobosan baru bagi perkembangan ilmu pengetahuan dan teknologi. Acara ini juga sebagai ajang motivasi bagi kami untuk menjadi lebih baik, dengan adanya tekad untuk maju dan terus memberikan manfaat bagi sivitas akademika Jurusan Ilmu Komputer khususnya dan sivitas akademika FMIPA Universitas Lampung.
+  `;
   const aboutHighlights = (highlights && highlights.length > 0) ? highlights : DEFAULT_HIGHLIGHTS;
   const aboutLogo = logo || "/css-logo.png";
 
@@ -49,17 +51,17 @@ const About = ({ title, description1, description2, highlights, logo }: AboutPro
           <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">
             <span className="gradient-text">{aboutTitle}</span>
           </h2>
-          <p className="mt-5 text-muted-foreground text-justify">
-            {aboutDesc1}
-          </p>
-          <p className="mt-4 text-muted-foreground text-justify">
-            {aboutDesc2}
-            {"...  "}
-            <Link href="/tentang-kami" className="text-cyan-strong group inline-flex items-center gap-1">
-              Lihat selengkapnya
-              <ArrowUpRight size={16} className="group-hover:translate-x-1 transition-all" />
-            </Link>
-          </p>
+          {aboutDesc.split("\n").map((desc, i) => (
+            <p key={i} className="mt-5 text-muted-foreground text-justify">
+              {desc}
+              {i == aboutDesc.split("\n").length - 1 &&
+                <Link href="/tentang-kami" className="ml-3 text-cyan-strong group inline-flex items-center gap-1">
+                  Lihat selengkapnya
+                  <ArrowUpRight size={16} className="group-hover:translate-x-1 transition-all" />
+                </Link>
+              }
+            </p>
+          ))}
 
           <ul className="mt-6 flex justify-start flex-wrap gap-3 text-sm">
             {aboutHighlights.map((f) => (
