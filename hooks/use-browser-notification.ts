@@ -53,7 +53,7 @@ async function registerAndSubscribe(userId: string) {
   }
 
   const endpointKey = getEndpointStorageKey(userId);
-  const savedEndpoint = localStorage.getItem(endpointKey);
+  const savedEndpoint = sessionStorage.getItem(endpointKey);
 
   if (subscription && subscription.endpoint === savedEndpoint) {
     return; 
@@ -67,7 +67,7 @@ async function registerAndSubscribe(userId: string) {
 
   if (res.ok) {
     if (subscription) {
-      localStorage.setItem(endpointKey, subscription.endpoint);
+      sessionStorage.setItem(endpointKey, subscription.endpoint);
     }
   } else {
     const body = await res.json().catch(() => ({}));
