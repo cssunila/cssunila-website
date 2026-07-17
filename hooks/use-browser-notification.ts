@@ -44,13 +44,13 @@ async function registerAndSubscribe(userId: string) {
   const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
 
   let subscription = await registration.pushManager.getSubscription();
-
   if (!subscription) {
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: convertedVapidKey,
     });
   }
+  
 
   const endpointKey = getEndpointStorageKey(userId);
   const savedEndpoint = sessionStorage.getItem(endpointKey);
