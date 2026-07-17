@@ -121,7 +121,7 @@ export default function LogsTab() {
           entity_type,
           entity_id,
           status,
-          actor_id,
+          actor,
           metadata,
           created_at,
           actor:profiles!export_logs_actor_id_fkey(full_name)
@@ -156,7 +156,6 @@ export default function LogsTab() {
     },
     staleTime: 30_000,
   });
-  console.log(isError);
 
   const logs = data?.logs ?? [];
   const total = data?.total ?? 0;

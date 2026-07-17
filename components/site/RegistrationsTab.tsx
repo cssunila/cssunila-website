@@ -21,6 +21,7 @@ import {
   AlertTriangle,
   Wallet,
   Users,
+  Trash,
 } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -466,7 +467,7 @@ const RegistrationsTab = () => {
   const suparef = useRef(createClient());
   const [confirmModal, setConfirmModal] = useState<{
     open: boolean;
-    type: "verify" | "reject";
+    type: "verify" | "reject" | "delete";
     regId: string;
     teamName: string;
   } | null>(null);
@@ -533,9 +534,31 @@ const RegistrationsTab = () => {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const deleteReg = useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      const supabase = suparef.current;
+      const { error } = await supabase
+        .from("registrations")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Pendaftaran telah dihapus");
+      qc.invalidateQueries({ queryKey: ["admin-regs"] });
+      setSelectedReg(null);
+      setRejectTarget(null);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const handleVerify = (id: string, teamName: string) => {
     setConfirmModal({ open: true, type: "verify", regId: id, teamName });
   };
+
+  const handleDelete = (id: string, teamName: string) => {
+    setConfirmModal({ open: true, type: "delete", regId: id, teamName });
+  }
 
   const handleRejectRequest = (reg: AdminReg) => {
     setPendingRejectReg(reg);
@@ -552,6 +575,8 @@ const RegistrationsTab = () => {
       verify.mutate({ id: confirmModal.regId, status: "verified" });
     } else if (confirmModal.type === "reject" && pendingRejectReg) {
       setRejectTarget(pendingRejectReg);
+    } else if (confirmModal.type === "delete") {
+      deleteReg.mutate({ id: confirmModal.regId });
     }
     setConfirmModal(null);
     setPendingRejectReg(null);
@@ -835,6 +860,15 @@ const RegistrationsTab = () => {
                       <Eye size={12} /> Detail
                     </button>
 
+                    {!(["pending_verification","verified"].includes(r.status)) && 
+                      <button
+                        onClick={() => handleDelete(r.id, r.team_name)}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/25 bg-destructive/10 px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/20 transition cursor-pointer"
+                      >
+                        <Trash size={12} />
+                      </button>
+                    }
+
                     {r.status === "pending_verification" && (
                       <>
                         <button
@@ -894,14 +928,16 @@ const RegistrationsTab = () => {
 
       <ConfirmModal
         open={!!confirmModal?.open}
-        variant="warning"
-        title={confirmModal?.type === "verify" ? "Konfirmasi Verifikasi" : "Konfirmasi Penolakan"}
+        variant={(confirmModal?.type === "verify" || confirmModal?.type === "reject") ? "warning" : "danger"}
+        title={confirmModal?.type === "verify" ? "Konfirmasi Verifikasi" : confirmModal?.type === "reject" ? "Konfirmasi Penolakan" : "Konfirmasi Penghapusan"}
         message={
           confirmModal?.type === "verify"
             ? `Anda akan memverifikasi pendaftaran tim "${confirmModal.teamName}". Tindakan ini bersifat permanen dan tidak dapat diubah lagi. Lanjutkan?`
-            : `Anda akan menolak pendaftaran tim "${confirmModal?.teamName}". Tindakan ini bersifat permanen dan tidak dapat diubah lagi. Lanjutkan?`
+            : confirmModal?.type === "reject" ?
+             `Anda akan menolak pendaftaran tim "${confirmModal?.teamName}". Tindakan ini bersifat permanen dan tidak dapat diubah lagi. Lanjutkan?`
+            : `Apakah anda yakin ingin menghapus pendaftaran tim "${confirmModal?.teamName}"? Tindakan ini bersifat permanen dan tidak dapat diubah lagi. Lanjutkan?`
         }
-        confirmLabel={confirmModal?.type === "verify" ? "Ya, Verifikasi" : "Ya, Tolak"}
+        confirmLabel={confirmModal?.type === "verify" ? "Ya, Verifikasi" : confirmModal?.type === "reject" ? "Ya, Tolak" : "Ya, Hapus"}
         cancelLabel="Batal"
         onConfirm={handleConfirmModalProceed}
         onCancel={() => { setConfirmModal(null); setPendingRejectReg(null); }}
