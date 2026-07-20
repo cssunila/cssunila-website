@@ -82,11 +82,11 @@ export default async function PengumumanPage() {
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Image src={"/assets/juara_1.png"} width={20} height={20} alt="logo juara" className="w-full h-auto object-contain pointer-events-none" />;
+        return <Image src={"/assets/juara_1.png"} width={20} height={20} alt="Logo Juara 1" className="w-full h-auto object-contain pointer-events-none" />;
       case 2:
-        return <Image src={"/assets/juara_2.png"} width={20} height={20} alt="logo juara" className="w-full h-auto object-contain pointer-events-none" />;
+        return <Image src={"/assets/juara_2.png"} width={20} height={20} alt="Logo Juara 2" className="w-full h-auto object-contain pointer-events-none" />;
       case 3:
-        return <Image src={"/assets/juara_3.png"} width={20} height={20} alt="logo juara" className="w-full h-auto object-contain pointer-events-none" />;
+        return <Image src={"/assets/juara_3.png"} width={20} height={20} alt="Logo Juara 3" className="w-full h-auto object-contain pointer-events-none" />;
       default:
         return <Star className="text-cyan-400 size-6" />;
     }

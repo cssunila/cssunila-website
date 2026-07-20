@@ -45,7 +45,7 @@ export default function NotifPermissionModal({
       aria-labelledby="notif-modal-title"
       aria-describedby="notif-modal-desc"
     >
-      <div className="relative w-full max-w-[400px] bg-background backdrop-blur-[28px] saturate-160 border border-accent-foreground rounded-3xl p-8 pb-7 shadow-[0_32px_80px_-16px_oklch(0.1_0.05_270_/_0.9),_inset_0_0_0_1px_oklch(0.72_0.14_200_/_0.08)] animate-notif-box-in">
+      <div className="relative w-full max-w-100 bg-background backdrop-blur-[28px] saturate-160 border border-accent-foreground rounded-3xl p-8 pb-7 shadow-[0_32px_80px_-16px_oklch(0.1_0.05_270_/_0.9),_inset_0_0_0_1px_oklch(0.72_0.14_200_/_0.08)] animate-notif-box-in">
         {/* Close button */}
         <button
           onClick={onDismiss}
@@ -56,7 +56,7 @@ export default function NotifPermissionModal({
         </button>
 
         {/* Icon */}
-        <div className="relative w-[72px] h-[72px] mx-auto mb-6">
+        <div className="relative w-18 h-18 mx-auto mb-6">
           <div className="absolute inset-0 rounded-full border-[1.5px] border-accent-foreground animate-notif-pulse-ring" />
           <div className="absolute inset-0 rounded-full border-[1.5px] border-accent-foreground animate-notif-pulse-ring [animation-delay:1.25s]" />
           <div className="absolute inset-2 flex items-center justify-center rounded-full bg-linear-to-br from-[oklch(0.52_0.3_274)] to-[oklch(0.72_0.14_200)] text-white shadow-[0_0_28px_oklch(0.72_0.14_200_/_0.45)]">

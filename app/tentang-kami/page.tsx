@@ -18,7 +18,7 @@ const TentangKami = () => {
             <section className="relative isolate overflow-hidden pt-30 md:pt-32 pb-26 md:pb-30">
                 <Image
                     src={"/css-logo.png"}
-                    alt=""
+                    alt="Logo CSS"
                     aria-hidden
                     width={1920}
                     height={1088}
@@ -35,7 +35,7 @@ const TentangKami = () => {
                     </Link>
                     <h1 className="font-display text-shadow text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl md:text-7xl lg:text-8xl md:mb-10 mb-6">
                         <span className="text-foreground">Computer</span>{" "}
-                        <span className="gradient-text">Science 3.0 </span>
+                        <span className="gradient-text">Science Showdown 3.0 </span>
                     </h1>
                     <p className="text-muted-foreground mb-3 text-justify">
                         <span className="gradient-text">Computer Science Showdown 3.0 (CSS)</span> adalah kegiatan tahunan dalam rangka memperingati Dies Natalis Jurusan Ilmu Komputer FMIPA Universitas Lampung, yang pada tahun ini telah memasuki usia ke-13. Kegiatan ini telah diselenggarakan sejak tahun 2012, dan awalnya dikenal dengan nama PRJ (Pekan Raya Jurusan).
@@ -53,7 +53,7 @@ const TentangKami = () => {
                     {/* Penyelenggara */}
                     <div className="mt-12 grid gap-6 md:grid-cols-2">
                         <div className="glass-strong rounded-3xl p-8">
-                            <span className="inline-flex size-11 items-center justify-center rounded-2xl bg-gradient-to-br from-sapphire to-cyan-strong">
+                            <span className="inline-flex size-11 items-center justify-center rounded-2xl bg-linear-to-br from-sapphire to-cyan-strong">
                                 <GraduationCap className="size-5 text-background" />
                             </span>
                             <h3 className="mt-5 font-display text-xl font-bold">

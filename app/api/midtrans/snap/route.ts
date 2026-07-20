@@ -47,7 +47,7 @@ export const POST = async (req: Request) => {
     const { data: reg, error: regErr } = await supabase
       .from("registrations")
       .select(
-        "id, user_id, team_name, leader_name, leader_email, leader_whatsapp, status, slot, competition:competitions(name, fee_idr), payments(id, amount_idr, status, midtrans_token, midtrans_order_id)"
+        "id, user_id, team_name, leader_name, leader_email, leader_whatsapp, status, slot, competition:competitions(name, fee_idr, slug), payments(id, amount_idr, status, midtrans_token, midtrans_order_id)"
       )
       .eq("id", data.registrationId)
       .maybeSingle();
@@ -123,6 +123,10 @@ export const POST = async (req: Request) => {
       ? reg.competition[0]?.fee_idr
       : (reg.competition as { fee_idr: number } | null)?.fee_idr;
 
+    const competitionSlug = Array.isArray(reg.competition)
+      ? reg.competition[0]?.slug
+      : (reg.competition as { slug: string } | null)?.slug;
+
     const appUrl = process.env.NEXT_PUBLIC_DOMAIN_URL ?? "http://localhost:3000";
 
     const body = {
@@ -144,6 +148,8 @@ export const POST = async (req: Request) => {
           ),
           price: competitionPrice ?? 0,
           quantity: reg.slot,
+          merchant_name: "CSS UNILA",
+          url: `${appUrl}/lomba/${competitionSlug}`
         },
       ],
       credit_card: {

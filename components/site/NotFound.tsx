@@ -7,7 +7,6 @@ import Link from "next/link";
 const NotFound = () => {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-20">
-      {/* ambient orbs */}
       <div className="pointer-events-none absolute -left-24 top-1/4 -z-10 h-80 w-80 rounded-full bg-sapphire/30 blur-3xl animate-float" />
       <div className="pointer-events-none absolute -right-16 bottom-10 -z-10 h-96 w-96 rounded-full bg-cyan-strong/25 blur-3xl animate-float [animation-delay:1.5s]" />
       <div

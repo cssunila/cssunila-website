@@ -190,8 +190,8 @@ export default function PaymentErrorPage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-40 -right-40 size-[600px] rounded-full bg-red-500/8 blur-[120px]" />
-        <div className="absolute -bottom-40 -left-40 size-[500px] rounded-full bg-rose-500/6 blur-[100px]" />
+        <div className="absolute -top-40 -right-40 size-150 rounded-full bg-red-500/8 blur-[120px]" />
+        <div className="absolute -bottom-40 -left-40 size-125 rounded-full bg-rose-500/6 blur-[100px]" />
       </div>
       <Navbar />
       <Suspense

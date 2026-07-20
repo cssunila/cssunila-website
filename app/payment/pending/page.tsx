@@ -104,7 +104,6 @@ function PaymentPendingContent() {
 
         {result.state === "pending" && (
           <div className="glass rounded-3xl border border-amber-500/20 p-10 text-center shadow-2xl">
-            {/* Icon dengan animasi pulse */}
             <div className="mx-auto mb-6 relative flex size-24 items-center justify-center">
               <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping opacity-40" />
               <div className="relative flex size-24 items-center justify-center rounded-full bg-amber-500/15 shadow-2xl shadow-amber-500/20">
@@ -188,8 +187,8 @@ export default function PaymentPendingPage() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-40 -right-40 size-[600px] rounded-full bg-amber-500/8 blur-[120px]" />
-        <div className="absolute -bottom-40 -left-40 size-[500px] rounded-full bg-yellow-500/6 blur-[100px]" />
+        <div className="absolute -top-40 -right-40 size-150 rounded-full bg-amber-500/8 blur-[120px]" />
+        <div className="absolute -bottom-40 -left-40 size-125 rounded-full bg-yellow-500/6 blur-[100px]" />
       </div>
       <Navbar />
       <Suspense
