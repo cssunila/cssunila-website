@@ -55,6 +55,7 @@ CREATE TABLE public.profiles (
   whatsapp text,
   institution text,
   avatar_url text,
+  suspended boolean DEFAULT false NOT NULL,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -115,6 +116,7 @@ CREATE TABLE public.registrations (
   leader_email text,
   rejection_reason text,
   status public.registration_status NOT NULL DEFAULT 'draft',
+  slot integer NOT NULL DEFAULT 1,
   verified_at timestamp with time zone,
   verified_by uuid REFERENCES auth.users(id),
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -197,7 +199,6 @@ CREATE TABLE public.sponsors (
   name text NOT NULL,
   logo_url text,
   website text,
-  tier text,
   position integer NOT NULL DEFAULT 0,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -558,6 +559,7 @@ CREATE TABLE public.winners (
   rank integer NOT NULL,
   title text NOT NULL,
   prize_money text,
+  status public.publish_status DEFAULT 'draft'::public.publish_status,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -613,7 +615,8 @@ ON CONFLICT (id) DO NOTHING;
 -- Table: public.timeline_items (manageable event timeline)
 CREATE TABLE public.timeline_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  date text NOT NULL,
+  start_date timestamp with time zone NOT NULL,
+  end_date timestamp with time zone,
   label text NOT NULL,
   description text NOT NULL DEFAULT '',
   position integer NOT NULL DEFAULT 0,
@@ -632,10 +635,10 @@ CREATE POLICY "Admins can manage timeline_items" ON public.timeline_items
   WITH CHECK (public.has_role('admin', auth.uid()));
 
 -- Seed default timeline from static data
-INSERT INTO public.timeline_items (date, label, description, position) VALUES
-  ('25 Oktober 2026', 'Pembukaan', 'Acara pembukaan resmi CSS 3.0 yang menandai dimulainya rangkaian event teknologi dan esports terbesar kampus.', 1),
-  ('25 Oktober - 02 November 2026', 'Pelaksanaan Lomba', 'Seluruh cabang lomba berlangsung selama periode ini. Peserta bertanding untuk membuktikan kemampuan terbaik mereka.', 2),
-  ('08 November 2026', 'Penutupan', 'Malam puncak dan pengumuman juara dari seluruh cabang lomba CSS 3.0.', 3)
+INSERT INTO public.timeline_items (start_date, end_date, label, description, position) VALUES
+  ('2026-10-25T08:00:00+07:00'::timestamp with time zone, NULL, 'Pembukaan', 'Acara pembukaan resmi CSS 3.0 yang menandai dimulainya rangkaian event teknologi dan esports terbesar kampus.', 1),
+  ('2026-10-25T08:00:00+07:00'::timestamp with time zone, '2026-11-02T17:00:00+07:00'::timestamp with time zone, 'Pelaksanaan Lomba', 'Seluruh cabang lomba berlangsung selama periode ini. Peserta bertanding untuk membuktikan kemampuan terbaik mereka.', 2),
+  ('2026-11-08T19:00:00+07:00'::timestamp with time zone, NULL, 'Penutupan', 'Malam puncak dan pengumuman juara dari seluruh cabang lomba CSS 3.0.', 3)
 ON CONFLICT DO NOTHING;
 
 -- =========================================================================
@@ -645,7 +648,7 @@ ON CONFLICT DO NOTHING;
 ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'lomba';
 ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'petugas';
 
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS suspended boolean DEFAULT false NOT NULL;
+
 
 CREATE TABLE IF NOT EXISTS public.user_competitions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

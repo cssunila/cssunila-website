@@ -191,7 +191,7 @@ const FormAuth = () => {
                                 <Link href="/terms" target="_blank" className="text-secondary hover:underline font-medium">Syarat &amp; Ketentuan</Link>
                                 {" "}dan{" "}
                                 <Link href="/privacy" target="_blank" className="text-secondary hover:underline font-medium">Kebijakan Privasi</Link>
-                                {" "}kami. Login Google hanya mengakses nama dan email.
+                                {" "}kami.
                             </span>
                         </label>
                     </>
