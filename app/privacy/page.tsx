@@ -1,13 +1,13 @@
-import { ArrowLeft, ShieldCheck, Lock, Database, Cookie, UserCheck, Mail } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Lock, Database, Cookie, UserCheck, Mail, Globe, Bell } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "Kebijakan Privasi",
-    description: "Bagaimana CSS 3.0 mengumpulkan, menggunakan, dan melindungi data pribadi peserta.",
+    description: "Bagaimana CSS Unila 3.0 mengumpulkan, menggunakan, dan melindungi data pribadi peserta, termasuk data yang diperoleh melalui Google OAuth.",
     openGraph: {
-      title: "Kebijakan Privasi — CSS 3.0",
-      description: "Bagaimana CSS 3.0 mengumpulkan, menggunakan, dan melindungi data pribadi peserta.",
+      title: "Kebijakan Privasi — CSS Unila 3.0",
+      description: "Bagaimana CSS Unila 3.0 mengumpulkan, menggunakan, dan melindungi data pribadi peserta.",
     }
 }
 
@@ -15,53 +15,103 @@ const highlights = [
   {
     icon: Database,
     title: "Data yang Dikumpulkan",
-    body: "Nama, email, nomor kontak, institusi, dan berkas pendukung yang kamu unggah saat pendaftaran lomba.",
+    body: "Nama, email, foto profil (dari Google), nomor kontak, institusi, dan berkas pendukung yang kamu unggah saat pendaftaran lomba.",
   },
   {
     icon: Lock,
     title: "Keamanan",
-    body: "Data disimpan pada infrastruktur cloud terenkripsi dengan Row Level Security dan otentikasi ketat.",
+    body: "Data disimpan pada infrastruktur cloud terenkripsi dengan Row Level Security dan otentikasi ketat (Supabase Auth).",
   },
   {
     icon: UserCheck,
     title: "Kontrol Pengguna",
-    body: "Kamu berhak mengakses, memperbaharui, atau meminta penghapusan data pribadi kapan saja.",
+    body: "Kamu berhak mengakses, memperbaharui, atau meminta penghapusan data pribadi kapan saja melalui email panitia.",
   },
   {
     icon: Cookie,
-    title: "Cookie",
-    body: "Kami menggunakan cookie esensial untuk sesi login dan preferensi tampilan — bukan untuk iklan.",
+    title: "Cookie & Sesi",
+    body: "Kami menggunakan cookie esensial untuk sesi login dan preferensi tampilan — bukan untuk iklan atau pelacakan pihak ketiga.",
+  },
+  {
+    icon: Globe,
+    title: "Login Google",
+    body: "Saat kamu masuk menggunakan akun Google, kami hanya mengakses nama dan alamat email dari profil publikmu — tidak lebih.",
+  },
+  {
+    icon: Bell,
+    title: "Notifikasi",
+    body: "Dengan mengizinkan notifikasi browser, endpoint perangkatmu disimpan agar kami bisa mengirimkan notifikasi terkait lomba.",
   },
 ];
 
 const sections = [
   {
     title: "1. Informasi yang Kami Kumpulkan",
-    body: "Kami mengumpulkan informasi yang kamu berikan secara langsung saat membuat akun, mendaftar lomba, atau berkomunikasi dengan panitia. Informasi ini meliputi identitas diri, institusi asal, kontak, dan berkas pendukung.",
+    body: `Kami mengumpulkan informasi dalam dua cara:
+
+a) Informasi yang kamu berikan langsung — saat membuat akun menggunakan email/password atau Google OAuth, mendaftar lomba, atau berkomunikasi dengan panitia. Informasi ini meliputi: nama lengkap, alamat email, institusi asal, nomor kontak, dan berkas pendukung.
+
+b) Informasi yang kami terima dari Google — apabila kamu memilih untuk masuk menggunakan akun Google, kami menerima nama tampilan dan alamat email dari akun Google kamu. Kami TIDAK meminta atau menyimpan akses ke Gmail, Google Drive, kontak, atau layanan Google lainnya.`,
   },
   {
     title: "2. Bagaimana Kami Menggunakan Data",
-    body: "Data digunakan untuk: memproses pendaftaran lomba, verifikasi identitas peserta, komunikasi terkait event, penerbitan sertifikat, dan pelaporan dokumentasi kegiatan.",
+    body: `Data yang kami kumpulkan digunakan semata-mata untuk keperluan operasional platform CSS Unila, yaitu:
+- Memproses dan memverifikasi pendaftaran lomba
+- Mengirimkan notifikasi terkait status pendaftaran, pembayaran, dan pengumuman event
+- Komunikasi resmi antara peserta dan panitia
+- Menerbitkan sertifikat dan dokumentasi kegiatan
+- Peningkatan keamanan dan performa platform
+
+Kami tidak menggunakan data kamu untuk keperluan iklan, profiling komersial, atau dijual kepada pihak ketiga.`,
   },
   {
-    title: "3. Berbagi Data dengan Pihak Ketiga",
-    body: "Kami tidak menjual data pribadi kamu. Data hanya dibagikan kepada penyedia layanan resmi (payment gateway, penyimpanan cloud) sebatas yang diperlukan untuk operasional platform.",
+    title: "3. Penggunaan Data dari Google OAuth",
+    body: `Apabila kamu memilih untuk masuk menggunakan akun Google:
+- Kami hanya mengakses nama dan alamat email dari akun Google kamu (scope: profile, email)
+- Informasi ini digunakan untuk membuat dan mengelola akunmu di platform CSS Unila
+- Kami TIDAK mengakses, membaca, atau menyimpan data lain dari akun Google kamu (termasuk Gmail, Kontak, Drive, atau Kalender)
+- Kamu dapat mencabut akses ini kapan saja melalui pengaturan akun Google kamu di myaccount.google.com
+- Data yang diperoleh dari Google tidak dibagikan kepada pihak ketiga manapun`,
   },
   {
-    title: "4. Penyimpanan & Retensi Data",
-    body: "Data akan disimpan selama akun aktif dan hingga 1 tahun setelah event berakhir untuk keperluan audit dan dokumentasi. Setelah periode tersebut, data akan dianonimkan atau dihapus.",
+    title: "4. Berbagi Data dengan Pihak Ketiga",
+    body: `Kami tidak menjual atau menyewakan data pribadi kamu. Data hanya dibagikan kepada penyedia layanan teknis yang membantu operasional platform, yaitu:
+- Supabase (database dan autentikasi) — sebagai penyimpan data terenkripsi
+- Midtrans (payment gateway) — hanya data yang diperlukan untuk memproses pembayaran
+- Google (OAuth provider) — untuk proses autentikasi login saja
+
+Seluruh pihak ketiga ini terikat oleh kebijakan privasi dan keamanan data mereka masing-masing.`,
   },
   {
-    title: "5. Hak Peserta",
-    body: "Kamu berhak: (a) mengakses data pribadi, (b) memperbaiki data yang tidak akurat, (c) meminta penghapusan akun, dan (d) menarik persetujuan pengolahan data kapan saja.",
+    title: "5. Penyimpanan & Retensi Data",
+    body: "Data akan disimpan selama akun aktif dan hingga 1 tahun setelah event berakhir untuk keperluan audit dan dokumentasi. Setelah periode tersebut, data akan dianonimkan atau dihapus secara permanen.",
   },
   {
-    title: "6. Keamanan Data",
-    body: "Kami menerapkan langkah teknis dan organisatoris untuk melindungi data — enkripsi in-transit (TLS), enkripsi at-rest, kontrol akses berbasis peran, serta audit log berkala.",
+    title: "6. Notifikasi Push Browser",
+    body: "Apabila kamu mengizinkan notifikasi browser (Web Push), kami menyimpan token/endpoint perangkatmu di database kami. Data ini hanya digunakan untuk mengirimkan notifikasi terkait lomba (seperti status pendaftaran dan pengumuman). Kamu dapat mencabut izin ini kapan saja melalui pengaturan browser.",
   },
   {
-    title: "7. Perubahan Kebijakan",
-    body: "Kebijakan privasi ini dapat diperbarui sewaktu-waktu. Perubahan signifikan akan diinformasikan melalui email atau notifikasi pada platform.",
+    title: "7. Hak Peserta",
+    body: `Kamu memiliki hak-hak berikut atas data pribadimu:
+(a) Hak Akses — meminta salinan data pribadi yang kami simpan
+(b) Hak Koreksi — memperbaiki data yang tidak akurat atau tidak lengkap
+(c) Hak Penghapusan — meminta penghapusan akun dan seluruh data terkait
+(d) Hak Portabilitas — meminta data dalam format yang dapat dibaca mesin
+(e) Hak Penarikan Persetujuan — mencabut persetujuan pemrosesan data kapan saja
+
+Untuk menggunakan hak-hak ini, hubungi kami di cssunila25@gmail.com.`,
+  },
+  {
+    title: "8. Keamanan Data",
+    body: "Kami menerapkan langkah teknis dan organisatoris untuk melindungi data — enkripsi in-transit (TLS/HTTPS), enkripsi at-rest, kontrol akses berbasis peran (Row Level Security), serta audit log aktivitas secara berkala.",
+  },
+  {
+    title: "9. Anak di Bawah Umur",
+    body: "Platform ini ditujukan bagi pengguna berusia 17 tahun ke atas. Kami tidak secara sengaja mengumpulkan data dari anak di bawah usia 17 tahun tanpa persetujuan orang tua/wali.",
+  },
+  {
+    title: "10. Perubahan Kebijakan",
+    body: "Kebijakan privasi ini dapat diperbarui sewaktu-waktu. Perubahan signifikan akan diinformasikan melalui email atau notifikasi pada platform setidaknya 7 hari sebelum berlaku.",
   },
 ];
 
@@ -92,12 +142,13 @@ const PrivacyPage = () => {
           Kebijakan <span className="gradient-text">Privasi</span>
         </h1>
         <p className="mt-4 max-w-2xl text-sm text-muted-foreground sm:text-base">
-          Terakhir diperbarui: 3 Juli 2026. Privasi kamu adalah prioritas kami. Halaman ini
-          menjelaskan bagaimana data kamu diperlakukan di platform CSS 3.0.
+          Terakhir diperbarui: 20 Juli 2026. Privasi kamu adalah prioritas kami. Halaman ini
+          menjelaskan bagaimana data kamu diperlakukan di platform CSS Unila 3.0, termasuk
+          data yang diperoleh melalui login Google.
         </p>
 
         {/* Highlights grid */}
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {highlights.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
@@ -126,7 +177,7 @@ const PrivacyPage = () => {
               <h2 className="font-display text-lg font-semibold text-foreground sm:text-xl">
                 {s.title}
               </h2>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
+              <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
                 {s.body}
               </p>
             </article>
@@ -137,19 +188,26 @@ const PrivacyPage = () => {
         <div className="mt-12 overflow-hidden rounded-2xl border border-border/60 bg-linear-to-br from-sapphire/15 via-transparent to-cyan-strong/15 p-6 sm:p-8">
           <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="font-display text-lg font-semibold">Ada pertanyaan?</h3>
+              <h3 className="font-display text-lg font-semibold">Ada pertanyaan tentang privasi?</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Tim CSS 3.0 siap membantu kamu terkait data pribadi.
+                Hubungi Data Protection Officer kami. Kami akan merespons dalam 3 hari kerja.
               </p>
             </div>
             <Link
               href="mailto:cssunila25@gmail.com"
               className="btn-hero hover:btn-hero-hover inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold"
             >
-              <Mail size={14} /> Hubungi Kami
+              <Mail size={14} /> cssunila25@gmail.com
             </Link>
           </div>
         </div>
+
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          CSS Unila 3.0 — Computer Science Showdown Universitas Lampung &middot;{" "}
+          <Link href="/terms" className="underline underline-offset-4 hover:text-foreground transition">
+            Syarat &amp; Ketentuan
+          </Link>
+        </p>
       </div>
     </div>
   );

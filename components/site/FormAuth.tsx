@@ -94,7 +94,7 @@ const FormAuth = () => {
 
             const supabase = suparef.current;
             if (mode === "register") {
-                if(!agree) {
+                if (!agree) {
                     toast.error("Anda harus menyetujui syarat dan ketentuan");
                     return;
                 }
@@ -174,7 +174,7 @@ const FormAuth = () => {
             <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
                 <div className="h-px flex-1 bg-border" /> atau <div className="h-px flex-1 bg-border" />
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-3">
                 {mode === "register" && (
                     <Field icon={UserIcon} placeholder="Nama lengkap" autoComplete={"name"} value={fullName} onChange={setFullName} />
@@ -186,7 +186,13 @@ const FormAuth = () => {
                         <Field icon={Lock} placeholder="Confirm Password" autoComplete="new-password" type="password" value={confirmPassword} onChange={setConfirmPassword} required />
                         <label htmlFor="agree" className="flex items-start gap-3 my-2">
                             <input onChange={(e) => setAgree(e.target.checked)} checked={agree} type="checkbox" id="agree" className="appearance-none mt-1 shrink-0 w-5 h-5 checked:bg-secondary rounded-md border" />
-                            <span className="text-sm text-muted-foreground">Dengan mendaftar, saya menyetujui <Link href="terms" target="_blank" className="text-secondary font-semibold">Syarat & Ketentuan</Link> dan <Link href="privacy" target="_blank" className="text-secondary font-semibold">Kebijakan Privasi</Link></span>
+                            <span className="mt-2 text-center text-[11px] text-muted-foreground leading-relaxed">
+                                Dengan melanjutkan, kamu menyetujui{" "}
+                                <Link href="/terms" target="_blank" className="text-secondary hover:underline font-medium">Syarat &amp; Ketentuan</Link>
+                                {" "}dan{" "}
+                                <Link href="/privacy" target="_blank" className="text-secondary hover:underline font-medium">Kebijakan Privasi</Link>
+                                {" "}kami. Login Google hanya mengakses nama dan email.
+                            </span>
                         </label>
                     </>
                 )}
