@@ -519,7 +519,12 @@ CREATE POLICY "Admins can manage all notifications" ON public.notifications
 -- Ensure storage schema is active (standard on Supabase)
 -- Insert the registration-files storage bucket
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('registration-files', 'registration-files', false)
+VALUES ('registration-files', 'registration-files', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Insert the site_settings storage bucket
+INSERT INTO storage.buckets (id, name, public, file_size_limit)
+VALUES ('site_settings', 'site_settings', true, 1048576)
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage Policies for 'registration-files' bucket
@@ -545,6 +550,37 @@ CREATE POLICY "Allow admins to read all registration files"
 ON storage.objects FOR SELECT TO authenticated
 USING (
   bucket_id = 'registration-files' AND
+  public.has_role('admin', auth.uid())
+);
+
+-- Storage Policies for 'site_settings' bucket
+
+-- 1. Allow public read access to site settings assets (logo, banner, etc.)
+CREATE POLICY "Allow public read access to site settings assets"
+ON storage.objects FOR SELECT TO public
+USING (bucket_id = 'site_settings');
+
+-- 2. Allow admins to upload assets to site settings
+CREATE POLICY "Allow admins to upload site settings assets"
+ON storage.objects FOR INSERT TO authenticated
+WITH CHECK (
+  bucket_id = 'site_settings' AND
+  public.has_role('admin', auth.uid())
+);
+
+-- 3. Allow admins to update site settings assets
+CREATE POLICY "Allow admins to update site settings assets"
+ON storage.objects FOR UPDATE TO authenticated
+USING (
+  bucket_id = 'site_settings' AND
+  public.has_role('admin', auth.uid())
+);
+
+-- 4. Allow admins to delete site settings assets
+CREATE POLICY "Allow admins to delete site settings assets"
+ON storage.objects FOR DELETE TO authenticated
+USING (
+  bucket_id = 'site_settings' AND
   public.has_role('admin', auth.uid())
 );
 
