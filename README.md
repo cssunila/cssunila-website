@@ -138,7 +138,9 @@ Agar autentikasi Google OAuth disetujui oleh Google Verification Center, pastika
 
 ## 👥 Kontributor & Pengembang
 
-* **M. Rafly Saputra** — *Lead Developer & Database Architect* — [@Raflysaputra23](https://github.com/Raflysaputra23)
+* **M. Rafly Saputra** — *Full-Stack Developer & Database Architect* — [@Raflysaputra23](https://github.com/Raflysaputra23)
+* **Nur Ramadhani** — *Design UI/UX Website CSS* — [@ichidha](https://github.com/ichidha)
+* **Rifan Habibi** — *Project Manager* — [@Rifanism](https://github.com/Rifanism)
 
 ---
 *Dibuat dengan 💻 & ☕ oleh Himakom FMIPA Universitas Lampung.*
