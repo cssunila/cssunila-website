@@ -59,12 +59,13 @@ const Footer = ({ marginTop = true }: { marginTop?: boolean }) => {
                   key={item.url}
                   href={item.url}
                   aria-label="social"
+                  rel="noopener noreferrer"
                   className="glass flex size-10 items-center justify-center rounded-full text-foreground/80 transition hover:text-cyan-strong"
                 >
                   <item.icon size={16} />
                 </Link>
               ))}
-              <Link href={"https://www.tiktok.com/@css.himakom.unila"} className="glass flex size-10 items-center justify-center rounded-full text-foreground/80 transition hover:text-cyan-strong">
+              <Link rel="noopener noreferrer" href={"https://www.tiktok.com/@css.himakom.unila"} className="glass flex size-10 items-center justify-center rounded-full text-foreground/80 transition hover:text-cyan-strong">
                 <Image src={"/assets/tiktok.svg"} width={40} height={40} alt={`tiktok logo`} className="h-4 w-auto" />
               </Link>
             </div>
@@ -77,10 +78,10 @@ const Footer = ({ marginTop = true }: { marginTop?: boolean }) => {
             <ul className="space-y-2 text-sm text-muted-foreground">
               {lomba.length > 0 ?
                 lomba.map((comp, idx) => (
-                  <li key={idx} className="flex items-center gap-2 group"><ArrowUpRight size={14} className="group-hover:text-cyan-strong group-hover:translate-x-0.5 transition-all" /> <a href="#lomba" className="group-hover:text-foreground">{comp}</a></li>
+                  <li key={idx} className="flex items-center gap-2 group"><ArrowUpRight size={14} className="group-hover:text-cyan-strong group-hover:translate-x-0.5 transition-all" /> <Link href="#lomba" className="group-hover:text-foreground">{comp}</Link></li>
                 ))
                 :
-                <li><a href="#lomba" className="hover:text-foreground">Belum tersedia</a></li>
+                <li><Link href="#lomba" className="hover:text-foreground">Belum tersedia</Link></li>
               }
             </ul>
           </div>
@@ -89,11 +90,11 @@ const Footer = ({ marginTop = true }: { marginTop?: boolean }) => {
             <h4 className="mb-1 font-display text-sm font-semibold uppercase tracking-wider">
               Kontak Kami
             </h4>
-            <Link href="mailto:cssunila25@gmail.com?subject=Halo CSS" className="flex items-center gap-2 text-sm text-cyan-strong"><Mail size={16} /> cssunila25@gmail.com</Link>
+            <Link rel="noopener noreferrer" href="mailto:cssunila25@gmail.com?subject=Halo CSS" className="flex items-center gap-2 text-sm text-cyan-strong"><Mail size={16} /> cssunila25@gmail.com</Link>
             <p className="text-sm text-muted-foreground mt-4 mb-1">
               Jl. Prof.Dr. Ir. Sumatri Brojonegoro No.1 Gedong Meneng, Kec. Rajabasa, Kota Bandar Lampung, Indonesia
             </p>
-            <Link href="https://maps.app.goo.gl/qtpKaZCQm6QrHE917" target="_blank" className="flex items-center gap-2 text-sm text-cyan-strong"><Map size={16} /> Gedung UKM FMIPA Unila</Link>
+            <Link rel="noopener noreferrer" href="https://maps.app.goo.gl/qtpKaZCQm6QrHE917" target="_blank" className="flex items-center gap-2 text-sm text-cyan-strong"><Map size={16} /> Gedung UKM FMIPA Unila</Link>
           </div>
         </div>
 
