@@ -30,13 +30,14 @@ const Navbar = () => {
     const { user, loading, role } = useAuth();
     const suparef = useRef(createClient());
     const router = useRouter();
-    const isAdmin = ["petugas","lomba","admin"].includes(role || "");
+    const isAdmin = ["petugas", "lomba", "admin"].includes(role || "");
 
     const [notifications, setNotifications] = useState<any[]>([]);
     const [showNotif, setShowNotif] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
     const { shouldShowModal: showNotifModal, requestPermission, dismissModal } = useBrowserNotification(!!user, user?.id);
     const [allowedComps, setAllowedComps] = useState<string[]>([]);
+    const [showInfoDomain, setShowInfoDomain] = useState<boolean>(false);
 
     const [settings, setSettings] = useState<Record<string, string>>({
         site_logo: "/css-logo.png",
@@ -51,6 +52,17 @@ const Navbar = () => {
         seminar: true,
         juara: true,
     });
+
+    useEffect(() => {
+        (async() => {
+            if(window !== undefined) {
+                const hostname = window.location.hostname;
+                if(['cssunila3-0.vercel.app'].includes(hostname)) {
+                    setShowInfoDomain(true);
+                }
+            }
+        })()
+    }, []);
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -127,7 +139,7 @@ const Navbar = () => {
                 .select("competition_id")
                 .eq("user_id", user.id);
             const allowedCompIds = (allowedCompsData ?? []).map((c) => c.competition_id);
-            
+
             if (allowedCompIds.length > 0) {
                 query.or(`user_id.eq.${user.id},and(is_for_admin.eq.true,competition_id.in.(${allowedCompIds.join(",")}))`);
             } else {
@@ -214,7 +226,7 @@ const Navbar = () => {
                         const newNotif = payload.new;
                         const isForMe = newNotif.user_id === user.id ||
                             (newNotif.is_for_admin && (
-                                role === "admin" || 
+                                role === "admin" ||
                                 (role === "lomba" && newNotif.competition_id && allowedComps.includes(newNotif.competition_id))
                             ));
 
@@ -487,6 +499,20 @@ const Navbar = () => {
                 cancelLabel="Batal"
                 onConfirm={() => { setShowLogoutConfirm(false); doSignOut(); }}
                 onCancel={() => setShowLogoutConfirm(false)}
+            />
+
+            <ConfirmModal
+                open={showInfoDomain}
+                title="Informasi"
+                message={`Info CSS UNILA 3.0 sudah dialihkan ke domain cssunila.com, Silahkan kunjungi domain tersebut untuk mengakses informasi seputar CSS UNILA 3.0.`}
+                confirmLabel="Ya, Alihkan"
+                onConfirm={() => { 
+                        if (showInfoDomain) {
+                            window.location.href = "https://cssunila.com";
+                            setShowInfoDomain(false);
+                        }
+                }}
+                onCancel={() => setShowInfoDomain(false)}
             />
 
             <NotifPermissionModal
