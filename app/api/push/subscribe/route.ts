@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/supabase/server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
-export async function POST(req: Request) {
+export const POST = async (req: Request) => {
   const ip = getClientIp(req);
   const { allowed, resetAt } = rateLimit(`push-subscribe:${ip}`, 20, 60_000);
   if (!allowed) {

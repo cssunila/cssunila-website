@@ -25,6 +25,7 @@ import {
   Globe,
   HelpCircle,
   Sparkles,
+  Loader2,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { id as localeId } from "date-fns/locale";
@@ -206,7 +207,7 @@ export default function LogsTab() {
     };
   };
 
-  const { data: analyticsData } = useQuery<AnalyticsApiResponse>({
+  const { data: analyticsData, isLoading: isLoadingGA, refetch: refetchGA } = useQuery<AnalyticsApiResponse>({
     queryKey: ["admin-analytics-api"],
     queryFn: async () => {
       const res = await fetch("/api/admin/analytics");
@@ -227,9 +228,6 @@ export default function LogsTab() {
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-display font-bold">Analytics & Activity Logs</h2>
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-cyan-strong/15 text-cyan-strong border border-cyan-strong/30">
-              <Sparkles size={10} /> Real-time
-            </span>
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">
             Analisis pengunjung Google Analytics, kesehatan sistem, dan rekam jejak aktivitas real-time.
@@ -238,6 +236,7 @@ export default function LogsTab() {
         <button
           onClick={() => {
             refetch();
+            refetchGA();
           }}
           disabled={isFetching}
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -258,11 +257,15 @@ export default function LogsTab() {
               <BarChart3 size={18} />
             </div>
           </div>
-          <p className="font-display text-2xl font-bold mt-2 text-foreground">
-            {total.toLocaleString("id-ID")}
+          <p className="font-display text-2xl font-bold mt-2 text-cyan-strong">
+            {isLoading ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) :
+              total ? total.toLocaleString("id-ID") : '-'
+            }
           </p>
           <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-            <Activity size={12} className="text-cyan-strong" /> Rekam jejak di database
+            Rekam jejak di database
           </p>
         </div>
 
@@ -280,7 +283,11 @@ export default function LogsTab() {
             {successRatio}%
           </p>
           <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-            <CheckCircle2 size={12} className="text-emerald-400" /> {stats.success} transaksi/aksi sukses
+            {isLoading ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) :
+              `${stats.success} transaksi/aksi sukses`
+            }
           </p>
         </div>
 
@@ -298,7 +305,11 @@ export default function LogsTab() {
             {stats.error + stats.warning}
           </p>
           <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-            <XCircle size={12} className="text-rose-400" /> {stats.error} error, {stats.warning} warning
+            {isLoading ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) :
+              `${stats.error} error, ${stats.warning} warning`
+            }
           </p>
         </div>
 
@@ -312,12 +323,16 @@ export default function LogsTab() {
               <User size={18} />
             </div>
           </div>
-          <p className="font-display text-2xl font-bold mt-2 text-sky-400">
-            {(systemStats?.totalUsers ?? 0).toLocaleString("id-ID")}
-          </p>
-          <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-            <CreditCard size={12} className="text-sky-400" /> {(systemStats?.totalRegistrations ?? 0).toLocaleString("id-ID")} tim terdaftar
-          </p>
+          {isLoadingGA ? <Loader2 size={20} className="animate-spin" /> : (
+            <>
+              <p className="font-display text-2xl font-bold mt-2 text-sky-400">
+                {(systemStats?.totalUsers ?? 0).toLocaleString("id-ID")}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
+                {(systemStats?.totalRegistrations ?? 0).toLocaleString("id-ID")} tim terdaftar
+              </p>
+            </>
+          )}
         </div>
       </div>
 
@@ -326,7 +341,7 @@ export default function LogsTab() {
         {/* GA Active 30 days */}
         <div className="glass-strong rounded-2xl p-5 border border-cyan-strong/20 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-cyan-strong uppercase tracking-wider">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Pengunjung Aktif
             </span>
             <div className="p-2 rounded-xl bg-cyan-strong/10 text-cyan-strong">
@@ -334,17 +349,21 @@ export default function LogsTab() {
             </div>
           </div>
           <p className="font-display text-2xl font-bold mt-2 text-cyan-strong">
-            {gaStats ? gaStats.activeUsers30d.toLocaleString("id-ID") : "—"}
+            {isLoadingGA ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) :
+              gaStats ? gaStats.activeUsers30d.toLocaleString("id-ID") : "—"
+            }
           </p>
           <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-            <Globe size={12} className="text-cyan-strong" /> User aktif dalam 30 hari
+            User aktif dalam 30 hari
           </p>
         </div>
 
         {/* GA Active 7 days */}
         <div className="glass-strong rounded-2xl p-5 border border-emerald-500/20 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Pengunjung Aktif
             </span>
             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
@@ -352,17 +371,21 @@ export default function LogsTab() {
             </div>
           </div>
           <p className="font-display text-2xl font-bold mt-2 text-emerald-400">
-            {gaStats ? gaStats.activeUsers7d.toLocaleString("id-ID") : "—"}
+            {isLoadingGA ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) :
+              gaStats ? gaStats.activeUsers7d.toLocaleString("id-ID") : "—"
+            }
           </p>
           <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-            <CheckCircle2 size={12} className="text-emerald-400" /> User aktif dalam 7 hari
+            User aktif dalam 7 hari
           </p>
         </div>
 
         {/* GA Page Views */}
         <div className="glass-strong rounded-2xl p-5 border border-amber-500/20 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-400 uppercase tracking-wider">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               Halaman di Kunjungi
             </span>
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
@@ -370,10 +393,14 @@ export default function LogsTab() {
             </div>
           </div>
           <p className="font-display text-2xl font-bold mt-2 text-amber-400">
-            {gaStats ? gaStats.pageViews30d.toLocaleString("id-ID") : "—"}
+            {isLoadingGA ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) :
+              gaStats ? gaStats.pageViews30d.toLocaleString("id-ID") : "—"
+            }
           </p>
           <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-            <Activity size={12} className="text-amber-400" /> Total tayangan halaman
+            Total tayangan halaman
           </p>
         </div>
 
@@ -388,22 +415,26 @@ export default function LogsTab() {
             </div>
           </div>
           <div className="mt-2 flex items-center gap-2">
-            {isGaApiConnected ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-                Terhubung
-              </span>
-            ) : gaMeasurementId ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/15 text-sky-400 border border-sky-500/30">
-                <span className="size-2 rounded-full bg-sky-400" />
-                Pelacak Web Aktif
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                <span className="size-2 rounded-full bg-amber-400" />
-                Tidak aktif
-              </span>
-            )}
+            {isLoadingGA ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) :
+              isGaApiConnected ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Terhubung
+                </span>
+              ) : gaMeasurementId ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                  <span className="size-2 rounded-full bg-sky-400" />
+                  Pelacak Web Aktif
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                  <span className="size-2 rounded-full bg-amber-400" />
+                  Tidak aktif
+                </span>
+              )
+            }
           </div>
         </div>
       </div>

@@ -58,7 +58,7 @@ async function getGoogleAccessToken(
   }
 }
 
-export async function GET(req: Request) {
+export const GET = async (req: Request) => {
   const ip = getClientIp(req);
   const { allowed, resetAt } = rateLimit(`admin-analytics:${ip}`, 20, 60_000);
   if (!allowed) {

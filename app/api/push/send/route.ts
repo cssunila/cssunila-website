@@ -14,7 +14,7 @@ if (vapidPublicKey && vapidPrivateKey) {
   );
 }
 
-export async function POST(req: Request) {
+export const POST = async (req: Request) => {
   try {
     const authHeader = req.headers.get("Authorization");
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

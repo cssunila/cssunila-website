@@ -25,7 +25,7 @@ async function verifyAdmin() {
   }
 }
 
-export async function GET() {
+export const GET = async () => {
   const adminUser = await verifyAdmin();
   if (!adminUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
