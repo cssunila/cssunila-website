@@ -24,7 +24,6 @@ import {
   TrendingUp,
   Globe,
   HelpCircle,
-  ExternalLink,
   Sparkles,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -193,8 +192,37 @@ export default function LogsTab() {
     setPage(1);
   };
 
+  type AnalyticsApiResponse = {
+    configured: boolean;
+    gaStats: {
+      activeUsers30d: number;
+      activeUsers7d: number;
+      pageViews30d: number;
+      sessions30d: number;
+    } | null;
+    systemStats: {
+      totalUsers: number;
+      totalRegistrations: number;
+    };
+  };
+
+  const { data: analyticsData } = useQuery<AnalyticsApiResponse>({
+    queryKey: ["admin-analytics-api"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/analytics");
+      if (!res.ok) throw new Error("Gagal memuat analytics");
+      return res.json();
+    },
+    staleTime: 60_000,
+  });
+
+  const gaStats = analyticsData?.gaStats;
+  const systemStats = analyticsData?.systemStats;
+  const isGaApiConnected = analyticsData?.configured ?? false;
+
   return (
     <div className="space-y-6">
+      {/* Header & Title */}
       <div className="flex flex-col gap-4 items-start sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
@@ -204,11 +232,13 @@ export default function LogsTab() {
             </span>
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Analisis sistem, statistik kesehatan aplikasi, dan rekam jejak aktivitas real-time.
+            Analisis pengunjung Google Analytics, kesehatan sistem, dan rekam jejak aktivitas real-time.
           </p>
         </div>
         <button
-          onClick={() => refetch()}
+          onClick={() => {
+            refetch();
+          }}
           disabled={isFetching}
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -218,24 +248,30 @@ export default function LogsTab() {
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Total Log Sistem */}
         <div className="glass-strong rounded-2xl p-5 border border-white/10 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Log Sistem</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Total Log Sistem
+            </span>
             <div className="p-2 rounded-xl bg-cyan-strong/10 text-cyan-strong">
               <BarChart3 size={18} />
             </div>
           </div>
           <p className="font-display text-2xl font-bold mt-2 text-foreground">
-            {total.toLocaleString()}
+            {total.toLocaleString("id-ID")}
           </p>
           <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-            <Activity size={12} className="text-cyan-strong" /> Tercatat di database
+            <Activity size={12} className="text-cyan-strong" /> Rekam jejak di database
           </p>
         </div>
 
+        {/* Keberhasilan Sistem */}
         <div className="glass-strong rounded-2xl p-5 border border-white/10 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Keberhasilan Sistem</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Keberhasilan Sistem
+            </span>
             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
               <TrendingUp size={18} />
             </div>
@@ -248,9 +284,12 @@ export default function LogsTab() {
           </p>
         </div>
 
+        {/* Error & Warning */}
         <div className="glass-strong rounded-2xl p-5 border border-white/10 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Error & Warning</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Error & Warning
+            </span>
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
               <AlertTriangle size={18} />
             </div>
@@ -263,24 +302,106 @@ export default function LogsTab() {
           </p>
         </div>
 
-        {/* Google Analytics */}
+        {/* User & Pendaftaran */}
         <div className="glass-strong rounded-2xl p-5 border border-white/10 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Google Analytics</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              User
+            </span>
+            <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400">
+              <User size={18} />
+            </div>
+          </div>
+          <p className="font-display text-2xl font-bold mt-2 text-sky-400">
+            {(systemStats?.totalUsers ?? 0).toLocaleString("id-ID")}
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
+            <CreditCard size={12} className="text-sky-400" /> {(systemStats?.totalRegistrations ?? 0).toLocaleString("id-ID")} tim terdaftar
+          </p>
+        </div>
+      </div>
+
+      {/* Google Analytics */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {/* GA Active 30 days */}
+        <div className="glass-strong rounded-2xl p-5 border border-cyan-strong/20 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-cyan-strong uppercase tracking-wider">
+              Pengunjung Aktif
+            </span>
+            <div className="p-2 rounded-xl bg-cyan-strong/10 text-cyan-strong">
+              <Globe size={18} />
+            </div>
+          </div>
+          <p className="font-display text-2xl font-bold mt-2 text-cyan-strong">
+            {gaStats ? gaStats.activeUsers30d.toLocaleString("id-ID") : "—"}
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
+            <Globe size={12} className="text-cyan-strong" /> User aktif dalam 30 hari
+          </p>
+        </div>
+
+        {/* GA Active 7 days */}
+        <div className="glass-strong rounded-2xl p-5 border border-emerald-500/20 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">
+              Pengunjung Aktif
+            </span>
+            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+              <TrendingUp size={18} />
+            </div>
+          </div>
+          <p className="font-display text-2xl font-bold mt-2 text-emerald-400">
+            {gaStats ? gaStats.activeUsers7d.toLocaleString("id-ID") : "—"}
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
+            <CheckCircle2 size={12} className="text-emerald-400" /> User aktif dalam 7 hari
+          </p>
+        </div>
+
+        {/* GA Page Views */}
+        <div className="glass-strong rounded-2xl p-5 border border-amber-500/20 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-amber-400 uppercase tracking-wider">
+              Halaman di Kunjungi
+            </span>
+            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+              <BarChart3 size={18} />
+            </div>
+          </div>
+          <p className="font-display text-2xl font-bold mt-2 text-amber-400">
+            {gaStats ? gaStats.pageViews30d.toLocaleString("id-ID") : "—"}
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
+            <Activity size={12} className="text-amber-400" /> Total tayangan halaman
+          </p>
+        </div>
+
+        {/* Status Koneksi API GA */}
+        <div className="glass-strong rounded-2xl p-5 border border-white/10 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Status Data API GA
+            </span>
             <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400">
               <Globe size={18} />
             </div>
           </div>
           <div className="mt-2 flex items-center gap-2">
-            {gaMeasurementId ? (
+            {isGaApiConnected ? (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                 <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-                Aktif
+                Terhubung
+              </span>
+            ) : gaMeasurementId ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                <span className="size-2 rounded-full bg-sky-400" />
+                Pelacak Web Aktif
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
                 <span className="size-2 rounded-full bg-amber-400" />
-                Tidak ada konfigurasi Key!
+                Tidak aktif
               </span>
             )}
           </div>
