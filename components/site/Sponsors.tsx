@@ -95,9 +95,9 @@ const Sponsors = () => {
                   <Image
                     src={sp.logo_url}
                     alt={sp.name}
-                    width={120}
-                    height={60}
-                    className="h-10 w-auto object-contain opacity-70 transition group-hover:opacity-100"
+                    width={180}
+                    height={100}
+                    className="h-16 w-auto object-contain opacity-70 transition group-hover:opacity-100"
                   />
                 ) : (
                   <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-cyan-strong">
@@ -134,9 +134,9 @@ const Sponsors = () => {
                     <Image
                       src={mp.logo_url}
                       alt={mp.name}
-                      width={120}
-                      height={60}
-                      className="h-10 w-auto object-contain opacity-60 grayscale transition group-hover:opacity-100 group-hover:grayscale-0"
+                      width={180}
+                      height={100}
+                      className="h-16 w-auto object-contain opacity-70 transition group-hover:opacity-100"
                     />
                   ) : (
                     <span className="font-display text-sm font-medium text-muted-foreground group-hover:text-foreground transition">
