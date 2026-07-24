@@ -2,7 +2,7 @@
 
 import { createClient } from "@/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, X } from "lucide-react";
+import { Eye, EyeOff, Loader2, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ type GroupComp = {
   id: string;
   name: string;
   slug: string;
-  group_links: { link_url: string | null; qr_url: string | null };
+  group_links: { link_url: string | null; qr_url: string | null; is_visible: boolean };
 };
 
 const GroupLinksTab = () => {
@@ -38,12 +38,12 @@ const GroupLinksTab = () => {
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-groups", role, allowedComps],
+    queryKey: ["admin-groups", "group-visible", role, allowedComps],
     queryFn: async (): Promise<GroupComp[]> => {
       const supabase = suparef.current;
       let query = supabase
         .from("competitions")
-        .select("id, name, slug, group_links(link_url, qr_url)");
+        .select("id, name, slug, group_links(link_url, qr_url, is_visible)");
 
       if (role === "lomba") {
         if (!allowedComps || allowedComps.length === 0) {
@@ -60,11 +60,12 @@ const GroupLinksTab = () => {
   });
 
   const save = useMutation({
-    mutationFn: async (v: { competition_id: string; link_url: string; qr_url: string }) => {
+
+    mutationFn: async (v: { competition_id: string; link_url: string; qr_url: string; is_visible: boolean }) => {
       if (!v.link_url.trim()) throw new Error("Link grup wajib diisi");
       const supabase = suparef.current;
       const { error } = await supabase.from("group_links").upsert(
-        { competition_id: v.competition_id, link_url: v.link_url, qr_url: v.qr_url || null },
+        { competition_id: v.competition_id, link_url: v.link_url, qr_url: v.qr_url || null, is_visible: v.is_visible },
         { onConflict: "competition_id" },
       );
       if (error) throw error;
@@ -87,11 +88,14 @@ const GroupLinksTab = () => {
 
 const GroupLinkRow = ({
   comp, initial, onSave
-}: { comp: GroupComp; initial: { link_url: string | null; qr_url: string | null } | null; onSave: (v: { link_url: string; qr_url: string }) => void }) => {
+}: { comp: GroupComp; initial: { link_url: string | null; qr_url: string | null; is_visible: boolean } | null; onSave: (v: { link_url: string; qr_url: string; is_visible: boolean }) => void }) => {
   const [link, setLink] = useState<string>(initial?.link_url ?? "");
   const [qr, setQr] = useState<string>(initial?.qr_url ?? "");
+  const [visible, setVisible] = useState<boolean>(initial?.is_visible ?? false);
   const [loading, setLoading] = useState<boolean>(false);
   const suparef = useRef(createClient());
+  const qc = useQueryClient();
+
 
   const handleGambar = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoading(true);
@@ -133,7 +137,7 @@ const GroupLinkRow = ({
       .getPublicUrl(filename);
 
     setQr(url.publicUrl);
-    onSave({ link_url: link, qr_url: url.publicUrl });
+    onSave({ link_url: link, qr_url: url.publicUrl, is_visible: visible });
     setLoading(false);
   }
 
@@ -161,12 +165,27 @@ const GroupLinkRow = ({
         .getPublicUrl(filename);
 
       setQr(url.publicUrl);
-      onSave({ link_url: link, qr_url: url.publicUrl });
+      onSave({ link_url: link, qr_url: url.publicUrl, is_visible: visible });
     } else {
-      onSave({ link_url: link, qr_url: qr });
+      onSave({ link_url: link, qr_url: qr, is_visible: visible });
     }
     setLoading(false);
   }
+
+  const toggleVis = useMutation({
+    mutationFn: async (newValue: boolean) => {
+      const supabase = suparef.current;
+     
+      const { error } = await supabase
+        .from("group_links")
+        .update({is_visible: newValue, updated_at: new Date().toISOString() })
+        .eq("competition_id", comp.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["group-visible"] });
+    },
+  });
 
 
   return (
@@ -175,19 +194,39 @@ const GroupLinkRow = ({
       <p className="text-xs text-muted-foreground">/{comp.slug}</p>
       <div className="mt-3 flex flex-col gap-2">
         <div className="space-y-2">
-          {loading ? <div className="flex items-center justify-start"><Loader2 className="animate-spin w-12 h-12" /></div> : qr && 
-          <div className="flex items-center gap-3">
-            <Image src={qr} alt="Gambar QR" width={100} height={100} className="object-contain w-24 h-24 rounded-lg" />
-            <button type="button" onClick={() => setQr("")} className="text-xs text-destructive hover:underline flex items-center gap-1">
+          {loading ? <div className="flex items-center justify-start"><Loader2 className="animate-spin w-12 h-12" /></div> : qr &&
+            <div className="flex items-center gap-3">
+              <Image src={qr} alt="Gambar QR" width={100} height={100} className="object-contain w-24 h-24 rounded-lg" />
+              <button type="button" onClick={() => setQr("")} className="text-xs text-destructive hover:underline flex items-center gap-1">
                 <X size={12} /> Hapus Gambar
-            </button>
-          </div>
+              </button>
+            </div>
           }
           <input type="file" accept=".jpg,.png,.jpeg,.webp" className={"inputCls inputFile"} onChange={(e) => handleGambar(e)} />
         </div>
         <input className={"inputCls"} placeholder="Link grup (WA/Telegram)" value={link} onChange={(e) => setLink(e.target.value)} />
+
       </div>
-      <div className="mt-3 flex justify-end">
+      <div className="mt-3 flex justify-end gap-3">
+        <button
+          onClick={() => {
+            const next = !visible;
+            setVisible(next);
+            toggleVis.mutate(next, {
+              onSuccess: () => toast.success(next ? "Grup ditampilkan" : "Grup disembunyikan"),
+              onError: (e: Error) => toast.error(e.message),
+            });
+          }}
+          disabled={toggleVis.isPending}
+          title={visible ? "Sembunyikan section Berita dari landing page" : "Tampilkan section Berita di landing page"}
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${visible
+            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+            : "border-amber-500/40 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+            }`}
+        >
+          {toggleVis.isPending ? <Loader2 size={13} className="animate-spin" /> : visible ? <Eye size={13} /> : <EyeOff size={13} />}
+          {visible ? "Ditampilkan" : "Disembunyikan"}
+        </button>
         <button disabled={loading || !link} onClick={() => handleSave()} className="btn-hero rounded-full px-4 py-1.5 text-xs font-semibold">Simpan</button>
       </div>
     </div>

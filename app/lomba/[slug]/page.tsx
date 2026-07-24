@@ -132,7 +132,7 @@ const LombaDetail = async ({ params }: Props) => {
         .from("registrations")
         .select("id")
         .eq("competition_id", data.id)
-        .eq("status", "verified");
+        .in("status", ["verified", "pending_verification"]);
 
       c = {
         ...(data as any),
@@ -252,6 +252,14 @@ const LombaDetail = async ({ params }: Props) => {
                 </p>
               ))}
           </div>
+
+          {c.quota > 0 && (pendaftarCount ?? 0) >= c.quota && (
+            <div className="mt-8 max-w-5xl flex items-center justify-center rounded-2xl p-4 bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              <span className="text-lg font-medium uppercase tracking-widest animate-pulse">
+                Pendaftaran Penuh
+              </span>
+            </div>
+          )}
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
@@ -538,6 +546,7 @@ const LombaDetail = async ({ params }: Props) => {
             <div className="pointer-events-none absolute -top-20 left-1/2 -z-10 size-64 -translate-x-1/2 rounded-full bg-cyan-strong/30 blur-3xl" />
             <DaftarActionButton
               isOpen={c.is_open}
+              isQuota={c.quota > 0 ? (pendaftarCount ?? 0) >= c.quota : null}
               slug={c.slug}
               currentUrl={currentUrl}
             />

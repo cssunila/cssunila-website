@@ -53,6 +53,7 @@ export const DownloadPanduanButton = ({
 
 interface DaftarActionButtonProps {
   isOpen: boolean;
+  isQuota: boolean | null;
   slug: string;
   currentUrl: string;
 }
@@ -60,6 +61,7 @@ interface DaftarActionButtonProps {
 export const DaftarActionButton = ({
   isOpen,
   slug,
+  isQuota,
   currentUrl,
 }: DaftarActionButtonProps) => {
   const { user, loading } = useAuth();
@@ -72,6 +74,19 @@ export const DaftarActionButton = ({
         </h2>
         <p className="mt-3 text-muted-foreground">
           Cabang ini belum membuka pendaftaran. Pantau pengumuman selanjutnya ya.
+        </p>
+      </>
+    );
+  }
+
+  if (isQuota) {
+    return (
+      <>
+        <h2 className="font-display text-3xl font-bold sm:text-4xl">
+          Pendaftaran Sudah Penuh
+        </h2>
+        <p className="mt-3 text-muted-foreground">
+          Pendaftaran sudah ditutup. Pantau pengumuman selanjutnya ya.
         </p>
       </>
     );

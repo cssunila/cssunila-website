@@ -261,7 +261,7 @@ export default function LogsTab() {
             {isLoading ? (
               <Loader2 size={20} className="animate-spin" />
             ) :
-              total ? total.toLocaleString("id-ID") : '-'
+              total ? total.toLocaleString("id-ID") : 0
             }
           </p>
           <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">

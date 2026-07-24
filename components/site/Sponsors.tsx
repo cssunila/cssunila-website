@@ -97,7 +97,7 @@ const Sponsors = () => {
                     alt={sp.name}
                     width={180}
                     height={100}
-                    className="h-16 w-auto rounded-lg object-contain opacity-70 transition group-hover:opacity-100"
+                    className="h-20 w-auto rounded-lg object-contain opacity-70 transition group-hover:opacity-100"
                   />
                 ) : (
                   <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-cyan-strong">
@@ -120,7 +120,7 @@ const Sponsors = () => {
             <p className="mb-5 text-xs font-medium uppercase tracking-widest text-muted-foreground">
               Media Partner
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
               {mediaPartners.map((mp) => (
                 <Link
                   key={mp.id}
@@ -136,7 +136,7 @@ const Sponsors = () => {
                       alt={mp.name}
                       width={180}
                       height={100}
-                      className="h-16 w-auto rounded-lg object-contain opacity-70 transition group-hover:opacity-100"
+                      className="h-20 w-auto rounded-lg object-contain opacity-70 transition group-hover:opacity-100"
                     />
                   ) : (
                     <span className="font-display text-sm font-medium text-muted-foreground group-hover:text-foreground transition">

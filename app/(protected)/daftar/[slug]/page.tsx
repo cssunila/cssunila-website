@@ -32,6 +32,7 @@ type CompRow = {
     is_open: boolean;
     is_multi_slot: boolean;
     slot: number;
+    quota: number;
     team_size: string | null;
     competition_fields: FieldRow[];
 };
@@ -97,7 +98,7 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
             const supabase = suparef.current;
             const { data, error } = await supabase
                 .from("competitions")
-                .select("id, name, slug, fee_idr, is_open, team_size, is_multi_slot, slot, competition_fields(id,key,label,field_type,placeholder,required,options,position)")
+                .select("id, name, slug, fee_idr, is_open, team_size, is_multi_slot, slot, quota, competition_fields(id,key,label,field_type,placeholder,required,options,position)")
                 .eq("slug", slug)
                 .maybeSingle();
             if (error) throw error;
@@ -119,13 +120,25 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
                 throw new Error("Harap menyetujui data anda sudah benar");
             }
 
+            const supabase = suparef.current;
+            const { data: register } = await supabase
+                .from("registrations")
+                .select("id")
+                .eq("competition_id", comp.id)
+                .in("status", ["verified","pending_verification"]);
+
+            if (register && comp.quota > 0) {
+                if(register.length >= comp.quota) {
+                    throw new Error("Pendaftaran sudah penuh!");
+                }
+            }
+
             for (const f of comp.competition_fields) {
                 if (f.required && !answers[f.key]?.trim()) {
                     throw new Error(`Isi field "${f.label}"`);
                 }
             }
 
-            const supabase = suparef.current;
             const { data: reg, error: e1 } = await supabase
                 .from("registrations")
                 .insert({
