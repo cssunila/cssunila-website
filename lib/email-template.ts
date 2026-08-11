@@ -182,19 +182,6 @@ export type RegistrationEmailData = {
 export const generateRegistrationEmailHtml = (data: RegistrationEmailData) => {
   const displayName = data.leaderName?.trim() || "Peserta";
   const formattedAmount = `Rp ${Number(data.amountIdr || 0).toLocaleString("id-ID")}`;
-  const formattedDate = data.paidAt
-    ? new Date(data.paidAt).toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : new Date().toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
 
   return `<!DOCTYPE html>
 <html lang="id">
@@ -270,7 +257,7 @@ export const generateRegistrationEmailHtml = (data: RegistrationEmailData) => {
                     text-align:center;
                   ">
                     <span style="color:#10b981;font-size:13px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;">
-                      &#x2705; Status Pembayaran: Terbayar / Berhasil
+                      &#x2705; Pendaftaran Berhasil
                     </span>
                   </td>
                 </tr>
@@ -321,10 +308,6 @@ export const generateRegistrationEmailHtml = (data: RegistrationEmailData) => {
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cbd5e1;font-size:12px;font-family:monospace;">${data.orderId}</td>
                 </tr>
                 ` : ""}
-                <tr>
-                  <td style="padding:14px 18px;color:#9ca3af;font-size:13px;">Waktu Transaksi</td>
-                  <td style="padding:14px 18px;color:#cbd5e1;font-size:13px;">${formattedDate}</td>
-                </tr>
               </table>
 
               <!-- Information Note -->
@@ -340,10 +323,10 @@ export const generateRegistrationEmailHtml = (data: RegistrationEmailData) => {
                       &#x2139;&#xFE0F; Langkah Selanjutnya:
                     </p>
                     <p style="margin:0 0 6px;color:#cbd5e1;font-size:12px;line-height:1.6;">
-                      1. Kunjungi menu <strong>Riwayat Pendaftaran</strong> pada website CSS 3.0 untuk mengunduh bukti e-tiket pendaftaran Anda.
+                      1. Kunjungi menu <strong>Riwayat Pendaftaran</strong> pada website CSS 3.0 untuk memantau status pendaftaran anda.
                     </p>
                     <p style="margin:0;color:#cbd5e1;font-size:12px;line-height:1.6;">
-                      2. Bergabunglah ke grup WhatsApp peserta perlombaan melalui tautan yang tersedia di halaman riwayat.
+                      2. Bergabunglah ke grup WhatsApp peserta perlombaan melalui tautan yang tersedia di halaman riwayat. Tautan akan tersedia ketika status pendaftaran terverifikasi.
                     </p>
                   </td>
                 </tr>

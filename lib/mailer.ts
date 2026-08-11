@@ -43,11 +43,10 @@ export const sendRegistrationEmail = async (data: RegistrationEmailData) => {
     await transporter.sendMail({
       from: `"CSS 3.0 — Computer Science Showdown" <${process.env.EMAIL_SMTP_USER}>`,
       to: data.leaderEmail,
-      subject: `[CSS 3.0] Bukti Pendaftaran & Pembayaran - ${data.competitionName}`,
+      subject: `[CSS 3.0] Bukti Pendaftaran - ${data.competitionName}`,
       text: plainText,
       html,
     });
-    console.log(`[Email] Registration email sent to ${data.leaderEmail}`);
   } catch (error) {
     console.error("[Email] Failed to send registration email:", error);
   }
