@@ -303,6 +303,14 @@ export default function AdminRegisterModal({ onClose, resumePay }: AdminRegister
         })
         .eq("id", createdRegId);
       if (regErr) throw regErr;
+
+      if (createdRegId) {
+        fetch("/api/email/send-registration", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ registrationId: createdRegId }),
+        }).catch((err) => console.error("[Admin Register] Error sending email:", err));
+      }
     },
     onSuccess: () => {
       toast.success("Pendaftaran berhasil diverifikasi!");

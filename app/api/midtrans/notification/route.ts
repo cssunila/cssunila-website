@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { createAdmin } from "@/supabase/admin";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { sendRegistrationEmailById } from "@/lib/mailer";
 
 type Notification = {
   order_id?: string;
@@ -69,7 +70,7 @@ export const POST = async (request: Request) => {
 
   const { data: payment, error: pErr } = await supabaseAdmin
     .from("payments")
-    .select("id, registration_id, amount_idr")
+    .select("id, registration_id, amount_idr, status")
     .eq("midtrans_order_id", order_id)
     .maybeSingle();
 
@@ -80,6 +81,8 @@ export const POST = async (request: Request) => {
   if (Number(gross_amount) !== payment.amount_idr) {
     return new Response("amount mismatch", { status: 400 });
   }
+
+  const wasAlreadySuccess = payment.status === "success";
 
   let payStatus:
     | "pending"
@@ -131,5 +134,11 @@ export const POST = async (request: Request) => {
       .eq("id", payment.registration_id);
   }
 
+  if (payStatus === "success" && !wasAlreadySuccess && payment.registration_id) {
+    sendRegistrationEmailById(payment.registration_id).catch((err) => {
+      console.error("[Midtrans Notification] Error sending registration email:", err);
+    });
+  }
+
   return NextResponse.json({ ok: true });
-}
+}

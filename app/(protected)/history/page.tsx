@@ -292,6 +292,12 @@ const HistoryPage = () => {
         .update({ status: "pending_verification" })
         .eq("id", registrationId);
       if (regErr) throw regErr;
+
+      fetch("/api/email/send-registration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ registrationId }),
+      }).catch((err) => console.error("[Manual Pay] Error sending email:", err));
     },
     onSuccess: () => {
       toast.success("Pendaftaran berhasil dibayar!");

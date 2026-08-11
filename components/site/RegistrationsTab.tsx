@@ -583,6 +583,14 @@ const RegistrationsTab = () => {
         })
         .eq("id", id);
       if (error) throw error;
+
+      if (status === "verified") {
+        fetch("/api/email/send-registration", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ registrationId: id }),
+        }).catch((err) => console.error("[Admin Verify] Error sending email:", err));
+      }
     },
     onSuccess: () => {
       toast.success("Status diperbarui");
