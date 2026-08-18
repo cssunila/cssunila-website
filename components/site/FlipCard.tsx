@@ -59,6 +59,7 @@ export default function FlipCard({ logoCss }: FlipCardProps) {
             width={200}
             height={400}
             alt="Logo Himakom"
+            loading="eager"
             className="w-full max-w-65 object-contain pointer-events-none"
           />
         </div>

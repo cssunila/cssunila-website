@@ -62,6 +62,8 @@ const Sponsors = async () => {
                     alt={sp.name}
                     width={180}
                     height={100}
+                    placeholder="blur"
+                    loading="lazy"
                     className="h-20 w-auto rounded-lg object-contain opacity-70 transition group-hover:opacity-100"
                   />
                 ) : (
@@ -101,6 +103,8 @@ const Sponsors = async () => {
                       alt={mp.name}
                       width={180}
                       height={100}
+                      loading="lazy"
+                      placeholder="blur"
                       className="h-20 w-auto rounded-lg object-contain opacity-70 transition group-hover:opacity-100"
                     />
                   ) : (

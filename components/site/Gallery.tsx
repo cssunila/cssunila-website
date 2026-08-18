@@ -25,6 +25,7 @@ const Gallery = ({ imgUrl, i }: Props) => {
                     width={120}
                     height={120}
                     loading="lazy"
+                    placeholder="blur"
                     className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="opacity-0 group-hover:opacity-100 transition-all duration-500 absolute inset-0 bg-background/50 flex items-center justify-center">

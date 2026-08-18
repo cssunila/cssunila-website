@@ -23,6 +23,8 @@ const ImagePreviewModal = ({ url, onClose }: { url: string; onClose: () => void 
             alt="Preview"
             width={1920}
             height={1080}
+            loading="lazy"
+            placeholder="blur"
             className="w-full h-full object-contain max-h-[85vh]"
           />
         </div>

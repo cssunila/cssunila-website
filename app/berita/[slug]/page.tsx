@@ -178,8 +178,9 @@ const NewsDetailPage = async ({ params }: Props) => {
                   alt={news.title}
                   width={1920}
                   height={720}
+                  loading="lazy"
+                  placeholder="blur"
                   className="object-cover w-full h-full bg-background/50"
-                  preload
                 />
               </div>
             )}

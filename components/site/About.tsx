@@ -31,7 +31,7 @@ const About = ({ title, description, highlights, logo }: AboutProps) => {
     <section id="about" className="relative isolate py-24">
       <Image
         src={"/assets/elektrik.png"}
-        alt=""
+        alt="Elektrik Background"
         aria-hidden
         width={1920}
         height={1088}
