@@ -233,7 +233,7 @@ const AnswerValue = ({
         </div>
       );
     }
-    
+
     return (
       <Link
         href={value}
@@ -649,6 +649,17 @@ const RegistrationsTab = () => {
     setPendingRejectReg(null);
   };
 
+  const exportToJson = (rowsLct: AdminReg[]) => {
+    const data = rowsLct.map((t) => ({ name: t.team_name, school: "-" }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `teams-lct.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const exportToPdf = () => {
     if (rows.length === 0) {
       toast.error("Tidak ada data untuk diexport");
@@ -891,6 +902,8 @@ const RegistrationsTab = () => {
     return statusOk && compOk;
   });
 
+  const rowsLct = rows.filter((r) => r.competition?.slug === "lct-k");
+
   const statusFilters = [
     { title: "Semua Status", filter: "all" },
     { title: "Pending Payment", filter: "pending_payment" },
@@ -963,6 +976,14 @@ const RegistrationsTab = () => {
             >
               <UserPlus size={12} /> Daftarkan Peserta
             </button>
+            {rowsLct.length > 0 &&
+              <button
+                onClick={() => exportToJson(rowsLct)}
+                className="inline-flex items-center gap-1.5 rounded-full bg-white/5 border border-white/10 px-4 py-2 text-xs font-semibold text-foreground hover:bg-white/10 transition cursor-pointer"
+              >
+                <ExternalLink size={12} /> Export JSON LCT
+              </button>
+            }
             <button
               onClick={exportToPdf}
               className="inline-flex items-center gap-1.5 rounded-full bg-white/5 border border-white/10 px-4 py-2 text-xs font-semibold text-foreground hover:bg-white/10 transition cursor-pointer"
