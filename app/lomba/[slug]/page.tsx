@@ -568,7 +568,7 @@ const LombaDetail = async ({ params }: Props) => {
         </div>
       </section>
 
-      {c.banner && (
+      {/* {c.banner && (
         <section className="py-16">
           <div className="mx-auto max-w-3xl px-4 text-center">
             <div className="flex justify-center group items-center">
@@ -583,7 +583,7 @@ const LombaDetail = async ({ params }: Props) => {
             </div>
           </div>
         </section>
-      )}
+      )} */}
 
       <section className="py-16">
         <div className="mx-auto max-w-3xl px-4 text-center">
