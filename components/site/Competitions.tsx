@@ -2,11 +2,12 @@ import { ArrowUpRight, Users, Wallet, Lock, User, MapPin } from "lucide-react";
 import { getIcon, accentGlow } from "@/lib/icons";
 import Link from "next/link";
 import { createClient } from "@/supabase/server";
+import Image from "next/image";
 
 type CompCard = {
     slug: string; name: string; tagline: string | null; description: string[];
     icon: string | null; accent: string | null; fee_idr: number; quota: number;
-    team_size: string | null; is_open: boolean; location_name: string | null;
+    team_size: string | null; is_open: boolean; location_name: string | null; banner: string | null;
 };
 
 const Competitions = async () => {
@@ -16,7 +17,7 @@ const Competitions = async () => {
         const supabase = await createClient();
         const { data: competitions } = await supabase
             .from("competitions")
-            .select("slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,is_open,location_name")
+            .select("slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,is_open,location_name,banner")
             .order("position");
 
         if (competitions) data = competitions as CompCard[];
@@ -51,8 +52,9 @@ const Competitions = async () => {
                             <article
                                 id={c.slug}
                                 key={c.slug}
-                                className="glass group flex flex-col relative overflow-hidden rounded-3xl p-6 transition hover:-translate-y-1 hover:border-white/20"
+                                className="glass isolate group flex flex-col relative overflow-hidden rounded-3xl p-6 transition hover:-translate-y-1 hover:border-white/20"
                             >
+                                {c.banner && <Image width={150} height={150} className="absolute inset-0 h-full w-full object-cover opacity-30 -z-10" src={c.banner} alt={`Banner ${c.name}`} />}
                                 <div
                                     className={`pointer-events-none absolute -top-20 -right-20 size-56 rounded-full bg-linear-to-br blur-3xl transition group-hover:scale-110 ${accentGlow[accent] ?? accentGlow.cyan}`}
                                 />
