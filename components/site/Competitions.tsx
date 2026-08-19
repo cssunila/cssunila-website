@@ -77,7 +77,7 @@ const Competitions = async () => {
                                     {(c.description ?? []).join(". ")}
                                 </p>
 
-                                <dl className="mt-5 mb-5 space-y-1.5 text-xs text-muted-foreground">
+                                <div className="mt-5 mb-5 space-y-1.5 text-xs text-muted-foreground">
                                     <div className="flex items-center gap-2">
                                         <Wallet size={12} className="text-cyan-strong" /> <span>Rp. {c.fee_idr.toLocaleString("id-ID")} / tim</span>
                                     </div>
@@ -92,7 +92,7 @@ const Competitions = async () => {
                                             <MapPin size={12} className="text-cyan-strong" /> <span className="truncate">{c.location_name}</span>
                                         </div>
                                     )}
-                                </dl>
+                                </div>
 
                                 <Link
                                     href={`/lomba/${c.slug}`}

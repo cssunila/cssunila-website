@@ -1,3 +1,4 @@
+import { DEFAULT_BLUR } from "@/lib/placeholderBlur";
 import { X } from "lucide-react";
 import Image from "next/image";
 
@@ -24,6 +25,7 @@ const ImagePreviewModal = ({ url, onClose }: { url: string; onClose: () => void 
             width={1920}
             height={1080}
             loading="lazy"
+            blurDataURL={DEFAULT_BLUR}
             placeholder="blur"
             className="w-full h-full object-contain max-h-[85vh]"
           />

@@ -89,7 +89,7 @@ export default function VideoBackground({
       {bgImageSrc && (
         <Image
           src={bgImageSrc}
-          alt=""
+          alt="Logo CSS"
           width={1920}
           height={1080}
           className="absolute inset-0 h-full w-full object-cover"

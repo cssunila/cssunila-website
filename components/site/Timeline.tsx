@@ -37,10 +37,11 @@ const Timeline = ({ items }: TimelineProps) => {
             <h2 className="text-center tracking-tight text-muted-foreground w-4/5">Timeline acara belum ditentukan oleh panitia.</h2>
           </div>
         )}
-        <ol className="relative flex flex-col">
+        
+        <div className="relative flex flex-col">
           <div className="absolute left-4 top-0 bottom-0 w-px bg-linear-to-b from-sapphire via-cyan-strong to-transparent md:left-1/2" />
           {timelineItems.map((item, i) => (
-            <li
+            <div
               key={`${item.label}-${i}`}
               className="relative group mb-8 md:mb-12 w-full"
             >
@@ -64,9 +65,9 @@ const Timeline = ({ items }: TimelineProps) => {
                   {item.description}
                 </p>
               </div>
-            </li>
+            </div>
           ))}
-        </ol>
+        </div>
       </div>
     </section>
   );

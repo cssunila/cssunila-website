@@ -442,14 +442,14 @@ const LombaDetail = async ({ params }: Props) => {
           <h2 className="mt-3 font-display text-3xl text-center mb-10 font-bold sm:text-4xl">
             Timeline <span className="gradient-text">{c.name}</span>
           </h2>
-          <ol className="relative flex flex-col">
+          <div className="relative flex flex-col">
             {c.timeline.length > 0 && (
               <>
                 <div className="absolute left-4 top-0 bottom-0 w-px bg-linear-to-b from-sapphire via-cyan-strong to-transparent md:left-1/2" />
                 {c.timeline.map((item, i) => {
                   const date = parseDateRange(item.date);
                   return (
-                    <li
+                    <div
                       key={`${item.label}-${i}`}
                       className="relative group mb-8 md:mb-12 w-full"
                     >
@@ -471,7 +471,7 @@ const LombaDetail = async ({ params }: Props) => {
                           {item.label}
                         </h3>
                       </div>
-                    </li>
+                    </div>
                   )
                 })}
               </>
@@ -484,7 +484,7 @@ const LombaDetail = async ({ params }: Props) => {
                 </h2>
               </div>
             )}
-          </ol>
+          </div>
         </div>
       </section>
 

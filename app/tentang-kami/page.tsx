@@ -70,7 +70,7 @@ const TentangKami = () => {
                         <span className="gradient-text">Science Showdown 3.0 </span>
                     </h1>
                     <p className="text-muted-foreground mb-3 text-justify">
-                        <span className="gradient-text">Computer Science Showdown 3.0 (CSS)</span> adalah kegiatan tahunan dalam rangka memperingati Dies Natalis Jurusan Ilmu Komputer FMIPA Universitas Lampung, yang pada tahun ini telah memasuki usia ke-13. Kegiatan ini telah diselenggarakan sejak tahun 2012, dan awalnya dikenal dengan nama PRJ (Pekan Raya Jurusan).
+                        <span className="gradient-text">Computer Science Showdown 3.0 (CSS)</span> adalah kegiatan tahunan dalam rangka memperingati Dies Natalis Jurusan Ilmu Komputer FMIPA Universitas Lampung, yang pada tahun ini telah memasuki usia ke-14. Kegiatan ini telah diselenggarakan sejak tahun 2012, dan awalnya dikenal dengan nama PRJ (Pekan Raya Jurusan).
                     </p>
                     <p className="text-muted-foreground mb-3 text-justify">
                         Seiring dengan perkembangan zaman dan kebutuhan akan pembaruan konsep yang lebih relevan dengan bidang Ilmu Komputer, pada tahun 2024 PRJ resmi berganti nama menjadi <span className="gradient-text">CSS (Computer Science Showdown).</span> Pergantian nama ini membawa semangat baru dan nuansa yang lebih segar, dengan harapan mampu menjadi wadah yang lebih inspiratif dan modern bagi seluruh sivitas akademika.
@@ -106,7 +106,7 @@ const TentangKami = () => {
                                 Untuk Siapa?
                             </h3>
                             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                                Pelajar SMA/SMK sederajat, untuk mengasah kemampuan serta mencari pengalaman di dunia teknologi dan ingin
+                                Pelajar SMA/SMK sederajat, mahasiswa, dan peserta umum. CSS membuka pintu bagi kalian yang ingin mengasah kemampuan serta mencari pengalaman di dunia teknologi maupun non-teknologi dan ingin
                                 tumbuh bersama.
                             </p>
                         </div>

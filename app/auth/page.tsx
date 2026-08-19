@@ -53,7 +53,7 @@ const AuthPage = async () => {
 
                 <div className="glass-strong rounded-3xl p-7">
                     <div className="flex items-center gap-3">
-                        <Image src={logo} width={80} height={80} alt={`${titleMain} ${titleSub}`} className="h-8 w-auto" />
+                        <Image src={logo} width={80} height={80} loading={"lazy"} alt={`${titleMain} ${titleSub}`} className="h-8 w-auto" />
                         <div>
                             <p className="font-display text-lg font-bold">
                                 {titleMain} <span className="gradient-text">{titleSub}</span>

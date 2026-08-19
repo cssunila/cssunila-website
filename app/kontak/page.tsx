@@ -1,4 +1,5 @@
 import Footer from "@/components/site/Footer";
+import { MapLocationView } from "@/components/site/Maps";
 import Navbar from "@/components/site/Navbar";
 import {
     ArrowLeft,
@@ -102,7 +103,7 @@ const KontakPage = () => {
                         </p>
                     </div>
 
-                    {/* Channels */}
+                    {/* Sosial Media */}
                     <div className="mt-14 grid gap-4 sm:grid-cols-2">
                         {channels.map((c) => (
                             <Link
@@ -134,18 +135,21 @@ const KontakPage = () => {
                         ))}
                     </div>
 
-                    {/* Address + hours */}
-                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                    {/* Alamat */}
+                    <div className="mt-6">
                         <div className="glass rounded-2xl p-6">
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 mb-2">
                                 <MapPin className="size-5 text-cyan-strong" />
-                                <h3 className="font-display text-base font-semibold">
+                                <h3 className="font-display text-xl font-semibold">
                                     Lokasi
                                 </h3>
                             </div>
-                            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                                Jl. Prof.Dr. Ir. Sumatri Brojonegoro No.1 Gedong Meneng, Kec. Rajabasa, Kota Bandar Lampung, Indonesia
-                            </p>
+                            <MapLocationView
+                                locationName={"Gedung Kemahasiswaan FMIPA Universitas Lampung"}
+                                latitude={-5.36671477686508}
+                                longitude={105.24436600935563}
+                                nonLomba
+                            />
                         </div>
                     </div>
 
@@ -245,7 +249,7 @@ const KontakPage = () => {
                         </div>
                     </div>
 
-                    {/* Final CTA */}
+                    {/* CTA */}
                     <div className="mt-20 rounded-3xl border border-border/60 bg-white/5 p-8 text-center sm:p-10">
                         <p className="text-sm text-muted-foreground">
                             Masih butuh bantuan? Kirim email dan tim kami akan segera membalas.

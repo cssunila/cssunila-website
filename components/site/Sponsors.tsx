@@ -1,3 +1,4 @@
+import { DEFAULT_BLUR } from "@/lib/placeholderBlur";
 import { createClient } from "@/supabase/server";
 import Image from "next/image";
 import Link from "next/link";
@@ -62,6 +63,7 @@ const Sponsors = async () => {
                     alt={sp.name}
                     width={180}
                     height={100}
+                    blurDataURL={DEFAULT_BLUR}
                     placeholder="blur"
                     loading="lazy"
                     className="h-20 w-auto rounded-lg object-contain opacity-70 transition group-hover:opacity-100"
@@ -104,6 +106,7 @@ const Sponsors = async () => {
                       width={180}
                       height={100}
                       loading="lazy"
+                      blurDataURL={DEFAULT_BLUR}
                       placeholder="blur"
                       className="h-20 w-auto rounded-lg object-contain opacity-70 transition group-hover:opacity-100"
                     />

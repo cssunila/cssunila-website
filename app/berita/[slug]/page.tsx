@@ -10,6 +10,7 @@ import ShareButton from "@/components/site/ShareButton";
 import Gallery from "@/components/site/Gallery";
 import Remarkdown from "@/components/site/Remarkdown";
 import { formatDatetime } from "@/lib/formatTanggal";
+import { DEFAULT_BLUR } from "@/lib/placeholderBlur";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -179,6 +180,7 @@ const NewsDetailPage = async ({ params }: Props) => {
                   width={1920}
                   height={720}
                   loading="lazy"
+                  blurDataURL={DEFAULT_BLUR}
                   placeholder="blur"
                   className="object-cover w-full h-full bg-background/50"
                 />

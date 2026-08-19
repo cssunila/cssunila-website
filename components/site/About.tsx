@@ -61,8 +61,8 @@ const About = ({ title, description, highlights, logo }: AboutProps) => {
               }
             </p>
           ))}
-
-          <ul className="mt-6 flex justify-start flex-wrap gap-3 text-sm">
+          <h2 className="mt-6 text-xl font-semibold sm:text-2xl">Benefit yang didapatkan</h2>
+          <ul className="mt-3 flex justify-start flex-wrap gap-3 text-sm">
             {aboutHighlights.map((f) => (
               <li
                 key={f}

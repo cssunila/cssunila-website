@@ -4,6 +4,7 @@ import Image from "next/image";
 import ImagePreviewModal from "./ImagePreviewModal";
 import { useState } from "react";
 import { Fullscreen } from "lucide-react";
+import { DEFAULT_BLUR } from "@/lib/placeholderBlur";
 
 type Props = {
     imgUrl: string,
@@ -26,6 +27,7 @@ const Gallery = ({ imgUrl, i }: Props) => {
                     height={120}
                     loading="lazy"
                     placeholder="blur"
+                    blurDataURL={DEFAULT_BLUR}
                     className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="opacity-0 group-hover:opacity-100 transition-all duration-500 absolute inset-0 bg-background/50 flex items-center justify-center">

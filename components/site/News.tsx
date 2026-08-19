@@ -1,4 +1,5 @@
 import { formatDatetime } from "@/lib/formatTanggal";
+import { DEFAULT_BLUR } from "@/lib/placeholderBlur";
 import { createClient } from "@/supabase/server";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
@@ -50,7 +51,7 @@ const News = async () => {
                         >
                             {n.image_url && (
                                 <div className="overflow-hidden rounded-xl w-full h-48 mb-4">
-                                    <Image src={n.image_url} alt={n.title} width={150} height={150} placeholder="blur" className="w-full h-full object-cover object-center group-hover:scale-105 transition-all duration-300" loading="lazy" />
+                                    <Image src={n.image_url} alt={n.title} width={150} height={150} blurDataURL={DEFAULT_BLUR} placeholder="blur" className="w-full h-full object-cover object-center group-hover:scale-105 transition-all duration-300" loading="lazy" />
                                 </div>
                             )}
 

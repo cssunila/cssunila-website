@@ -119,12 +119,14 @@ type MapDisplayProps = {
     locationName?: string | null;
     latitude?: number | null;
     longitude?: number | null;
+    nonLomba?: boolean;
 };
 
 export const MapLocationView = ({
     locationName,
     latitude,
     longitude,
+    nonLomba
 }: MapDisplayProps) => {
     const lat = latitude ?? DEFAULT_LAT;
     const lng = longitude ?? DEFAULT_LNG;
@@ -145,7 +147,7 @@ export const MapLocationView = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div>
                     <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-cyan-strong mb-1">
-                        <MapPin size={14} /> Lokasi Pelaksanaan
+                        {!nonLomba && <><MapPin size={14} /> Lokasi Pelaksanaan</>}
                     </span>
                     <h3 className="font-display text-xl font-bold text-foreground">
                         {name}
