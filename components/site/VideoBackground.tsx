@@ -92,6 +92,7 @@ export default function VideoBackground({
           alt="Logo CSS"
           width={1920}
           height={1080}
+          priority
           className="absolute inset-0 h-full w-full object-cover"
           style={{
             opacity: showBg ? bgImageOpacity : 0,

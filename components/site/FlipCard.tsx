@@ -42,7 +42,7 @@ export default function FlipCard({ logoCss }: FlipCardProps) {
             height={400}
             alt="Logo CSS 3.0"
             className="w-full max-w-72 object-contain pointer-events-none"
-            loading="eager"
+            priority
           />
         </div>
 
@@ -59,7 +59,7 @@ export default function FlipCard({ logoCss }: FlipCardProps) {
             width={200}
             height={400}
             alt="Logo Himakom"
-            loading="eager"
+            priority
             className="w-full max-w-65 object-contain pointer-events-none"
           />
         </div>
