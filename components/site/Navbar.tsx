@@ -12,6 +12,7 @@ import Image from "next/image";
 import ConfirmModal from "./ConfirmModal";
 import NotifPermissionModal from "./NotifPermissionModal";
 import { useBrowserNotification } from "@/hooks/use-browser-notification";
+import { useQuery } from "@tanstack/react-query";
 
 const links = [
     { href: "/", label: "Beranda" },
@@ -29,7 +30,7 @@ const Navbar = () => {
     const suparef = useRef(createClient());
     const router = useRouter();
     const isAdmin = ["petugas", "lomba", "admin"].includes(role || "");
-    
+
     const [scrolled, setScrolled] = useState(false);
     const [open, setOpen] = useState(false);
     const [notifications, setNotifications] = useState<any[]>([]);
@@ -54,10 +55,10 @@ const Navbar = () => {
     });
 
     useEffect(() => {
-        (async() => {
-            if(window !== undefined) {
+        (async () => {
+            if (window !== undefined) {
                 const hostname = window.location.hostname;
-                if(['cssunila3-0.vercel.app'].includes(hostname)) {
+                if (['cssunila3-0.vercel.app'].includes(hostname)) {
                     setShowInfoDomain(true);
                 }
             }
@@ -279,6 +280,22 @@ const Navbar = () => {
         return true;
     });
 
+    const { data: paymentPending } = useQuery({
+        queryKey: ["payment-status", user?.id],
+        queryFn: async (): Promise<any> => {
+            const supabase = suparef.current;
+            const { data, error } = await supabase
+                .from("payments")
+                .select("id, user_id, status")
+                .eq("user_id", user?.id)
+                .eq("status", "pending");
+
+            if (error) throw error;
+            return data ?? [];
+        },
+        enabled: role !== null,
+    });
+
     return (
         <header
             className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? "py-2" : "py-4"
@@ -402,9 +419,14 @@ const Navbar = () => {
                                     {!isAdmin && (
                                         <Link
                                             href="/history"
-                                            className="btn-hero hover:btn-hero-hover inline-flex gap-2 items-center rounded-lg px-4 py-2 text-xs font-semibold"
+                                            className="relative btn-hero hover:btn-hero-hover inline-flex gap-2 items-center rounded-lg px-4 py-2 text-xs font-semibold"
                                         >
                                             <History size={14} /> <span className="hidden lg:inline">Riwayat</span>
+                                            {paymentPending && paymentPending.length > 0 && (
+                                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white animate-pulse">
+                                                    {paymentPending.length}
+                                                </span>
+                                            )}
                                         </Link>
                                     )}
                                     <button
@@ -449,9 +471,14 @@ const Navbar = () => {
                                         <Link
                                             href="/history"
                                             onClick={() => setOpen(false)}
-                                            className="btn-hero block rounded-full px-4 py-2 text-center text-sm font-semibold"
+                                            className="relative btn-hero block rounded-full px-4 py-2 text-center text-sm font-semibold"
                                         >
                                             Riwayat Saya
+                                            {paymentPending && paymentPending.length > 0 && (
+                                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white animate-pulse">
+                                                    {paymentPending.length}
+                                                </span>
+                                            )}
                                         </Link>
                                     )
                                 ) : (
@@ -507,11 +534,11 @@ const Navbar = () => {
                 message={`Info CSS UNILA 3.0 sudah dialihkan ke domain cssunila.com, Silahkan kunjungi domain tersebut untuk mengakses informasi seputar CSS UNILA 3.0.`}
                 confirmLabel="Ya, Alihkan"
                 variant="warning"
-                onConfirm={() => { 
-                        if (showInfoDomain) {
-                            window.location.href = "https://cssunila.com";
-                            setShowInfoDomain(false);
-                        }
+                onConfirm={() => {
+                    if (showInfoDomain) {
+                        window.location.href = "https://cssunila.com";
+                        setShowInfoDomain(false);
+                    }
                 }}
                 onCancel={() => setShowInfoDomain(false)}
             />
