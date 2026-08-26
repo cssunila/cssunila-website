@@ -398,11 +398,16 @@ const Navbar = () => {
                             )}
 
                             <button
-                                className="rounded-md p-2 text-foreground lg:hidden"
+                                className="relative rounded-md p-2 text-foreground lg:hidden"
                                 onClick={() => setOpen((o) => !o)}
                                 aria-label="Menu"
                             >
                                 {open ? <X size={20} /> : <Menu size={20} />}
+                                {paymentPending && paymentPending.length > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white animate-pulse">
+                                        {paymentPending.length}
+                                    </span>
+                                )}
                             </button>
                         </div>
                         <div className="hidden lg:flex items-center gap-2">
