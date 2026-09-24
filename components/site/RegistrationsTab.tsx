@@ -551,7 +551,7 @@ const RegistrationsTab = () => {
       let query = supabase
         .from("registrations")
         .select(
-          "id, user_id, team_name, leader_name, leader_whatsapp, leader_email, status, is_manual, rejection_reason, created_at, verified_at, slot, is_manual, verified_by:profiles!registrations_verified_by_fkey(full_name), competition:competitions(id,name,slug), payments(id,amount_idr,status,midtrans_order_id,midtrans_payment_type,paid_at,payment_proof), registration_answers(field_key,field_label,value)"
+          "id, user_id, team_name, leader_name, leader_whatsapp, leader_email, status, is_manual, rejection_reason, created_at, verified_at, slot, is_manual, verified_by:profiles!registrations_verified_by_fkey(full_name), competition:competitions(id,name,slug,kategori_peserta), payments(id,amount_idr,status,midtrans_order_id,midtrans_payment_type,paid_at,payment_proof), registration_answers(field_key,field_label,value)"
         );
 
       if (role === "lomba") {
@@ -1022,7 +1022,7 @@ const RegistrationsTab = () => {
                     })}
                   </p>
                   <h4 className="mt-0.5 font-display text-base font-bold text-foreground truncate">
-                    {r.team_name}
+                    {r.competition?.kategori_peserta === "tim" ? r.team_name : r.leader_name}
                   </h4>
                   <p className="text-sm font-medium text-cyan-strong">{r.competition?.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
