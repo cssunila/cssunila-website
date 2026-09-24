@@ -36,7 +36,7 @@ type Row = {
   status: string;
   rejection_reason: string;
   created_at: string;
-  competition: { id: string; slug: string; name: string } | null;
+  competition: { id: string; slug: string; name: string; kategori_peserta: "tim" |  "individu" } | null;
   payments:
   | {
     id: string;
@@ -141,7 +141,7 @@ const HistoryPage = () => {
       const { data, error } = await supabase
         .from("registrations")
         .select(
-          "id, team_name, leader_name, leader_whatsapp, status, rejection_reason, created_at, slot, competition:competitions(id, slug, name), payments(id, amount_idr, status, midtrans_token, midtrans_order_id)"
+          "id, team_name, leader_name, leader_whatsapp, status, rejection_reason, created_at, slot, competition:competitions(id, slug, name, kategori_peserta), payments(id, amount_idr, status, midtrans_token, midtrans_order_id)"
         )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -384,7 +384,7 @@ const HistoryPage = () => {
                       </p>
 
                       <h3 className="mt-0.5 font-display text-lg font-semibold">
-                        {r.team_name}
+                        {r.competition?.kategori_peserta === "tim" ? r.team_name : r.leader_name}
                       </h3>
 
                       <p className="text-sm text-cyan-strong">

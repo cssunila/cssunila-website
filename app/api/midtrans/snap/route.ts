@@ -68,7 +68,7 @@ export const POST = async (req: Request) => {
     const { data: reg, error: regErr } = await supabase
       .from("registrations")
       .select(
-        "id, user_id, team_name, leader_name, leader_email, leader_whatsapp, status, slot, competition:competitions(name, fee_idr, slug), payments(id, amount_idr, status, midtrans_token, midtrans_order_id)"
+        "id, user_id, team_name, leader_name, leader_email, leader_whatsapp, status, slot, competition:competitions(name, fee_idr, slug, kategori_peserta), payments(id, amount_idr, status, midtrans_token, midtrans_order_id)"
       )
       .eq("id", data.registrationId)
       .maybeSingle();
@@ -148,6 +148,10 @@ export const POST = async (req: Request) => {
       ? reg.competition[0]?.slug
       : (reg.competition as { slug: string } | null)?.slug;
 
+    const competitionKategoriPeserta = Array.isArray(reg.competition)
+      ? reg.competition[0]?.kategori_peserta
+      : (reg.competition as { kategori_peserta: "tim" | "individu" } | null)?.kategori_peserta;
+
 
     const body = {
       transaction_details: {
@@ -162,7 +166,7 @@ export const POST = async (req: Request) => {
       item_details: [
         {
           id: reg.id,
-          name: `${competitionName ?? "Lomba"} - ${reg.team_name}`.slice(
+          name: `${competitionName ?? "Lomba"} - ${competitionKategoriPeserta === "tim" ? reg.team_name : reg.leader_name}`.slice(
             0,
             50
           ),

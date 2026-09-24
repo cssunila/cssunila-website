@@ -38,7 +38,7 @@ export const sendRegistrationEmail = async (data: RegistrationEmailData) => {
 
   try {
     const html = generateRegistrationEmailHtml(data);
-    const plainText = `Halo ${data.leaderName || "Peserta"},\n\nTerima kasih telah mendaftar di CSS 3.0.\n\nDetail Pendaftaran:\n- Nama Tim: ${data.teamName}\n- Cabang Lomba: ${data.competitionName}\n- Jumlah Slot: ${data.slot || 1}\n- Total Pembayaran: Rp ${Number(data.amountIdr || 0).toLocaleString("id-ID")}\n- Status: Terbayar / Berhasil\n\nSilakan cek website CSS 3.0 untuk info selengkapnya.`;
+    const plainText = `Halo ${data.leaderName || "Peserta"},\n\nTerima kasih telah mendaftar di CSS 3.0.\n\nDetail Pendaftaran:\n-${data.kategoriPeserta === "tim" ? `Nama Tim: ${data.teamName}` : `Nama Peserta: ${data.leaderName}`}\n- Cabang Lomba: ${data.competitionName}\n- Jumlah Slot: ${data.slot || 1}\n- Total Pembayaran: Rp ${Number(data.amountIdr || 0).toLocaleString("id-ID")}\n- Status: Terbayar / Berhasil\n\nSilakan cek website CSS 3.0 untuk info selengkapnya.`;
 
     await transporter.sendMail({
       from: `"CSS 3.0 — Computer Science Showdown" <${process.env.EMAIL_SMTP_USER}>`,
@@ -58,7 +58,7 @@ export const sendRegistrationEmailById = async (registrationId: string) => {
     const { data: reg, error } = await supabaseAdmin
       .from("registrations")
       .select(
-        "id, team_name, leader_name, leader_email, leader_whatsapp, slot, status, created_at, competition:competitions(name), payments(id, amount_idr, status, midtrans_order_id, paid_at)"
+        "id, team_name, leader_name, leader_email, leader_whatsapp, slot, status, created_at, competition:competitions(name, kategori_peserta), payments(id, amount_idr, status, midtrans_order_id, paid_at)"
       )
       .eq("id", registrationId)
       .maybeSingle();
@@ -81,6 +81,7 @@ export const sendRegistrationEmailById = async (registrationId: string) => {
       leaderEmail: reg.leader_email || "",
       leaderWhatsapp: reg.leader_whatsapp || undefined,
       teamName: reg.team_name || "",
+      kategoriPeserta: comp.kategori_peserta,
       competitionName: comp?.name || "Perlombaan CSS 3.0",
       amountIdr: payment?.amount_idr || 0,
       slot: reg.slot || 1,

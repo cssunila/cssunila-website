@@ -55,7 +55,7 @@ type AdminReg = {
   created_at: string;
   verified_at: string | null;
   verified_by: { full_name: string } | null;
-  competition: { name: string; slug: string; id: string } | null;
+  competition: { name: string; slug: string; id: string, kategori_peserta: "tim" | "individu" } | null;
   payments: {
     id: string;
     amount_idr: number;
@@ -328,7 +328,7 @@ const DetailModal = ({
                   })}
                 </span>
               </div>
-              <h2 className="font-display text-2xl font-bold text-foreground">{reg.team_name}</h2>
+              <h2 className="font-display text-2xl font-bold text-foreground">{reg.competition?.kategori_peserta === "tim" ? reg.team_name : reg.leader_name}</h2>
               <p className="mt-0.5 text-sm font-medium text-cyan-strong">{reg.competition?.name ?? "—"}</p>
             </div>
             <button
@@ -347,7 +347,7 @@ const DetailModal = ({
                 <User size={12} /> Data Pendaftar
               </h3>
               <div className="glass rounded-2xl p-4 space-y-3">
-                <InfoRow icon={<User size={14} />} label="Nama Pendaftar" value={reg.leader_name} />
+                {reg.competition?.kategori_peserta === "tim" && <InfoRow icon={<User size={14} />} label="Nama Pendaftar" value={reg.leader_name} />}
                 <InfoRow icon={<Phone size={14} />} label="WhatsApp" value={reg.leader_whatsapp} />
                 {reg.leader_email && (
                   <InfoRow icon={<Mail size={14} />} label="Email" value={reg.leader_email} />

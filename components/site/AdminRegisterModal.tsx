@@ -40,6 +40,7 @@ type CompetitionOption = {
   is_multi_slot: boolean;
   slot: number;
   quota: number;
+  kategori_peserta: "tim" | "individu";
   competition_fields: FieldRow[];
 };
 
@@ -114,7 +115,7 @@ export default function AdminRegisterModal({ onClose, resumePay }: AdminRegister
       const { data, error } = await supabase
         .from("competitions")
         .select(
-          "id, name, slug, fee_idr, is_open, is_multi_slot, slot, quota, competition_fields(id,key,label,field_type,placeholder,required,options,position)"
+          "id, name, slug, fee_idr, is_open, is_multi_slot, slot, quota, kategori_peserta, competition_fields(id,key,label,field_type,placeholder,required,options,position)"
         )
         .order("position", { ascending: true });
       if (error) throw error;
@@ -475,7 +476,9 @@ export default function AdminRegisterModal({ onClose, resumePay }: AdminRegister
               <div>
                 <FieldLabel label="Nama Tim" required />
                 <input
-                  value={teamName}
+
+                  value={selectedComp.kategori_peserta === "tim" ? teamName : "-"}
+                  disabled={selectedComp.kategori_peserta === "individu"}
                   onChange={(e) => setTeamName(e.target.value)}
                   placeholder="Radar"
                   maxLength={100}

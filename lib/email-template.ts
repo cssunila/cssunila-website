@@ -170,6 +170,7 @@ export type RegistrationEmailData = {
   leaderWhatsapp?: string;
   teamName: string;
   competitionName: string;
+  kategoriPeserta: string;
   amountIdr: number;
   slot?: number;
   paymentStatus?: string;
@@ -272,10 +273,13 @@ export const generateRegistrationEmailHtml = (data: RegistrationEmailData) => {
                 border-collapse:separate;
                 border-spacing:0;
               ">
-                <tr>
+                ${
+                  data.kategoriPeserta === "tim" &&
+                  `<tr>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#9ca3af;font-size:13px;width:35%;">Nama Tim</td>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#f3f4f6;font-size:13px;font-weight:600;">${data.teamName || "-"}</td>
-                </tr>
+                </tr>`
+                }
                 <tr>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#9ca3af;font-size:13px;">Nama Pendaftar</td>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#f3f4f6;font-size:13px;font-weight:600;">${displayName}</td>
@@ -284,12 +288,16 @@ export const generateRegistrationEmailHtml = (data: RegistrationEmailData) => {
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#9ca3af;font-size:13px;">Email Pendaftar</td>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#38bdf8;font-size:13px;font-weight:600;">${data.leaderEmail}</td>
                 </tr>
-                ${data.leaderWhatsapp ? `
+                ${
+                  data.leaderWhatsapp
+                    ? `
                 <tr>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#9ca3af;font-size:13px;">WhatsApp</td>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#f3f4f6;font-size:13px;font-weight:600;">${data.leaderWhatsapp}</td>
                 </tr>
-                ` : ""}
+                `
+                    : ""
+                }
                 <tr>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#9ca3af;font-size:13px;">Cabang Lomba</td>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#38bdf8;font-size:13px;font-weight:700;">${data.competitionName}</td>
@@ -302,12 +310,16 @@ export const generateRegistrationEmailHtml = (data: RegistrationEmailData) => {
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#9ca3af;font-size:13px;">Total Biaya</td>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#34d399;font-size:14px;font-weight:700;">${formattedAmount}</td>
                 </tr>
-                ${data.orderId ? `
+                ${
+                  data.orderId
+                    ? `
                 <tr>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#9ca3af;font-size:13px;">No. Transaksi</td>
                   <td style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);color:#cbd5e1;font-size:12px;font-family:monospace;">${data.orderId}</td>
                 </tr>
-                ` : ""}
+                `
+                    : ""
+                }
               </table>
 
               <!-- Information Note -->
@@ -363,4 +375,3 @@ export const generateRegistrationEmailHtml = (data: RegistrationEmailData) => {
 };
 
 export const generateEmailTemplate = generateRegistrationEmailHtml;
-

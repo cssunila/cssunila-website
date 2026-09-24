@@ -77,6 +77,7 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
 
     useEffect(() => {
         (async () => {
+            if (comp?.kategori_peserta === "individu") setTeamName("-");
             if (user?.email) setLeaderEmail((v) => v || user.email!);
             if (user?.user_metadata.full_name) setLeaderName((v) => v || user.user_metadata.full_name!);
             if (user?.phone) setLeaderWhatsapp((v) => v || user.phone!);
