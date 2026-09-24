@@ -10,6 +10,7 @@ import {
   Search,
   UserCheck,
   MapPin,
+  User,
 } from "lucide-react";
 import Navbar from "@/components/site/Navbar";
 import Footer from "@/components/site/Footer";
@@ -57,6 +58,7 @@ type CompetitionData = {
   latitude: number | null;
   longitude: number | null;
   location_type: string | null;
+  kategori_peserta: "tim" | "individu";
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -129,7 +131,7 @@ const LombaDetail = async ({ params }: Props) => {
     const { data, error } = await supabase
       .from("competitions")
       .select(
-        "id,slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,is_open,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner,juara_1,juara_2,juara_3,panduan,is_multi_slot,location_name,latitude,longitude,location_type"
+        "id,slug,name,tagline,description,icon,accent,fee_idr,quota,team_size,is_open,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner,juara_1,juara_2,juara_3,panduan,is_multi_slot,location_name,latitude,longitude,location_type,kategori_peserta"
       )
       .eq("slug", slug)
       .maybeSingle();
@@ -291,7 +293,8 @@ const LombaDetail = async ({ params }: Props) => {
                 value: `${c.quota > 0 ? c.quota + " tim" : "Tidak ada batasan"}`,
               },
               { icon: Users, label: "Tim", value: c.team_size ?? "-" },
-              { icon: UserCheck, label: "Pendaftar", value: pendaftarCount ?? "-" },
+              { icon: c.kategori_peserta === "tim" ? Users : User, label: "Kategori Peserta", value: c.kategori_peserta ?? "-" },
+              // { icon: UserCheck, label: "Pendaftar", value: pendaftarCount ?? "-" },
 
             ].map((s) => (
               <div key={s.label} className="glass rounded-2xl p-5">

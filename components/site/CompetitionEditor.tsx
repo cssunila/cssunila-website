@@ -45,6 +45,7 @@ type CompFull = CompRow & {
   latitude?: number | null;
   longitude?: number | null;
   location_type?: string | null;
+  kategori_peserta: "tim" | "individu";
 };
 
 const CompetitionEditor = ({
@@ -304,6 +305,22 @@ const CompetitionEditor = ({
             onChange({ ...value, description: e.target.value.split("\n").map((s) => s.trim()).filter(Boolean) });
             setDescriptionText(e.target.value);
           }} />
+        </div>
+        <div>
+          <HelpLabel required label="Kategori Peserta" hint="Pilih kategori peserta: Pilih tim jika secara berkelompok / individu jika dilaksanakan perorangan" />
+          <Select
+            required
+            defaultValue={value.kategori_peserta ?? 'tim'}
+            onValueChange={(newValue: "tim" | "individu") => onChange({ ...value, kategori_peserta: newValue })}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Pilih Kategori Peserta" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="tim">Tim</SelectItem>
+              <SelectItem value="individu">Individu</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <HelpLabel required label="Tipe Lokasi Lomba" hint="Pilih tipe lokasi lomba: Online atau Offline" />

@@ -44,6 +44,7 @@ type CompFull = CompRow & {
   latitude?: number | null;
   longitude?: number | null;
   location_type?: string | null;
+  kategori_peserta: "tim" | "individu";
 };
 
 const CompetitionsTab = () => {
@@ -77,7 +78,7 @@ const CompetitionsTab = () => {
       const supabase = suparef.current;
       let query = supabase
         .from("competitions")
-        .select("id,slug,name,tagline,fee_idr,quota,is_open,position,description,icon,accent,team_size,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner,juara_1,juara_2,juara_3,panduan,is_multi_slot,slot,location_name,latitude,longitude,location_type");
+        .select("id,slug,name,tagline,fee_idr,quota,is_open,position,description,icon,accent,team_size,rules,timeline,pj_1,no_pj_1,pj_2,no_pj_2,banner,juara_1,juara_2,juara_3,panduan,is_multi_slot,slot,location_name,latitude,longitude,location_type,kategori_peserta");
 
       if (role === "lomba") {
         if (!allowedComps || allowedComps.length === 0) {
@@ -128,7 +129,8 @@ const CompetitionsTab = () => {
         location_name: v.location_type === "none" ? null : v.location_name ?? null,
         latitude: v.location_type === "none" || v.location_type === "online" ? null : v.latitude ?? -5.3668101,
         longitude: v.location_type === "none" || v.location_type === "online" ? null : v.longitude ?? 105.2436541,
-        location_type: v.location_type ?? "none"
+        location_type: v.location_type ?? "none",
+        kategori_peserta: v.kategori_peserta ?? "tim"
       };
       if (v.id) {
         const { error } = await supabase.from("competitions").update(payload).eq("id", v.id);

@@ -35,6 +35,7 @@ type CompRow = {
     slot: number;
     quota: number;
     team_size: string | null;
+    kategori_peserta: "tim" | "individu";
     competition_fields: FieldRow[];
 };
 
@@ -119,7 +120,7 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
             const supabase = suparef.current;
             const { data, error } = await supabase
                 .from("competitions")
-                .select("id, name, slug, fee_idr, is_open, team_size, is_multi_slot, slot, quota, competition_fields(id,key,label,field_type,placeholder,required,options,position)")
+                .select("id, name, slug, fee_idr, is_open, team_size, is_multi_slot, slot, quota, kategori_peserta, competition_fields(id,key,label,field_type,placeholder,required,options,position)")
                 .eq("slug", slug)
                 .maybeSingle();
             if (error) throw error;
@@ -336,10 +337,12 @@ const DaftarLomba = ({ params }: { params: Promise<{ slug: string }> }) => {
                                     }}
                                     className="glass mt-8 space-y-5 rounded-3xl p-6"
                                 >
-                                    <Field label="Nama Tim" required>
-                                        <input disabled={!comp.is_open} value={teamName} onChange={(e) => setTeamName(e.target.value)} className={"inputCls disabled:cursor-not-allowed"} maxLength={100} placeholder="Radar" required />
-                                    </Field>
-                                    <Field label="Nama Lengkap Pendaftar" required>
+                                    {comp.kategori_peserta === "tim" &&
+                                        <Field label="Nama Tim" required>
+                                            <input disabled={!comp.is_open} value={teamName} onChange={(e) => setTeamName(e.target.value)} className={"inputCls disabled:cursor-not-allowed"} maxLength={100} placeholder="Radar" required />
+                                        </Field>
+                                    }
+                                    <Field label={comp.kategori_peserta === "tim" ? "Nama Pendaftar" : "Nama Peserta"} required>
                                         <input disabled={!comp.is_open} value={leaderName} onChange={(e) => setLeaderName(e.target.value)} className={"inputCls disabled:cursor-not-allowed"} maxLength={100} placeholder="Bangraff" required />
                                     </Field>
                                     <div className="grid gap-5 sm:grid-cols-2">
